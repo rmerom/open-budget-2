@@ -125,7 +125,8 @@ public class OBudget2 implements EntryPoint {
     });
 
     final VStack vStack = new VStack();
-    String currentUser = (loginInfo.isLoggedIn() ? loginInfo.getEmailAddress()
+    String currentUser = (loginInfo.isLoggedIn() ? 
+    		"<a href='" + loginInfo.getLogoutUrl() + "'>"+loginInfo.getEmailAddress()+"</a>"
         : "<a href='" + loginInfo.getLoginUrl() + "'>log in</a>");
     Label userLabel = new Label(currentUser);
     vStack.addMember(userLabel);

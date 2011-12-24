@@ -22,24 +22,24 @@ public class LocalDataStore extends DataSource {
     setDescriptionField("title");
 
     DataSourceTextField topicName = new DataSourceTextField("title",
-        "שם סעיף");
+        "title");
 
-    DataSourceTextField codeAsText = new DataSourceTextField("code", "מספר");
+    DataSourceTextField codeAsText = new DataSourceTextField("code", "code");
     codeAsText.setRequired(true);
 
     DataSourceIntegerField numericCode = new DataSourceIntegerField(
-        "numericCode", "קוד נומרי");
+        "numericCode", "numericCode");
     codeAsText.setPrimaryKey(true);
     codeAsText.setRequired(true);
 
     DataSourceTextField parentCode = new DataSourceTextField("parentCode",
-        "סעיף אב");
+        "parentCode");
     parentCode.setRequired(true);
     parentCode.setForeignKey("numericCode");
     parentCode.setRootValue(100);
 
     DataSourceIntegerField grossAllocated = new DataSourceIntegerField(
-        "gross_allocated", "הקצאה ברוטו");
+        "gross_allocated", "gross_allocated");
 
     setFields(topicName, codeAsText, numericCode, parentCode, grossAllocated);
 

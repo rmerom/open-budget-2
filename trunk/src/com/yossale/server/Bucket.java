@@ -8,6 +8,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.yossale.client.BucketRecord;
 
 @PersistenceCapable
 public class Bucket {
@@ -46,5 +47,9 @@ public class Bucket {
 
 	public void setExpenses(List<Expense> expenses) {
 		this.expenses = expenses;
+	}
+	
+	public BucketRecord toBucketRecord() {
+		return new BucketRecord(String.valueOf(getKey().getId()), getName());
 	}
 }
