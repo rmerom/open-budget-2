@@ -1,28 +1,21 @@
 package com.yossale.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.DisplayNodeType;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.layout.VStack;
 import com.smartgwt.client.widgets.tree.DataChangedEvent;
 import com.smartgwt.client.widgets.tree.DataChangedHandler;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
-import com.yossale.client.datastore.LocalDataStore;
 import com.yossale.client.datastore.OneYearBudgetDataSource;
 import com.yossale.client.graph.GraphCanvas;
-import com.yossale.shared.RpcExpenseObject;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -31,7 +24,7 @@ public class OBudget2 implements EntryPoint {
 
   protected String returnedJson;
   private final GraphCanvas graph = new GraphCanvas();
-
+  
   /***/
 
   public TreeGrid generateGridList() {
@@ -42,7 +35,7 @@ public class OBudget2 implements EntryPoint {
     TreeGridField itemDescriptionField = new TreeGridField("title", "Title");
 
     TreeGridField grossAllocated = new TreeGridField("gross_allocated",
-        "הקצאה ברוטו");
+        "gross_allocated");
 
     final TreeGrid listGrid = new TreeGrid();
 
@@ -74,10 +67,10 @@ public class OBudget2 implements EntryPoint {
     budgetTree.setDisplayNodeType(DisplayNodeType.NULL);
     budgetTree.setLoadDataOnDemand(false);
     OneYearBudgetDataSource instance = OneYearBudgetDataSource.getInstance();
-    TreeGridField titleField = new TreeGridField("title", "שם סעיף");
+    TreeGridField titleField = new TreeGridField("title", "title");
     titleField.setFrozen(true);
 
-    TreeGridField codeField = new TreeGridField("code", "מספר");
+    TreeGridField codeField = new TreeGridField("code", "code");
 
     /**
      * We're basically working on a tableTree (TreeGrid = TableTree) , so we can
@@ -86,13 +79,8 @@ public class OBudget2 implements EntryPoint {
      */
     budgetTree.setFields(titleField, codeField);
 
-    List<Record> list = new ArrayList<Record>();
-    Record rec1 = new Record( new RpcExpenseObject("0001", 1992, "name1", 100, 110, 120, 130, 140, 150).convertToPropertiesMap());
-    Record rec2 = new Record( new RpcExpenseObject("0002", 1992, "name2", 100, 110, 120, 130, 140, 150).convertToPropertiesMap());
-    
-    ListGridRecord[] recsArr = new ListGridRecord[]{new ListGridRecord(rec1.getJsObj()), new ListGridRecord(rec2.getJsObj())};
-    budgetTree.setData(recsArr);
-    budgetTree.setAutoFetchData(false);
+    budgetTree.setDataSource(instance);
+    budgetTree.setAutoFetchData(true);
     budgetTree.setCanDragRecordsOut(true);
     budgetTree.setDragDataAction(DragDataAction.COPY);
 
@@ -111,11 +99,13 @@ public class OBudget2 implements EntryPoint {
         loadOBudget(result);
       }
     });
+    
+    getAsyncExpenseForYear(2002);
 
   }
 
-  private void loadOBudget(LoginInfo loginInfo) {
-
+  private void loadOBudget(LoginInfo loginInfo) {    
+    
     TreeGrid budgetTree = generateOneYearBudgetTree();
     final TreeGrid topicsList = generateGridList();
 
@@ -127,8 +117,10 @@ public class OBudget2 implements EntryPoint {
 
       @Override
       public void onDataChanged(DataChangedEvent event) {
+
         RecordList fields = topicsList.getDataAsRecordList();
         graph.updateGraph(fields);
+
       }
     });
 
@@ -143,5 +135,24 @@ public class OBudget2 implements EntryPoint {
 
     vStack.draw();
   }
+  
+  private void displayExpenses(ExpenseRecord[] result) {
+  }
+  
+  /**
+   * Call the backend server to get the expenses for the given year.
+   * Will call displayExpenses when the data returns.
+   * @param year
+   */
+  private void getAsyncExpenseForYear(int year) {
+	ExpenseServiceAsync expenseService = GWT.create(ExpenseService.class);
+    expenseService.getExpenses(year, new AsyncCallback<ExpenseRecord[]>() {
+      public void onFailure(Throwable error) {
+      }
 
+      public void onSuccess(ExpenseRecord[] result) {
+    	  displayExpenses(result);
+      }
+    });
+  }
 }
