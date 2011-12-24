@@ -1,4 +1,4 @@
-package com.yossale.server;
+package com.yossale.server.data;
 
 import java.util.List;
 

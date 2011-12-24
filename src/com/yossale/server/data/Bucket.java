@@ -1,4 +1,4 @@
-package com.yossale.server;
+package com.yossale.server.data;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
-import com.yossale.client.BucketRecord;
+import com.yossale.client.data.BucketRecord;
 
 @PersistenceCapable
 public class Bucket {
