@@ -50,6 +50,6 @@ public class Bucket {
 	}
 	
 	public BucketRecord toBucketRecord() {
-		return new BucketRecord(String.valueOf(getKey().getId()), getName());
+		return new BucketRecord(getKey().getId(), getName());
 	}
 }
