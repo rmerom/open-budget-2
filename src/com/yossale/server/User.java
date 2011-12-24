@@ -21,4 +21,34 @@ public class User {
 	
 	@Persistent
 	private List<Bucket> buckets;
+
+	public User() {
+	  super();
+	}
+
+	public Key getKey() {
+	  return key;
+	}
+
+	public void setKey(Key key) {
+	  this.key = key;
+	}
+
+	public String getEmail() {
+	  return email;
+	}
+
+	public void setEmail(String email) {
+	  this.email = email;
+	}
+
+	public List<Bucket> getBuckets() {
+	  return buckets;
+	}
+
+	public void setBuckets(List<Bucket> buckets) {
+	  this.buckets = buckets;
+	}
+	
+	
 }
