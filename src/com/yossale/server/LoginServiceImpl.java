@@ -17,16 +17,8 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
  * @see com.yossale.client.LoginService#login(java.lang.String)
  */
 public LoginInfo login(String requestUri) {
-	PersistenceManager pm =  
-			PMF.INSTANCE.getPersistenceManager();
-	System.out.println("start");
-	Expense expense = new Expense();
-	expense.setExpenseCode("0033");
-	pm.makePersistent(expense);
-	pm.close();
-	System.out.println("end");
 	
-    UserService userService = UserServiceFactory.getUserService();
+	UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
     LoginInfo loginInfo = new LoginInfo();
 
@@ -35,6 +27,15 @@ public LoginInfo login(String requestUri) {
       loginInfo.setEmailAddress(user.getEmail());
       loginInfo.setNickname(user.getNickname());
       loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));
+      
+      PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+  	  System.out.println("start");
+  	  Expense expense = new Expense();
+  	  expense.setExpenseCode("0033");
+  	  pm.makePersistent(expense);
+  	  pm.close();
+  	  System.out.println("end");
+  	
     } else {
       loginInfo.setLoggedIn(false);
       loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
