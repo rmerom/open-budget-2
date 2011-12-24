@@ -1,4 +1,4 @@
-package com.yossale.server;
+package com.yossale.server.data;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -6,9 +6,39 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.yossale.client.data.ExpenseRecord;
 
 @PersistenceCapable
 public class Expense {
+	
+	//Mispar Se'if Takzivi as string.
+	@Persistent
+	private String expenseCode;
+
+	@Persistent
+	private int year;
+
+	@Persistent
+	private String name;
+
+	@Persistent
+	private int netAmountAllocated;
+
+	@Persistent
+	private int netAmountRevised;
+
+	@Persistent
+	private int netAmountUsed;
+
+	@Persistent
+	private int grosAmountAllocated;
+
+	@Persistent
+	private int grossAmountRevised;
+
+	@Persistent
+	private int grossAmountUsed;
+	
 	public Expense(Key key, String expenseCode, int year, String name,
 			int netAmountAllocated, int netAmountRevised, int netAmountUsed,
 			int grosAmountAllocated, int grossAmountRevised, int grossAmountUsed) {
@@ -110,33 +140,10 @@ public class Expense {
 	public void setGrossAmountUsed(int grossAmountUsed) {
 		this.grossAmountUsed = grossAmountUsed;
 	}
-
-	// Mispar Se'if Takzivi as string.
-	@Persistent
-	private String expenseCode;
-
-	@Persistent
-	private int year;
-
-	@Persistent
-	private String name;
-
-	@Persistent
-	private int netAmountAllocated;
-
-	@Persistent
-	private int netAmountRevised;
-
-	@Persistent
-	private int netAmountUsed;
-
-	@Persistent
-	private int grosAmountAllocated;
-
-	@Persistent
-	private int grossAmountRevised;
-
-	@Persistent
-	private int grossAmountUsed;
-
+	
+	public ExpenseRecord toExpenseRecord() {
+		return new ExpenseRecord(expenseCode, year, name, netAmountAllocated,
+				netAmountRevised, netAmountUsed, grosAmountAllocated,
+				grossAmountRevised, grossAmountUsed);
+	}
 }

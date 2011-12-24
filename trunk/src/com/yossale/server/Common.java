@@ -5,7 +5,7 @@ import javax.jdo.PersistenceManager;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.yossale.server.User;
+import com.yossale.server.data.User;
 
 public class Common {
 

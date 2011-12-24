@@ -1,4 +1,4 @@
-package com.yossale.client;
+package com.yossale.client.data;
 
 import java.io.Serializable;
 

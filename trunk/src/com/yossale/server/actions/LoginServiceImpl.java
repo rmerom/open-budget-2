@@ -1,12 +1,14 @@
-package com.yossale.server;
+package com.yossale.server.actions;
 
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.yossale.client.LoginInfo;
-import com.yossale.client.LoginService;
+import com.yossale.client.actions.LoginService;
+import com.yossale.client.data.LoginInfo;
+import com.yossale.server.Common;
 
+@SuppressWarnings("serial")
 public class LoginServiceImpl extends RemoteServiceServlet implements
     LoginService {
 
@@ -24,7 +26,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements
 	    loginInfo.setEmailAddress(user.getEmail());
 	    loginInfo.setNickname(user.getNickname());
 	    loginInfo.setLogoutUrl(userService.createLogoutURL(requestUri));      
-	    com.yossale.server.User dbUser = Common.getUserByEmail(user.getEmail());
+	    Common.getUserByEmail(user.getEmail());
 	  } else {
 	    loginInfo.setLoggedIn(false);
 	    loginInfo.setLoginUrl(userService.createLoginURL(requestUri));
