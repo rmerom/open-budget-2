@@ -5,16 +5,16 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.visualizations.corechart.AreaChart;
 import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.widgets.Label;
-import com.yossale.shared.RpcExpenseObject;
+import com.yossale.client.data.ExpenseRecord;
 
 public class GraphCanvas extends Composite {
 
@@ -42,7 +42,7 @@ public class GraphCanvas extends Composite {
   
   public void updateGraph(RecordList fields) {
 
-    List<RpcExpenseObject> list = new ArrayList<RpcExpenseObject>();
+    List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
 
     if (fields != null && !fields.isEmpty()) {
 
@@ -79,7 +79,7 @@ public class GraphCanvas extends Composite {
 
 
 
-  private DataTable createTable(List<RpcExpenseObject> topics) {
+  private DataTable createTable(List<ExpenseRecord> topics) {
     DataTable data = DataTable.create();
     data.addColumn(ColumnType.NUMBER, "Year");
     data.addColumn(ColumnType.NUMBER, "Net Gross Allocated");
@@ -90,7 +90,7 @@ public class GraphCanvas extends Composite {
       return data;
     }
 
-    for (RpcExpenseObject t : topics) {
+    for (ExpenseRecord t : topics) {
       int rowIndex = data.addRow();
       data.setValue(rowIndex, 0, 2010);
       // data.setValue(rowIndex, 1, t.getGrossAllocated());
