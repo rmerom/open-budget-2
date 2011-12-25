@@ -8,7 +8,7 @@
   <!-- Servlets -->
   <servlet>
     <servlet-name>loginService</servlet-name>
-    <servlet-class>com.yossale.server.LoginServiceImpl</servlet-class>
+    <servlet-class>com.yossale.server.actions.LoginServiceImpl</servlet-class>
   </servlet>
 
   <servlet-mapping>
@@ -18,7 +18,7 @@
   
   <servlet>
     <servlet-name>expenseService</servlet-name>
-    <servlet-class>com.yossale.server.ExpenseServiceImpl</servlet-class>
+    <servlet-class>com.yossale.server.actions.ExpenseServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -28,7 +28,7 @@
   
   <servlet>
     <servlet-name>bucketService</servlet-name>
-    <servlet-class>com.yossale.server.BucketServiceImpl</servlet-class>
+    <servlet-class>com.yossale.server.actions.BucketServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>

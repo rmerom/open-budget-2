@@ -5,15 +5,13 @@ import java.util.List;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.RPCTransport;
-import com.yossale.shared.RpcExpenseObject;
+import com.yossale.client.data.ExpenseRecord;
 
 public class OneYearDS extends DataSource {
 
   private static final String YEARLY_BUDGET = "YearlyBudget";
 
-  private OneYearDS(String id, List<RpcExpenseObject> recs) {
+  private OneYearDS(String id, List<ExpenseRecord> recs) {
     setID(YEARLY_BUDGET + "_" + id);
         
     setTitleField("title");
