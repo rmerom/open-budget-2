@@ -13,7 +13,6 @@ import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
-import com.smartgwt.client.widgets.Label;
 import com.yossale.client.data.ExpenseRecord;
 
 public class GraphCanvas extends Composite {
@@ -30,8 +29,7 @@ public class GraphCanvas extends Composite {
     
     Runnable onLoadCallback = new Runnable() {
       public void run() {        
-        pie = new AreaChart(createTable(null), createOptions());
-        widget.add(new Label("Hello"));
+        pie = new AreaChart(createTable(null), createOptions());        
         widget.add(pie);
       }
     };
@@ -58,7 +56,7 @@ public class GraphCanvas extends Composite {
     options.setWidth(400);
     options.setHeight(240);
     // options.set3D(true);
-    options.setTitle("My Daily Activities");
+    options.setTitle("Government expenses");
     return options;
   }
 
