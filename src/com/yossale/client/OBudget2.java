@@ -6,29 +6,26 @@ import java.util.List;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.DragDataAction;
-import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.DropEvent;
+import com.smartgwt.client.widgets.events.DropHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectOtherItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.layout.VStack;
-import com.smartgwt.client.widgets.tree.DataChangedEvent;
-import com.smartgwt.client.widgets.tree.DataChangedHandler;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.smartgwt.client.widgets.tree.events.DataArrivedEvent;
+import com.smartgwt.client.widgets.tree.events.DataArrivedHandler;
 import com.yossale.client.actions.ExpenseService;
 import com.yossale.client.actions.ExpenseServiceAsync;
 import com.yossale.client.actions.LoginService;
@@ -52,8 +49,8 @@ public class OBudget2 implements EntryPoint {
 
   private Integer counter = 2012;
 
-  private void updateTree(final int year) {
 
+  private void updateTree(final int year) {
     /**
      * In the data model you need to have something which extends "TreeNode",
      * Which is very trivial..
@@ -83,7 +80,7 @@ public class OBudget2 implements EntryPoint {
         System.out.println("Updating tree for [" + year + "] ");
         Tree expensesTreeModel = new Tree();
         expensesTreeModel.setModelType(TreeModelType.PARENT);
-        expensesTreeModel.setNameProperty("Name");
+        expensesTreeModel.setNameProperty("ID");
         expensesTreeModel.setChildrenProperty("directReports");
         expensesTreeModel.setData(nodes);
         budgetTree.setData(expensesTreeModel);
@@ -143,12 +140,39 @@ public class OBudget2 implements EntryPoint {
     tree.setDragDataAction(DragDataAction.MOVE);
     tree.setCanRemoveRecords(true);
     
-    Tree bucketModel = new Tree();
+    
+    final Tree bucketModel = new Tree();
     bucketModel.setModelType(TreeModelType.PARENT);
-    bucketModel.setNameProperty("Name");
+    bucketModel.setNameProperty("ID");
     bucketModel.setChildrenProperty("directReports");
 //    expensesTreeModel.setData(nodes);
     tree.setData(bucketModel);
+    
+    
+    tree.addDataArrivedHandler(new DataArrivedHandler() {
+		
+		@Override
+		public void onDataArrived(DataArrivedEvent event) {
+			System.out.println("finished dropping something?");
+			
+		}
+	});
+    
+    tree.addDropHandler(new DropHandler() {
+		
+		@Override
+		public void onDrop(DropEvent event) {
+			System.out.println("dropped something?");
+			TreeNode[] nodes = bucketModel.getAllNodes();			
+			List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
+			
+			for (int i=0; i<nodes.length; i++) {
+				list.add(((ExpenseRecordTreeNode)nodes[i]).getRecord());
+			}			
+			
+			graph.updateGraph(list);
+		}
+	});
 
     return tree;
   }

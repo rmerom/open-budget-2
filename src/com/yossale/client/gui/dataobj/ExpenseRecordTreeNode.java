@@ -11,10 +11,11 @@ public class ExpenseRecordTreeNode extends TreeNode {
     
     this.record = expense;
     
-    String id = expense.getExpenseCode(); 
+    String id = expense.getYear() + "_" + expense.getExpenseCode() ; 
     setID(id);
     setParentID(id.substring(0, id.length() - 2));    
-    setAttribute("Name", id);
+    setAttribute("ID", id);
+    setAttribute("Name", expense.getExpenseCode());
     setAttribute("Year", expense.getYear());    
   }
 

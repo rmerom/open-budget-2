@@ -1,7 +1,9 @@
 package com.yossale.client.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -9,10 +11,9 @@ import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.corechart.AreaChart;
+import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RecordList;
 import com.yossale.client.data.ExpenseRecord;
 
 public class GraphCanvas extends Composite {
@@ -38,63 +39,65 @@ public class GraphCanvas extends Composite {
 
   }
   
-  public void updateGraph(RecordList fields) {
+  public void updateGraph(List<ExpenseRecord> nodes) {
 
-    List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
-
-    if (fields != null && !fields.isEmpty()) {
-
-      for (Record r : fields.toArray()) {
-        // list.add(new Expense(r));
-      }
-    }
-    pie.draw(createTable(list), createOptions());
+    
+    if (nodes == null || nodes.isEmpty()) {    	
+    	return;    	
+    }      
+    
+    pie.draw(createTable(nodes), createOptions());
   }
 
   private Options createOptions() {
     Options options = Options.create();
     options.setWidth(400);
     options.setHeight(240);
-    // options.set3D(true);
-    options.setTitle("Government expenses");
+//     options.set3D(true);
+    options.setTitle("Government expenses");    
     return options;
   }
-
-  private DataTable createTable() {
-    DataTable data = DataTable.create();
-    data.addColumn(ColumnType.NUMBER, "Year");
-    data.addColumn(ColumnType.NUMBER, "Sales");
-    data.addColumn(ColumnType.NUMBER, "Expenses");
-    data.addRows(2);
-    data.setValue(0, 0, 2004);
-    data.setValue(0, 1, 1000);
-    data.setValue(0, 2, 400);
-    data.setValue(1, 0, 2005);
-    data.setValue(1, 1, 1170);
-    data.setValue(0, 1, 460);
-    return data;
+  
+  private List<ExpenseRecord> summarizeResults(List<ExpenseRecord> topics) {
+	  
+	  Map<Integer, ExpenseRecord> map = new HashMap<Integer, ExpenseRecord>();
+	  
+	  for(ExpenseRecord t : topics) {		  
+		  ExpenseRecord sum = map.get(t.getYear()) == null ? new ExpenseRecord() : map.get(t.getYear());		  
+		  sum.add(t);
+		  sum.setYear(t.getYear());
+		  map.put(t.getYear(), sum);		  
+	  }
+	  
+	  return new ArrayList<ExpenseRecord>(map.values());
+	  
   }
 
-
-
   private DataTable createTable(List<ExpenseRecord> topics) {
+	  
+	System.out.println("Updating graph");
+	
+	
     DataTable data = DataTable.create();
     data.addColumn(ColumnType.NUMBER, "Year");
     data.addColumn(ColumnType.NUMBER, "Net Gross Allocated");
     data.addColumn(ColumnType.NUMBER, "Net Net Allocated");
-    data.addColumn(ColumnType.NUMBER, "Net Gross Used");
-
+    data.addColumn(ColumnType.NUMBER, "Net Gross Used");   
+    
     if (topics == null || topics.isEmpty()) {
       return data;
     }
+    
+    List<ExpenseRecord> sums = summarizeResults(topics);
 
-    for (ExpenseRecord t : topics) {
+    for (ExpenseRecord t : sums) {
       int rowIndex = data.addRow();
-      data.setValue(rowIndex, 0, 2010);
-      // data.setValue(rowIndex, 1, t.getGrossAllocated());
-      // data.setValue(rowIndex, 1, t.getNetAllocated());
-      // data.setValue(rowIndex, 2, t.getGrossUsed());
+      data.setValue(rowIndex, 0, t.getYear());
+      data.setValue(rowIndex, 1, t.getGrosAmountAllocated());
+      data.setValue(rowIndex, 2, t.getNetAmountAllocated());
+      data.setValue(rowIndex, 3, t.getGrossAmountUsed());
     }
+    
     return data;
   }
 
