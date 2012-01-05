@@ -117,4 +117,16 @@ public class ExpenseRecord implements Serializable {
 				+ ", netAmountRevised=" + netAmountRevised + ", netAmountUsed="
 				+ netAmountUsed + ", year=" + year + "]";
 	}
+	
+	public ExpenseRecord add(ExpenseRecord other) {		
+		
+		this.netAmountAllocated += other.netAmountAllocated;
+		this.netAmountRevised += other.netAmountRevised;
+		this.netAmountUsed += other.netAmountUsed;
+		this.grosAmountAllocated += other.grosAmountAllocated;
+		this.grossAmountRevised += other.grossAmountRevised;
+		this.grossAmountUsed += other.grossAmountUsed;
+		
+		return this;		
+	}
 }
