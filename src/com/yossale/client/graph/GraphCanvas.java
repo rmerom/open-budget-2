@@ -51,8 +51,8 @@ public class GraphCanvas extends Composite {
 
   private Options createOptions() {
     Options options = Options.create();
-    options.setWidth(400);
-    options.setHeight(240);
+    options.setWidth(600);
+    options.setHeight(400);
 //     options.set3D(true);
     options.setTitle("Government expenses");    
     return options;
@@ -79,7 +79,7 @@ public class GraphCanvas extends Composite {
 	
 	
     DataTable data = DataTable.create();
-    data.addColumn(ColumnType.NUMBER, "Year");
+    data.addColumn(ColumnType.STRING, "Year");
     data.addColumn(ColumnType.NUMBER, "Net Gross Allocated");
     data.addColumn(ColumnType.NUMBER, "Net Net Allocated");
     data.addColumn(ColumnType.NUMBER, "Net Gross Used");   
@@ -92,7 +92,7 @@ public class GraphCanvas extends Composite {
 
     for (ExpenseRecord t : sums) {
       int rowIndex = data.addRow();
-      data.setValue(rowIndex, 0, t.getYear());
+      data.setValue(rowIndex, 0, t.getYear()+"");
       data.setValue(rowIndex, 1, t.getGrosAmountAllocated());
       data.setValue(rowIndex, 2, t.getNetAmountAllocated());
       data.setValue(rowIndex, 3, t.getGrossAmountUsed());

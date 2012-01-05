@@ -20,6 +20,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tree.DataChangedEvent;
+import com.smartgwt.client.widgets.tree.DataChangedHandler;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
@@ -148,20 +150,10 @@ public class OBudget2 implements EntryPoint {
 //    expensesTreeModel.setData(nodes);
     tree.setData(bucketModel);
     
-    
-    tree.addDataArrivedHandler(new DataArrivedHandler() {
+    bucketModel.addDataChangedHandler(new DataChangedHandler() {
 		
 		@Override
-		public void onDataArrived(DataArrivedEvent event) {
-			System.out.println("finished dropping something?");
-			
-		}
-	});
-    
-    tree.addDropHandler(new DropHandler() {
-		
-		@Override
-		public void onDrop(DropEvent event) {
+		public void onDataChanged(DataChangedEvent event) {
 			System.out.println("dropped something?");
 			TreeNode[] nodes = bucketModel.getAllNodes();			
 			List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
@@ -170,10 +162,10 @@ public class OBudget2 implements EntryPoint {
 				list.add(((ExpenseRecordTreeNode)nodes[i]).getRecord());
 			}			
 			
-			graph.updateGraph(list);
+			graph.updateGraph(list);			
 		}
-	});
-
+	});      
+    
     return tree;
   }
 
@@ -187,7 +179,7 @@ public class OBudget2 implements EntryPoint {
     selectOtherItem.setOtherValue("OtherVal");
 
     selectOtherItem.setTitle("Select year");
-    selectOtherItem.setValueMap("2001", "2002", "2003");
+    selectOtherItem.setValueMap("2001", "2002", "2003","2004","2005", "2006", "2007","2008");
     selectOtherItem.addChangedHandler(new ChangedHandler() {
 
       @Override
@@ -253,7 +245,7 @@ public class OBudget2 implements EntryPoint {
     v.setAutoHeight();
     v.setMembersMargin(30);
     v.addMember(userLabel);
-    v.addMember(button);
+//    v.addMember(button);
     v.addMember(form);
     v.addMember(h);    
 
