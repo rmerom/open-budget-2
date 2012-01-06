@@ -83,7 +83,7 @@ public class ExpenseRecord implements Serializable {
 		this.netAmountUsed = netAmountUsed;
 	}
 
-	public int getGrosAmountAllocated() {
+	public int getGrossAmountAllocated() {
 		return grosAmountAllocated;
 	}
 

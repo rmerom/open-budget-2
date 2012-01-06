@@ -93,7 +93,7 @@ public class GraphCanvas extends Composite {
     for (ExpenseRecord t : sums) {
       int rowIndex = data.addRow();
       data.setValue(rowIndex, 0, t.getYear()+"");
-      data.setValue(rowIndex, 1, t.getGrosAmountAllocated());
+      data.setValue(rowIndex, 1, t.getGrossAmountAllocated());
       data.setValue(rowIndex, 2, t.getNetAmountAllocated());
       data.setValue(rowIndex, 3, t.getGrossAmountUsed());
     }

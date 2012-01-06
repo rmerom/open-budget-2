@@ -10,140 +10,154 @@ import com.yossale.client.data.ExpenseRecord;
 
 @PersistenceCapable
 public class Expense {
-	
-	//Mispar Se'if Takzivi as string.
-	@Persistent
-	private String expenseCode;
 
-	@Persistent
-	private int year;
+  // Mispar Se'if Takzivi as string.
+  @Persistent
+  private String expenseCode;
 
-	@Persistent
-	private String name;
+  @Persistent
+  private Integer year;
 
-	@Persistent
-	private int netAmountAllocated;
+  @Persistent
+  private String name;
 
-	@Persistent
-	private int netAmountRevised;
+  @Persistent
+  private Integer netAmountAllocated;
 
-	@Persistent
-	private int netAmountUsed;
+  @Persistent
+  private Integer netAmountRevised;
 
-	@Persistent
-	private int grosAmountAllocated;
+  @Persistent
+  private Integer netAmountUsed;
 
-	@Persistent
-	private int grossAmountRevised;
+  @Persistent
+  private Integer grossAmountAllocated;
 
-	@Persistent
-	private int grossAmountUsed;
-	
-	public Expense(Key key, String expenseCode, int year, String name,
-			int netAmountAllocated, int netAmountRevised, int netAmountUsed,
-			int grosAmountAllocated, int grossAmountRevised, int grossAmountUsed) {
-		this.key = key;
-		this.expenseCode = expenseCode;
-		this.year = year;
-		this.name = name;
-		this.netAmountAllocated = netAmountAllocated;
-		this.netAmountRevised = netAmountRevised;
-		this.netAmountUsed = netAmountUsed;
-		this.grosAmountAllocated = grosAmountAllocated;
-		this.grossAmountRevised = grossAmountRevised;
-		this.grossAmountUsed = grossAmountUsed;
-	}
-	
-	public Expense() {
-	}
+  @Persistent
+  private Integer grossAmountRevised;
 
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key key;
+  @Persistent
+  private Integer grossAmountUsed;
 
-	public Key getKey() {
-		return key;
-	}
+  public Expense(Key key, String expenseCode, int year, String name,
+      int netAmountAllocated, int netAmountRevised, int netAmountUsed,
+      int grosAmountAllocated, int grossAmountRevised, int grossAmountUsed) {
+    this.key = key;
+    this.expenseCode = expenseCode;
+    this.year = year;
+    this.name = name;
+    this.netAmountAllocated = netAmountAllocated;
+    this.netAmountRevised = netAmountRevised;
+    this.netAmountUsed = netAmountUsed;
+    this.grossAmountAllocated = grosAmountAllocated;
+    this.grossAmountRevised = grossAmountRevised;
+    this.grossAmountUsed = grossAmountUsed;
+  }
 
-	public void setKey(Key key) {
-		this.key = key;
-	}
+  public Expense() {
+  }
 
-	public String getExpenseCode() {
-		return expenseCode;
-	}
+  public Expense(ExpenseRecord r) {
 
-	public void setExpenseCode(String expenseCode) {
-		this.expenseCode = expenseCode;
-	}
+    this.expenseCode = r.getExpenseCode();
+    this.year = r.getYear();
+    this.name = r.getName();
+    this.netAmountAllocated = r.getNetAmountAllocated();
+    this.netAmountRevised = r.getNetAmountRevised();
+    this.netAmountUsed = r.getNetAmountUsed();
+    this.grossAmountAllocated = r.getGrossAmountAllocated();
+    this.grossAmountRevised = r.getGrossAmountRevised();
+    this.grossAmountUsed = r.getGrossAmountUsed();
 
-	public int getYear() {
-		return year;
-	}
+  }
 
-	public void setYear(int year) {
-		this.year = year;
-	}
+  @PrimaryKey
+  @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+  private Key key;
 
-	public String getName() {
-		return name;
-	}
+  public Key getKey() {
+    return key;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setKey(Key key) {
+    this.key = key;
+  }
 
-	public int getNetAmountAllocated() {
-		return netAmountAllocated;
-	}
+  public String getExpenseCode() {
+    return expenseCode;
+  }
 
-	public void setNetAmountAllocated(int netAmountAllocated) {
-		this.netAmountAllocated = netAmountAllocated;
-	}
+  public void setExpenseCode(String expenseCode) {
+    this.expenseCode = expenseCode;
+  }
 
-	public int getNetAmountRevised() {
-		return netAmountRevised;
-	}
+  public Integer getYear() {
+    return year;
+  }
 
-	public void setNetAmountRevised(int netAmountRevised) {
-		this.netAmountRevised = netAmountRevised;
-	}
+  public void setYear(int year) {
+    this.year = year;
+  }
 
-	public int getNetAmountUsed() {
-		return netAmountUsed;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void setNetAmountUsed(int netAmountUsed) {
-		this.netAmountUsed = netAmountUsed;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public int getGrosAmountAllocated() {
-		return grosAmountAllocated;
-	}
+  public Integer getNetAmountAllocated() {
+    return netAmountAllocated;
+  }
 
-	public void setGrosAmountAllocated(int grosAmountAllocated) {
-		this.grosAmountAllocated = grosAmountAllocated;
-	}
+  public void setNetAmountAllocated(int netAmountAllocated) {
+    this.netAmountAllocated = netAmountAllocated;
+  }
 
-	public int getGrossAmountRevised() {
-		return grossAmountRevised;
-	}
+  public Integer getNetAmountRevised() {
+    return netAmountRevised;
+  }
 
-	public void setGrossAmountRevised(int grossAmountRevised) {
-		this.grossAmountRevised = grossAmountRevised;
-	}
+  public void setNetAmountRevised(int netAmountRevised) {
+    this.netAmountRevised = netAmountRevised;
+  }
 
-	public int getGrossAmountUsed() {
-		return grossAmountUsed;
-	}
+  public Integer getNetAmountUsed() {
+    return netAmountUsed;
+  }
 
-	public void setGrossAmountUsed(int grossAmountUsed) {
-		this.grossAmountUsed = grossAmountUsed;
-	}
-	
-	public ExpenseRecord toExpenseRecord() {
-		return new ExpenseRecord(expenseCode, year, name, netAmountAllocated,
-				netAmountRevised, netAmountUsed, grosAmountAllocated,
-				grossAmountRevised, grossAmountUsed);
-	}
+  public void setNetAmountUsed(int netAmountUsed) {
+    this.netAmountUsed = netAmountUsed;
+  }
+
+  public Integer getGrossAmountAllocated() {
+    return grossAmountAllocated;
+  }
+
+  public void setGrossAmountAllocated(int grossAmountAllocated) {
+    this.grossAmountAllocated = grossAmountAllocated;
+  }
+
+  public Integer getGrossAmountRevised() {
+    return grossAmountRevised;
+  }
+
+  public void setGrossAmountRevised(int grossAmountRevised) {
+    this.grossAmountRevised = grossAmountRevised;
+  }
+
+  public Integer getGrossAmountUsed() {
+    return grossAmountUsed;
+  }
+
+  public void setGrossAmountUsed(int grossAmountUsed) {
+    this.grossAmountUsed = grossAmountUsed;
+  }
+
+  public ExpenseRecord toExpenseRecord() {
+    return new ExpenseRecord(expenseCode, year, name, netAmountAllocated,
+        netAmountRevised, netAmountUsed, grossAmountAllocated,
+        grossAmountRevised, grossAmountUsed);
+  }
 }
