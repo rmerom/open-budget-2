@@ -6,10 +6,10 @@ import java.util.List;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.Canvas;
@@ -123,13 +123,13 @@ public class OBudget2 implements EntryPoint {
 
   private TreeGrid generateBucket() {
 
-    TreeGrid tree = new TreeGrid();    
+    TreeGrid tree = new TreeGrid();
     tree.setFields(new TreeGridField("Name"), new TreeGridField("Year"));
     // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
     tree.setSize("400", "400");
 
     tree.setShowOpenIcons(true);
-    
+
     tree.setClosedIconSuffix("");
     tree.setShowEdges(true);
     tree.setBorder("0px");
@@ -137,40 +137,39 @@ public class OBudget2 implements EntryPoint {
     tree.setShowHeader(false);
     tree.setLeaveScrollbarGap(false);
     tree.setEmptyMessage("<br>Drag & drop expenses here");
-    tree.setCanReorderRecords(true); 
+    tree.setCanReorderRecords(true);
     tree.setCanAcceptDrop(true);
     tree.setCanDragRecordsOut(true);
     tree.setCanAcceptDroppedRecords(true);
     tree.setDragDataAction(DragDataAction.MOVE);
     tree.setCanRemoveRecords(true);
-    
-    
+
     final Tree bucketModel = new Tree();
     bucketModel.setModelType(TreeModelType.PARENT);
     bucketModel.setNameProperty("ID");
     bucketModel.setChildrenProperty("directReports");
-//    expensesTreeModel.setData(nodes);
+    // expensesTreeModel.setData(nodes);
     tree.setData(bucketModel);
-    
+
     bucketModel.addDataChangedHandler(new DataChangedHandler() {
-		
-		@Override
-		public void onDataChanged(DataChangedEvent event) {
-			System.out.println("dropped something?");
-			TreeNode[] nodes = bucketModel.getAllNodes();			
-			List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
-			
-			for (int i=0; i<nodes.length; i++) {
-				list.add(((ExpenseRecordTreeNode)nodes[i]).getRecord());
-			}			
-			
-			graph.updateGraph(list);			
-		}
-	});      
-    
+
+      @Override
+      public void onDataChanged(DataChangedEvent event) {
+        System.out.println("dropped something?");
+        TreeNode[] nodes = bucketModel.getAllNodes();
+        List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
+
+        for (int i = 0; i < nodes.length; i++) {
+          list.add(((ExpenseRecordTreeNode) nodes[i]).getRecord());
+        }
+
+        graph.updateGraph(list);
+      }
+    });
+
     return tree;
   }
-  
+
   private HLayout generateDBZone() {
 
     VLayout messageLayout = new VLayout();
@@ -198,13 +197,13 @@ public class OBudget2 implements EntryPoint {
     form.setNumCols(2);
     form.setHeight("*");
     form.setColWidths(60, "*");
-    
-    final TextAreaItem jsonText = new TextAreaItem();  
-    jsonText.setShowTitle(false);  
-    jsonText.setLength(5000);  
-    jsonText.setColSpan(2);  
-    jsonText.setWidth("*");  
-    jsonText.setHeight("*");  
+
+    final TextAreaItem jsonText = new TextAreaItem();
+    jsonText.setShowTitle(false);
+    jsonText.setLength(5000);
+    jsonText.setColSpan(2);
+    jsonText.setWidth("*");
+    jsonText.setHeight("*");
 
     form.setFields(commitText, retrieveText, jsonText);
 
@@ -217,8 +216,8 @@ public class OBudget2 implements EntryPoint {
     commitButton.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
 
-        final ExpenseRecord e = new ExpenseRecord("001122", 9999, "SomeName", 101,
-            102, 103, 104, 105, 106);
+        final ExpenseRecord e = new ExpenseRecord("001122", 9999, "SomeName",
+            101, 102, 103, 104, 105, 106);
 
         expensesService.addExpenseRecord(e, new AsyncCallback<Void>() {
 
@@ -235,7 +234,6 @@ public class OBudget2 implements EntryPoint {
 
         });
 
-        
       }
     });
 
@@ -243,37 +241,38 @@ public class OBudget2 implements EntryPoint {
     retrieveButton.addClickHandler(new ClickHandler() {
 
       @Override
-      public void onClick(ClickEvent event) {        
+      public void onClick(ClickEvent event) {
 
-        expensesService.getExpensesByYear(9999, new AsyncCallback<ExpenseRecord[]>() {          
+        expensesService.getExpensesByYear(9999,
+            new AsyncCallback<ExpenseRecord[]>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            retrieveText.setValue("Failure :(" );
-          }
+              @Override
+              public void onFailure(Throwable caught) {
+                retrieveText.setValue("Failure :(");
+              }
 
-          @Override
-          public void onSuccess(ExpenseRecord[] result) {
-            retrieveText.setValue("Success!");            
-            
-            textCanvas.setContents(textCanvas.getPrefix() + " Retrieved " + 
-                result.length + " records");
-          }
+              @Override
+              public void onSuccess(ExpenseRecord[] result) {
+                retrieveText.setValue("Success!");
 
-        });
-        
+                textCanvas.setContents(textCanvas.getPrefix() + " Retrieved "
+                    + result.length + " records");
+              }
+
+            });
+
       }
     });
-    
+
     IButton deleteAll = new IButton("Delete All");
     deleteAll.addClickHandler(new ClickHandler() {
-      public void onClick(ClickEvent event) {       
+      public void onClick(ClickEvent event) {
 
         expensesService.removeAll(new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
-            commitText.setValue("Deleted everything");            
+            commitText.setValue("Deleted everything");
           }
 
           @Override
@@ -282,41 +281,59 @@ public class OBudget2 implements EntryPoint {
           }
 
         });
-        
+
       }
     });
-    
+
     IButton commitJson = new IButton("CommitJson");
     commitJson.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
-        
+
         String content = jsonText.getValueAsString();
 
-        JSONValue res = JSONParser.parseStrict(content);        
-        JSONArray arr = res.isArray();
-        for (int i=0; i<arr.size(); i++) {
-          
+        JSONValue res = JSONParser.parseStrict(content);
+        JSONArray arrayOfObjects = res.isArray();
+        if (arrayOfObjects == null || arrayOfObjects.size() < 1) {
+          return;
         }
-        
-                
+
+        for (int i = 0; i < arrayOfObjects.size(); i++) {
+
+          JSONObject obj = arrayOfObjects.get(0).isObject();
+          final ExpenseRecord er = generateExpenseRecord(obj);
+
+          expensesService.addExpenseRecord(er, new AsyncCallback<Void>() {
+
+            @Override
+            public void onSuccess(Void result) {
+              commitText.setValue("Success!");
+              textCanvas.setContents(textCanvas.getPrefix() + er.toString());
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              commitText.setValue("Failure :(");
+            }
+
+          });
+
+        }
+
       }
     });
-    
-    
 
     buttonLayout.addMember(commitButton);
     buttonLayout.addMember(retrieveButton);
     buttonLayout.addMember(deleteAll);
     buttonLayout.addMember(commitJson);
-    
 
     HLayout layout = new HLayout(15);
     layout.setAutoHeight();
     layout.addMember(messageLayout);
     layout.addMember(buttonLayout);
-    
+
     return layout;
 
   }
@@ -331,7 +348,8 @@ public class OBudget2 implements EntryPoint {
     selectOtherItem.setOtherValue("OtherVal");
 
     selectOtherItem.setTitle("Select year");
-    selectOtherItem.setValueMap("2001", "2002", "2003","2004","2005", "2006", "2007","2008");
+    selectOtherItem.setValueMap("2001", "2002", "2003", "2004", "2005", "2006",
+        "2007", "2008");
     selectOtherItem.addChangedHandler(new ChangedHandler() {
 
       @Override
@@ -400,9 +418,40 @@ public class OBudget2 implements EntryPoint {
     v.addMember(generateDBZone());
     v.addMember(button);
     v.addMember(form);
-    v.addMember(h);    
+    v.addMember(h);
 
     v.draw();
+
+  }
+
+  private ExpenseRecord generateExpenseRecord(JSONObject j) {
+
+    String expenseCode = j.get("code").toString();
+    int year = Integer.parseInt(j.get("year").toString());
+    String name = j.get("title").toString();
+    int netAmountAllocated = parseJson(j, "net_allocated");
+    int netAmountRevised = parseJson(j, "net_revised");
+    int netAmountUsed = parseJson(j, "net_used");
+    int grosAmountAllocated = parseJson(j, "gross_allocated");
+    int grossAmountRevised = parseJson(j, "gross_revised");
+    int grossAmountUsed = parseJson(j, "gross_used");
+
+    ExpenseRecord r = new ExpenseRecord(expenseCode, year, name,
+        netAmountAllocated, netAmountRevised, netAmountUsed,
+        grosAmountAllocated, grossAmountRevised, grossAmountUsed);
+
+    return r;
+  }
+
+  private int parseJson(JSONObject j, String property) {
+
+    JSONValue p = j.get(property);
+    if (p == null || p.isNumber() == null) {
+      return 0;
+    }
+
+    double d = p.isNumber().doubleValue();
+    return new Double(d).intValue();
 
   }
 

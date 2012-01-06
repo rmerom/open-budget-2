@@ -2,6 +2,8 @@ package com.yossale.client.data;
 
 import java.io.Serializable;
 
+import com.google.gwt.json.client.JSONObject;
+
 public class ExpenseRecord implements Serializable {
 
 	private static final long serialVersionUID = -2358987888595684650L;
@@ -18,6 +20,8 @@ public class ExpenseRecord implements Serializable {
 	private int grossAmountUsed;
 	
 	public ExpenseRecord() {
+	  
+	  
 	}
 
 	public ExpenseRecord(String expenseCode, int year, String name,
@@ -33,6 +37,20 @@ public class ExpenseRecord implements Serializable {
 		this.grosAmountAllocated = grosAmountAllocated;
 		this.grossAmountRevised = grossAmountRevised;
 		this.grossAmountUsed = grossAmountUsed;
+	}
+	
+	public ExpenseRecord(JSONObject j) {
+	  
+	  this.expenseCode = j.get("code").toString();
+    this.year = Integer.parseInt(j.get("year").toString());
+    this.name = j.get("title").toString();
+    this.netAmountAllocated = Integer.parseInt(j.get("net_allocated").toString());;
+    this.netAmountRevised = Integer.parseInt(j.get("net_revised").toString());;
+    this.netAmountUsed = Integer.parseInt(j.get("net_used").toString());;
+    this.grosAmountAllocated = Integer.parseInt(j.get("gross_allocated").toString());;
+    this.grossAmountRevised = Integer.parseInt(j.get("gross_revised").toString());;
+    this.grossAmountUsed = Integer.parseInt(j.get("gross_used").toString());;
+	  
 	}
 
 	public String getExpenseCode() {
