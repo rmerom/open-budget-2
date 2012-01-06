@@ -5,17 +5,22 @@ import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DropEvent;
-import com.smartgwt.client.widgets.events.DropHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectOtherItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -26,8 +31,6 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import com.smartgwt.client.widgets.tree.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.tree.events.DataArrivedHandler;
 import com.yossale.client.actions.ExpenseService;
 import com.yossale.client.actions.ExpenseServiceAsync;
 import com.yossale.client.actions.LoginService;
@@ -50,7 +53,6 @@ public class OBudget2 implements EntryPoint {
   private TreeGrid bucketTree;
 
   private Integer counter = 2012;
-
 
   private void updateTree(final int year) {
     /**
@@ -168,6 +170,156 @@ public class OBudget2 implements EntryPoint {
     
     return tree;
   }
+  
+  private HLayout generateDBZone() {
+
+    VLayout messageLayout = new VLayout();
+    messageLayout.setWidth(200);
+    messageLayout.setHeight(300);
+    messageLayout.setBorder("1px solid #6a6a6a");
+    messageLayout.setLayoutMargin(5);
+
+    final Canvas textCanvas = new Canvas();
+    textCanvas.setPrefix("<b>Testing the DB:</b><BR>");
+    textCanvas.setPadding(5);
+    textCanvas.setHeight(1);
+
+    final TextItem commitText = new TextItem();
+    commitText.setTitle("Commit");
+    commitText.setWidth("*");
+    commitText.setDefaultValue("Commit");
+
+    final TextItem retrieveText = new TextItem();
+    retrieveText.setTitle("Retrieve");
+    retrieveText.setWidth("*");
+    retrieveText.setDefaultValue("Retrieve");
+
+    final DynamicForm form = new DynamicForm();
+    form.setNumCols(2);
+    form.setHeight("*");
+    form.setColWidths(60, "*");
+    
+    final TextAreaItem jsonText = new TextAreaItem();  
+    jsonText.setShowTitle(false);  
+    jsonText.setLength(5000);  
+    jsonText.setColSpan(2);  
+    jsonText.setWidth("*");  
+    jsonText.setHeight("*");  
+
+    form.setFields(commitText, retrieveText, jsonText);
+
+    messageLayout.addMember(textCanvas);
+    messageLayout.addMember(form);
+
+    VLayout buttonLayout = new VLayout(10);
+
+    IButton commitButton = new IButton("Commit");
+    commitButton.addClickHandler(new ClickHandler() {
+      public void onClick(ClickEvent event) {
+
+        final ExpenseRecord e = new ExpenseRecord("001122", 9999, "SomeName", 101,
+            102, 103, 104, 105, 106);
+
+        expensesService.addExpenseRecord(e, new AsyncCallback<Void>() {
+
+          @Override
+          public void onSuccess(Void result) {
+            commitText.setValue("Success!");
+            textCanvas.setContents(textCanvas.getPrefix() + e.toString());
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            commitText.setValue("Failure :(");
+          }
+
+        });
+
+        
+      }
+    });
+
+    IButton retrieveButton = new IButton("Retrieve");
+    retrieveButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {        
+
+        expensesService.getExpensesByYear(9999, new AsyncCallback<ExpenseRecord[]>() {          
+
+          @Override
+          public void onFailure(Throwable caught) {
+            retrieveText.setValue("Failure :(" );
+          }
+
+          @Override
+          public void onSuccess(ExpenseRecord[] result) {
+            retrieveText.setValue("Success!");            
+            
+            textCanvas.setContents(textCanvas.getPrefix() + " Retrieved " + 
+                result.length + " records");
+          }
+
+        });
+        
+      }
+    });
+    
+    IButton deleteAll = new IButton("Delete All");
+    deleteAll.addClickHandler(new ClickHandler() {
+      public void onClick(ClickEvent event) {       
+
+        expensesService.removeAll(new AsyncCallback<Void>() {
+
+          @Override
+          public void onSuccess(Void result) {
+            commitText.setValue("Deleted everything");            
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            commitText.setValue("Failure to delete");
+          }
+
+        });
+        
+      }
+    });
+    
+    IButton commitJson = new IButton("CommitJson");
+    commitJson.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        
+        String content = jsonText.getValueAsString();
+
+        JSONValue res = JSONParser.parseStrict(content);        
+        JSONArray arr = res.isArray();
+        for (int i=0; i<arr.size(); i++) {
+          
+        }
+        
+                
+      }
+    });
+    
+    
+
+    buttonLayout.addMember(commitButton);
+    buttonLayout.addMember(retrieveButton);
+    buttonLayout.addMember(deleteAll);
+    buttonLayout.addMember(commitJson);
+    
+
+    HLayout layout = new HLayout(15);
+    layout.setAutoHeight();
+    layout.addMember(messageLayout);
+    layout.addMember(buttonLayout);
+    
+    return layout;
+
+  }
 
   private DynamicForm generateDynamicForm() {
 
@@ -245,7 +397,8 @@ public class OBudget2 implements EntryPoint {
     v.setAutoHeight();
     v.setMembersMargin(30);
     v.addMember(userLabel);
-//    v.addMember(button);
+    v.addMember(generateDBZone());
+    v.addMember(button);
     v.addMember(form);
     v.addMember(h);    
 

@@ -8,4 +8,9 @@ import com.yossale.client.data.ExpenseRecord;
 public interface ExpenseService extends RemoteService {
 
 	ExpenseRecord[] getExpenses(int year);
+	void addExpenseRecord(ExpenseRecord record);
+	ExpenseRecord[] getExpensesByYear(int year);
+	void removeAll();
+
+	
 }
