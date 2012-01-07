@@ -11,4 +11,6 @@ public interface ExpenseServiceAsync {
   void getExpensesByYear(int year, AsyncCallback<ExpenseRecord[]> callback);
 
   void removeAll(AsyncCallback<Void> callback);
+
+  void loadYearData(String year, AsyncCallback<Void> callback);
 }

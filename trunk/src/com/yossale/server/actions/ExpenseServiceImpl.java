@@ -1,9 +1,20 @@
 package com.yossale.server.actions;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.yossale.client.actions.ExpenseService;
@@ -45,7 +56,7 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
   public void removeAll() {
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Expense.class);
-    
+
     try {
       List<Expense> results = (List<Expense>) query.execute();
       pm.deletePersistentAll(results);
@@ -56,19 +67,107 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     }
   }
 
+  private ExpenseRecord generateExpenseRecord(JSONObject j) throws JSONException {    
+
+    String expenseCode = j.getString("code");
+    String name = j.get("title").toString();
+    Integer year = parseJson(j,"year");    
+    Integer netAmountAllocated = parseJson(j, "net_allocated");
+    Integer netAmountRevised = parseJson(j, "net_revised");
+    Integer netAmountUsed = parseJson(j, "net_used");
+    Integer grosAmountAllocated = parseJson(j, "gross_allocated");
+    Integer grossAmountRevised = parseJson(j, "gross_revised");
+    Integer grossAmountUsed = parseJson(j, "gross_used");
+
+    ExpenseRecord r = new ExpenseRecord(expenseCode, year, name,
+        netAmountAllocated, netAmountRevised, netAmountUsed,
+        grosAmountAllocated, grossAmountRevised, grossAmountUsed);
+
+    return r;
+  }
+
+  private Integer parseJson(JSONObject j, String property) {
+
+    if (!j.has(property)) {
+      return 0;
+    } 
+    Integer p = 0;
+    try {
+      p = j.getInt(property);
+    } catch (JSONException e) {
+      // TODO Auto-generated catch block      
+    }
+    return p;
+
+  }
+
+  public void loadYearData(String year) {
+
+    if (year == null) {
+      return;
+    }
+    
+    URL url;
+
+    String fullPath = getServletConfig().getServletContext().getRealPath(
+        "/data/"+ year +".txt");
+    final StringBuilder builder = new StringBuilder("");
+    try {
+      // url = new URL("http://127.0.0.1:8888/data/testJson.txt");
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(
+          new FileInputStream(fullPath)));
+
+      String line = null;
+
+      while ((line = reader.readLine()) != null) {
+        builder.append(line);
+      }
+      reader.close();
+    } catch (MalformedURLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    String json = builder.toString();
+
+    try {
+
+      JSONArray arr = new JSONArray(json);
+      System.out.println("Found " + arr.length() + " records");
+      
+      for (int i = 0; i < arr.length(); i++) {
+
+        JSONObject obj = arr.getJSONObject(i);
+        final ExpenseRecord er = generateExpenseRecord(obj);
+        if (er != null) {
+          addExpenseRecord(er);
+        }
+
+      }
+
+    } catch (Exception e) {
+        System.out.println("Failed to commit Expsense record to DB");
+    }
+
+  }
+
   public ExpenseRecord[] getExpensesByYear(int year) {
 
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Expense.class);
 
-    // query.setFilter("year == expenseYearParam");
-    // query.setOrdering("expenseCode desc");
-    // query.declareParameters("String expenseYearParam");
+    query.setFilter("year == expenseYearParam");
+    query.setOrdering("expenseCode desc");
+    query.declareParameters("Integer expenseYearParam");
 
     List<Expense> results = null;
 
     try {
-      results = (List<Expense>) query.execute();
+      results = (List<Expense>) query.execute(year);
     } catch (Exception e) {
       System.out.println("Failed to run query");
 
@@ -81,6 +180,7 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     }
 
     ExpenseRecord[] expensesArr = new ExpenseRecord[results.size()];
+    System.out.println("Found " + results.size() + " records");
     for (int i = 0; i < results.size(); i++) {
 
       Expense e = results.get(i);
