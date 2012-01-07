@@ -11,6 +11,7 @@ public interface ExpenseService extends RemoteService {
 	void addExpenseRecord(ExpenseRecord record);
 	ExpenseRecord[] getExpensesByYear(int year);
 	void removeAll();
+	void loadYearData(String year);
 
 	
 }

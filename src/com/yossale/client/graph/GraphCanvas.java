@@ -1,6 +1,8 @@
 package com.yossale.client.graph;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,22 +82,29 @@ public class GraphCanvas extends Composite {
 	
     DataTable data = DataTable.create();
     data.addColumn(ColumnType.STRING, "Year");
-    data.addColumn(ColumnType.NUMBER, "Net Gross Allocated");
-    data.addColumn(ColumnType.NUMBER, "Net Net Allocated");
-    data.addColumn(ColumnType.NUMBER, "Net Gross Used");   
+    data.addColumn(ColumnType.NUMBER, "Net Allocated");
+    data.addColumn(ColumnType.NUMBER, "Net Revised");
+    data.addColumn(ColumnType.NUMBER, "Net Used");   
     
     if (topics == null || topics.isEmpty()) {
       return data;
     }
     
     List<ExpenseRecord> sums = summarizeResults(topics);
+    Collections.sort(sums, new Comparator<ExpenseRecord>() {
+
+      @Override
+      public int compare(ExpenseRecord o1, ExpenseRecord o2) {        
+        return (new Integer(o1.getYear()).compareTo(new Integer(o2.getYear()))  );
+      }
+    });
 
     for (ExpenseRecord t : sums) {
       int rowIndex = data.addRow();
       data.setValue(rowIndex, 0, t.getYear()+"");
-      data.setValue(rowIndex, 1, t.getGrossAmountAllocated());
-      data.setValue(rowIndex, 2, t.getNetAmountAllocated());
-      data.setValue(rowIndex, 3, t.getGrossAmountUsed());
+      data.setValue(rowIndex, 1, t.getNetAmountAllocated());
+      data.setValue(rowIndex, 2, t.getNetAmountRevised());
+      data.setValue(rowIndex, 3, t.getNetAmountUsed());
     }
     
     return data;

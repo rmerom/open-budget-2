@@ -9,24 +9,23 @@ public class ExpenseRecord implements Serializable {
 	private static final long serialVersionUID = -2358987888595684650L;
 	
 	// Mispar Se'if Takzivi as string.
-	private String expenseCode;
-	private int year;
-	private String name;
-	private int netAmountAllocated;
-	private int netAmountRevised;
-	private int netAmountUsed;
-	private int grosAmountAllocated;
-	private int grossAmountRevised;
-	private int grossAmountUsed;
+	private String expenseCode = "";	
+	private String name = "";
+	private Integer year = 0;
+	private Integer netAmountAllocated = 0;
+	private Integer netAmountRevised = 0;
+	private Integer netAmountUsed = 0;
+	private Integer grosAmountAllocated = 0;
+	private Integer grossAmountRevised = 0;
+	private Integer grossAmountUsed = 0;
 	
-	public ExpenseRecord() {
-	  
+	public ExpenseRecord() {  
 	  
 	}
 
-	public ExpenseRecord(String expenseCode, int year, String name,
-			int netAmountAllocated, int netAmountRevised, int netAmountUsed,
-			int grosAmountAllocated, int grossAmountRevised, int grossAmountUsed) {
+	public ExpenseRecord(String expenseCode, Integer year, String name,
+	    Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
+	    Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
 		super();
 		this.expenseCode = expenseCode;
 		this.year = year;

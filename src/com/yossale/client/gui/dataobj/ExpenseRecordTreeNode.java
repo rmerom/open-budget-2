@@ -15,7 +15,8 @@ public class ExpenseRecordTreeNode extends TreeNode {
     setID(id);
     setParentID(id.substring(0, id.length() - 2));    
     setAttribute("ID", id);
-    setAttribute("Name", expense.getExpenseCode());
+    setAttribute("#", expense.getExpenseCode());
+    setAttribute("Name", expense.getName());    
     setAttribute("Year", expense.getYear());    
   }
 

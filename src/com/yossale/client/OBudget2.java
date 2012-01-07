@@ -5,10 +5,6 @@ import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -67,7 +63,7 @@ public class OBudget2 implements EntryPoint {
      * is it's ID, you just provide them to the model as an array, and it'll
      * take care of the rest.
      */
-    expensesService.getExpenses(year, new AsyncCallback<ExpenseRecord[]>() {
+    expensesService.getExpensesByYear(year, new AsyncCallback<ExpenseRecord[]>() {
 
       @Override
       public void onSuccess(ExpenseRecord[] result) {
@@ -102,7 +98,7 @@ public class OBudget2 implements EntryPoint {
     TreeGrid employeeTreeGrid = new TreeGrid();
     employeeTreeGrid.setShowOpenIcons(true);
     employeeTreeGrid.setClosedIconSuffix("");
-    employeeTreeGrid.setFields(new TreeGridField("Name"), new TreeGridField(
+    employeeTreeGrid.setFields(new TreeGridField("#"), new TreeGridField("Name"), new TreeGridField(
         "Year"));
     // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
     employeeTreeGrid.setSize("400", "400");
@@ -110,7 +106,6 @@ public class OBudget2 implements EntryPoint {
     employeeTreeGrid.setShowEdges(true);
     employeeTreeGrid.setBorder("0px");
     employeeTreeGrid.setBodyStyleName("normal");
-    employeeTreeGrid.setShowHeader(false);
     employeeTreeGrid.setLeaveScrollbarGap(false);
     employeeTreeGrid.setEmptyMessage("<br>Choose year to see budget expenses");
 
@@ -124,7 +119,7 @@ public class OBudget2 implements EntryPoint {
   private TreeGrid generateBucket() {
 
     TreeGrid tree = new TreeGrid();
-    tree.setFields(new TreeGridField("Name"), new TreeGridField("Year"));
+    tree.setFields(new TreeGridField("#"), new TreeGridField("Name"), new TreeGridField("Year"));
     // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
     tree.setSize("400", "400");
 
@@ -134,7 +129,6 @@ public class OBudget2 implements EntryPoint {
     tree.setShowEdges(true);
     tree.setBorder("0px");
     tree.setBodyStyleName("normal");
-    tree.setShowHeader(false);
     tree.setLeaveScrollbarGap(false);
     tree.setEmptyMessage("<br>Drag & drop expenses here");
     tree.setCanReorderRecords(true);
@@ -242,8 +236,13 @@ public class OBudget2 implements EntryPoint {
 
       @Override
       public void onClick(ClickEvent event) {
+        
+        String content = jsonText.getValueAsString();
+        if (null == content) {
+          return;
+        }
 
-        expensesService.getExpensesByYear(9999,
+        expensesService.getExpensesByYear(Integer.parseInt(content),
             new AsyncCallback<ExpenseRecord[]>() {
 
               @Override
@@ -292,35 +291,39 @@ public class OBudget2 implements EntryPoint {
       public void onClick(ClickEvent event) {
 
         String content = jsonText.getValueAsString();
-
-        JSONValue res = JSONParser.parseStrict(content);
-        JSONArray arrayOfObjects = res.isArray();
-        if (arrayOfObjects == null || arrayOfObjects.size() < 1) {
+        if (content == null) {
           return;
         }
+        System.out.println("Updating data for year " + content);
 
-        for (int i = 0; i < arrayOfObjects.size(); i++) {
+        expensesService.loadYearData(content, new AsyncCallback<Void>() {
 
-          JSONObject obj = arrayOfObjects.get(0).isObject();
-          final ExpenseRecord er = generateExpenseRecord(obj);
+          @Override
+          public void onSuccess(Void result) {
+            commitText.setValue("Success!");
+            textCanvas.setContents(textCanvas.getPrefix());
+          }
 
-          expensesService.addExpenseRecord(er, new AsyncCallback<Void>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            commitText.setValue("Failure :(");
+          }
 
-            @Override
-            public void onSuccess(Void result) {
-              commitText.setValue("Success!");
-              textCanvas.setContents(textCanvas.getPrefix() + er.toString());
-            }
+        });
 
-            @Override
-            public void onFailure(Throwable caught) {
-              commitText.setValue("Failure :(");
-            }
+      }
+    });
+    
+    final IButton updateBudget = new IButton("Update budget tree");
+    updateBudget.addClickHandler(new ClickHandler() {
 
-          });
-
+      @Override
+      public void onClick(ClickEvent event) {
+        String content = jsonText.getValueAsString();
+        if (content == null) {
+          return;
         }
-
+        updateTree(Integer.parseInt(content));        
       }
     });
 
@@ -328,6 +331,8 @@ public class OBudget2 implements EntryPoint {
     buttonLayout.addMember(retrieveButton);
     buttonLayout.addMember(deleteAll);
     buttonLayout.addMember(commitJson);
+    buttonLayout.addMember(updateBudget);
+    
 
     HLayout layout = new HLayout(15);
     layout.setAutoHeight();
@@ -344,12 +349,11 @@ public class OBudget2 implements EntryPoint {
     form.setWidth(250);
 
     SelectOtherItem selectOtherItem = new SelectOtherItem();
-    selectOtherItem.setOtherTitle("Other..");
-    selectOtherItem.setOtherValue("OtherVal");
+//    selectOtherItem.setOtherTitle("Other..");
+//    selectOtherItem.setOtherValue("OtherVal");
 
     selectOtherItem.setTitle("Select year");
-    selectOtherItem.setValueMap("2001", "2002", "2003", "2004", "2005", "2006",
-        "2007", "2008");
+    selectOtherItem.setValueMap("2008", "2009","2010");
     selectOtherItem.addChangedHandler(new ChangedHandler() {
 
       @Override
@@ -389,18 +393,6 @@ public class OBudget2 implements EntryPoint {
 
     final DynamicForm form = generateDynamicForm();
 
-    final IButton button = new IButton("Click me to change tree!");
-    button.setWidth(120);
-    button.setHeight(60);
-
-    button.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        updateTree(counter++);
-      }
-    });
-
     HLayout h = new HLayout();
     h.addMember(budgetTree);
     h.addMember(bucketTree);
@@ -414,46 +406,18 @@ public class OBudget2 implements EntryPoint {
     Label userLabel = new Label(currentUser);
     v.setAutoHeight();
     v.setMembersMargin(30);
-    v.addMember(userLabel);
-    v.addMember(generateDBZone());
-    v.addMember(button);
+//    v.addMember(userLabel);       
     v.addMember(form);
-    v.addMember(h);
+    v.addMember(h);   
+    
+    v.addMember(generateDBZone());
+    
 
     v.draw();
 
   }
 
-  private ExpenseRecord generateExpenseRecord(JSONObject j) {
-
-    String expenseCode = j.get("code").toString();
-    int year = Integer.parseInt(j.get("year").toString());
-    String name = j.get("title").toString();
-    int netAmountAllocated = parseJson(j, "net_allocated");
-    int netAmountRevised = parseJson(j, "net_revised");
-    int netAmountUsed = parseJson(j, "net_used");
-    int grosAmountAllocated = parseJson(j, "gross_allocated");
-    int grossAmountRevised = parseJson(j, "gross_revised");
-    int grossAmountUsed = parseJson(j, "gross_used");
-
-    ExpenseRecord r = new ExpenseRecord(expenseCode, year, name,
-        netAmountAllocated, netAmountRevised, netAmountUsed,
-        grosAmountAllocated, grossAmountRevised, grossAmountUsed);
-
-    return r;
-  }
-
-  private int parseJson(JSONObject j, String property) {
-
-    JSONValue p = j.get(property);
-    if (p == null || p.isNumber() == null) {
-      return 0;
-    }
-
-    double d = p.isNumber().doubleValue();
-    return new Double(d).intValue();
-
-  }
+   
 
   @Override
   public void onModuleLoad() {
