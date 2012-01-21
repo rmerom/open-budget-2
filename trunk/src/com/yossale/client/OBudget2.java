@@ -1,11 +1,14 @@
 package com.yossale.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.Canvas;
@@ -45,10 +48,9 @@ public class OBudget2 implements EntryPoint {
   private final GraphCanvas graph = new GraphCanvas();
   private final ExpenseServiceAsync expensesService = GWT
       .create(ExpenseService.class);
+  private final Map<Integer, Tree> budgetTreesCache = new HashMap<Integer, Tree>();
 
   private TreeGrid bucketTree;
-
-  private Integer counter = 2012;
 
   private void updateTree(final int year) {
     /**
@@ -63,43 +65,54 @@ public class OBudget2 implements EntryPoint {
      * is it's ID, you just provide them to the model as an array, and it'll
      * take care of the rest.
      */
-    expensesService.getExpensesByYear(year, new AsyncCallback<ExpenseRecord[]>() {
 
-      @Override
-      public void onSuccess(ExpenseRecord[] result) {
+    if (budgetTreesCache.containsKey(year)) {
+      System.out.println("Cache hit on " + year);
+      Tree treeModel = budgetTreesCache.get(year);
+      budgetTree.setData(treeModel);
+      
+    } else {
 
-        if (result == null || result.length == 0) {
-          return;
-        }
+      expensesService.getExpensesByYear(year,
+          new AsyncCallback<ExpenseRecord[]>() {
 
-        TreeNode[] nodes = new TreeNode[result.length];
-        for (int i = 0; i < result.length; i++) {
-          nodes[i] = new ExpenseRecordTreeNode(result[i]);
-        }
+            @Override
+            public void onSuccess(ExpenseRecord[] result) {
 
-        System.out.println("Updating tree for [" + year + "] ");
-        Tree expensesTreeModel = new Tree();
-        expensesTreeModel.setModelType(TreeModelType.PARENT);
-        expensesTreeModel.setNameProperty("ID");
-        expensesTreeModel.setChildrenProperty("directReports");
-        expensesTreeModel.setData(nodes);
-        budgetTree.setData(expensesTreeModel);
-      }
+              if (result == null || result.length == 0) {
+                return;
+              }
 
-      @Override
-      public void onFailure(Throwable caught) {
-        System.out.println("Call to server for year : " + year + " failed");
-      }
-    });
+              TreeNode[] nodes = new TreeNode[result.length];
+              for (int i = 0; i < result.length; i++) {
+                nodes[i] = new ExpenseRecordTreeNode(result[i]);
+              }
 
+              System.out.println("Updating tree for [" + year + "] ");
+              Tree expensesTreeModel = new Tree();
+              expensesTreeModel.setModelType(TreeModelType.PARENT);
+              expensesTreeModel.setNameProperty("ID");
+              expensesTreeModel.setChildrenProperty("directReports");
+              expensesTreeModel.setData(nodes);
+              budgetTreesCache.put(year, expensesTreeModel);
+              budgetTree.setData(expensesTreeModel);              
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              System.out.println("Call to server for year : " + year
+                  + " failed");
+            }
+          });
+    }
   }
 
   private TreeGrid generateBudgetTree() {
     TreeGrid employeeTreeGrid = new TreeGrid();
     employeeTreeGrid.setShowOpenIcons(true);
     employeeTreeGrid.setClosedIconSuffix("");
-    employeeTreeGrid.setFields(new TreeGridField("#"), new TreeGridField("Name"), new TreeGridField(
-        "Year"));
+    employeeTreeGrid.setFields(new TreeGridField("#"),
+        new TreeGridField("Name"), new TreeGridField("Year"));
     // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
     employeeTreeGrid.setSize("400", "400");
 
@@ -113,13 +126,17 @@ public class OBudget2 implements EntryPoint {
     employeeTreeGrid.setCanAcceptDroppedRecords(true);
     employeeTreeGrid.setCanDragRecordsOut(true);
 
+    employeeTreeGrid.setShowFilterEditor(true);
+    employeeTreeGrid.setFilterOnKeypress(true);
+
     return employeeTreeGrid;
   }
 
   private TreeGrid generateBucket() {
 
     TreeGrid tree = new TreeGrid();
-    tree.setFields(new TreeGridField("#"), new TreeGridField("Name"), new TreeGridField("Year"));
+    tree.setFields(new TreeGridField("#"), new TreeGridField("Name"),
+        new TreeGridField("Year"));
     // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
     tree.setSize("400", "400");
 
@@ -137,6 +154,8 @@ public class OBudget2 implements EntryPoint {
     tree.setCanAcceptDroppedRecords(true);
     tree.setDragDataAction(DragDataAction.MOVE);
     tree.setCanRemoveRecords(true);
+    tree.setShowFilterEditor(true);
+    tree.setFilterOnKeypress(true);
 
     final Tree bucketModel = new Tree();
     bucketModel.setModelType(TreeModelType.PARENT);
@@ -236,7 +255,7 @@ public class OBudget2 implements EntryPoint {
 
       @Override
       public void onClick(ClickEvent event) {
-        
+
         String content = jsonText.getValueAsString();
         if (null == content) {
           return;
@@ -313,7 +332,7 @@ public class OBudget2 implements EntryPoint {
 
       }
     });
-    
+
     final IButton updateBudget = new IButton("Update budget tree");
     updateBudget.addClickHandler(new ClickHandler() {
 
@@ -323,7 +342,7 @@ public class OBudget2 implements EntryPoint {
         if (content == null) {
           return;
         }
-        updateTree(Integer.parseInt(content));        
+        updateTree(Integer.parseInt(content));
       }
     });
 
@@ -332,7 +351,6 @@ public class OBudget2 implements EntryPoint {
     buttonLayout.addMember(deleteAll);
     buttonLayout.addMember(commitJson);
     buttonLayout.addMember(updateBudget);
-    
 
     HLayout layout = new HLayout(15);
     layout.setAutoHeight();
@@ -349,11 +367,11 @@ public class OBudget2 implements EntryPoint {
     form.setWidth(250);
 
     SelectOtherItem selectOtherItem = new SelectOtherItem();
-//    selectOtherItem.setOtherTitle("Other..");
-//    selectOtherItem.setOtherValue("OtherVal");
+    // selectOtherItem.setOtherTitle("Other..");
+    // selectOtherItem.setOtherValue("OtherVal");
 
     selectOtherItem.setTitle("Select year");
-    selectOtherItem.setValueMap("2008", "2009","2010");
+    selectOtherItem.setValueMap("2008", "2009", "2010");
     selectOtherItem.addChangedHandler(new ChangedHandler() {
 
       @Override
@@ -406,18 +424,23 @@ public class OBudget2 implements EntryPoint {
     Label userLabel = new Label(currentUser);
     v.setAutoHeight();
     v.setMembersMargin(30);
-//    v.addMember(userLabel);       
+    // v.addMember(userLabel);
+    v.addMember(createTitle());
     v.addMember(form);
-    v.addMember(h);   
-    
+    v.addMember(h);
+
     v.addMember(generateDBZone());
-    
 
     v.draw();
 
   }
 
-   
+  private Canvas createTitle() {
+    Label l = new Label();
+    l.setAlign(Alignment.CENTER);
+    l.setTitle("חוקר התקציב");
+    return l;
+  }
 
   @Override
   public void onModuleLoad() {
