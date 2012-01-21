@@ -5,8 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -53,6 +52,7 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     }
   }
 
+  @SuppressWarnings("unchecked")
   public void removeAll() {
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Expense.class);
@@ -106,8 +106,6 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     if (year == null) {
       return;
     }
-    
-    URL url;
 
     String fullPath = getServletConfig().getServletContext().getRealPath(
         "/data/"+ year +".txt");
@@ -152,27 +150,26 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     } catch (Exception e) {
         System.out.println("Failed to commit Expsense record to DB");
     }
-
   }
-
+ 
+  @SuppressWarnings("unchecked")
   public ExpenseRecord[] getExpensesByYear(int year) {
-
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+  	List<Expense> results = new ArrayList<Expense>();
+  	
+  	PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Expense.class);
-
     query.setFilter("year == expenseYearParam");
     query.setOrdering("expenseCode desc");
     query.declareParameters("Integer expenseYearParam");
 
-    List<Expense> results = null;
-
-    try {
-      results = (List<Expense>) query.execute(year);
-    } catch (Exception e) {
-      System.out.println("Failed to run query");
-
-    } finally {
-      query.closeAll();
+    int startPos = 0;
+    query.setRange(startPos, startPos + 1000);
+    List<Expense> rangeResults = (List<Expense>) query.execute(year);
+    while (rangeResults != null && !rangeResults.isEmpty()) {
+    	results.addAll(rangeResults);
+    	startPos = startPos + 1000;
+    	query.setRange(startPos, startPos + 1000);
+      rangeResults = (List<Expense>) query.execute(year);
     }
 
     if (results == null || results.isEmpty()) {
@@ -182,7 +179,6 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     ExpenseRecord[] expensesArr = new ExpenseRecord[results.size()];
     System.out.println("Found " + results.size() + " records");
     for (int i = 0; i < results.size(); i++) {
-
       Expense e = results.get(i);
       expensesArr[i] = e.toExpenseRecord();
     }
