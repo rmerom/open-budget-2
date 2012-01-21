@@ -6,6 +6,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.yossale.client.data.ExpenseRecord;
 
 @PersistenceCapable
@@ -39,10 +40,9 @@ public class Expense {
   @Persistent
   private Integer grossAmountUsed;
 
-  public Expense(Key key, String expenseCode, int year, String name,
-      int netAmountAllocated, int netAmountRevised, int netAmountUsed,
-      int grosAmountAllocated, int grossAmountRevised, int grossAmountUsed) {
-    this.key = key;
+  public Expense(String expenseCode, Integer year, String name,
+      Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
+      Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
     this.expenseCode = expenseCode;
     this.year = year;
     this.name = name;
@@ -52,13 +52,13 @@ public class Expense {
     this.grossAmountAllocated = grosAmountAllocated;
     this.grossAmountRevised = grossAmountRevised;
     this.grossAmountUsed = grossAmountUsed;
+    generateKey();
   }
 
   public Expense() {
   }
 
   public Expense(ExpenseRecord r) {
-
     this.expenseCode = r.getExpenseCode();
     this.year = r.getYear();
     this.name = r.getName();
@@ -68,7 +68,7 @@ public class Expense {
     this.grossAmountAllocated = r.getGrossAmountAllocated();
     this.grossAmountRevised = r.getGrossAmountRevised();
     this.grossAmountUsed = r.getGrossAmountUsed();
-
+    generateKey();
   }
 
   @PrimaryKey
@@ -77,10 +77,6 @@ public class Expense {
 
   public Key getKey() {
     return key;
-  }
-
-  public void setKey(Key key) {
-    this.key = key;
   }
 
   public String getExpenseCode() {
@@ -95,7 +91,7 @@ public class Expense {
     return year;
   }
 
-  public void setYear(int year) {
+  public void setYear(Integer year) {
     this.year = year;
   }
 
@@ -111,7 +107,7 @@ public class Expense {
     return netAmountAllocated;
   }
 
-  public void setNetAmountAllocated(int netAmountAllocated) {
+  public void setNetAmountAllocated(Integer netAmountAllocated) {
     this.netAmountAllocated = netAmountAllocated;
   }
 
@@ -119,7 +115,7 @@ public class Expense {
     return netAmountRevised;
   }
 
-  public void setNetAmountRevised(int netAmountRevised) {
+  public void setNetAmountRevised(Integer netAmountRevised) {
     this.netAmountRevised = netAmountRevised;
   }
 
@@ -127,7 +123,7 @@ public class Expense {
     return netAmountUsed;
   }
 
-  public void setNetAmountUsed(int netAmountUsed) {
+  public void setNetAmountUsed(Integer netAmountUsed) {
     this.netAmountUsed = netAmountUsed;
   }
 
@@ -135,7 +131,7 @@ public class Expense {
     return grossAmountAllocated;
   }
 
-  public void setGrossAmountAllocated(int grossAmountAllocated) {
+  public void setGrossAmountAllocated(Integer grossAmountAllocated) {
     this.grossAmountAllocated = grossAmountAllocated;
   }
 
@@ -143,7 +139,7 @@ public class Expense {
     return grossAmountRevised;
   }
 
-  public void setGrossAmountRevised(int grossAmountRevised) {
+  public void setGrossAmountRevised(Integer grossAmountRevised) {
     this.grossAmountRevised = grossAmountRevised;
   }
 
@@ -151,7 +147,7 @@ public class Expense {
     return grossAmountUsed;
   }
 
-  public void setGrossAmountUsed(int grossAmountUsed) {
+  public void setGrossAmountUsed(Integer grossAmountUsed) {
     this.grossAmountUsed = grossAmountUsed;
   }
 
@@ -159,5 +155,9 @@ public class Expense {
     return new ExpenseRecord(expenseCode, year, name, netAmountAllocated,
         netAmountRevised, netAmountUsed, grossAmountAllocated,
         grossAmountRevised, grossAmountUsed);
+  }
+  
+  private void generateKey() {
+  	key =	KeyFactory.createKey(getClass().getSimpleName(), "" + year + expenseCode);
   }
 }

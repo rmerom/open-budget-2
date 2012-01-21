@@ -35,6 +35,18 @@
     <servlet-name>bucketService</servlet-name>
     <url-pattern>/obudget2/bucket</url-pattern>
   </servlet-mapping>
+
+
+  <!--  Cron servlets -->
+  <servlet>
+    <servlet-name>updateDBServlet</servlet-name>
+    <servlet-class>com.yossale.server.cron.UpdateDBFromYedaServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>updateDBServlet</servlet-name>
+    <url-pattern>/cron/updatedb</url-pattern>
+  </servlet-mapping>
     
   <!-- Default page to serve -->
   <welcome-file-list>
