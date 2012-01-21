@@ -154,7 +154,6 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
  
   @SuppressWarnings("unchecked")
   public ExpenseRecord[] getExpensesByYear(int year) {
-  	List<Expense> results = new ArrayList<Expense>();
   	
   	PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Expense.class);
@@ -162,15 +161,7 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     query.setOrdering("expenseCode desc");
     query.declareParameters("Integer expenseYearParam");
 
-    int startPos = 0;
-    query.setRange(startPos, startPos + 1000);
-    List<Expense> rangeResults = (List<Expense>) query.execute(year);
-    while (rangeResults != null && !rangeResults.isEmpty()) {
-    	results.addAll(rangeResults);
-    	startPos = startPos + 1000;
-    	query.setRange(startPos, startPos + 1000);
-      rangeResults = (List<Expense>) query.execute(year);
-    }
+    List<Expense> results = (List<Expense>) query.execute(year);
 
     if (results == null || results.isEmpty()) {
       return new ExpenseRecord[] {};
