@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -24,7 +22,8 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
 	private Logger logger = Logger.getLogger(UpdateDBFromYedaServlet.class.getName());
 	private static final long serialVersionUID = 1773352816547081584L;
 	
-	private static final int MIN_YEAR = 1992;
+	private static final int MAX_SECTIONS_PER_YEAR = 1000000;
+	
 	private static final String FROM_YEAR = "fromYear";  // GET parameter
 	private static final String TO_YEAR = "toYear";  // GET parameter
 
@@ -55,7 +54,7 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
 	private JSONArray fetchYearSections(int requestedYear) throws IOException, JSONException {
   	logger.warning("fetching: " + requestedYear);
   	URL url = new URL("http://api.yeda.us/data/gov/mof/budget/?o=json&query=%7B%22year%22:" 
-	      + requestedYear + "%7D");
+	      + requestedYear + "%7D&limit=" + MAX_SECTIONS_PER_YEAR);
   	BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
   	String line = reader.readLine();
   	JSONArray sections = new JSONArray(line);
