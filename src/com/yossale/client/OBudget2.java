@@ -30,14 +30,14 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import com.yossale.client.actions.ExpenseService;
-import com.yossale.client.actions.ExpenseServiceAsync;
+import com.yossale.client.actions.SectionService;
+import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.actions.LoginService;
 import com.yossale.client.actions.LoginServiceAsync;
-import com.yossale.client.data.ExpenseRecord;
+import com.yossale.client.data.SectionRecord;
 import com.yossale.client.data.LoginInfo;
 import com.yossale.client.graph.GraphCanvas;
-import com.yossale.client.gui.dataobj.ExpenseRecordTreeNode;
+import com.yossale.client.gui.dataobj.SectionRecordTreeNode;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -46,8 +46,8 @@ public class OBudget2 implements EntryPoint {
 
   private TreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
-  private final ExpenseServiceAsync expensesService = GWT
-      .create(ExpenseService.class);
+  private final SectionServiceAsync sectionsService = GWT
+      .create(SectionService.class);
   private final Map<Integer, Tree> budgetTreesCache = new HashMap<Integer, Tree>();
 
   private TreeGrid bucketTree;
@@ -59,7 +59,7 @@ public class OBudget2 implements EntryPoint {
      * 
      * Since we want to give it all the records and let him figure the
      * Hierarchy, we need to tell him 2 thing : id and parentId. This is defined
-     * in the object itself (here it's at the ExpenseRecord)
+     * in the object itself (here it's at the SectionRecord)
      * 
      * So after you have a list of items, each knows who is father is and what
      * is it's ID, you just provide them to the model as an array, and it'll
@@ -73,11 +73,11 @@ public class OBudget2 implements EntryPoint {
       
     } else {
 
-      expensesService.getExpensesByYear(year,
-          new AsyncCallback<ExpenseRecord[]>() {
+      sectionsService.getSectionsByYear(year,
+          new AsyncCallback<SectionRecord[]>() {
 
             @Override
-            public void onSuccess(ExpenseRecord[] result) {
+            public void onSuccess(SectionRecord[] result) {
 
               if (result == null || result.length == 0) {
                 return;
@@ -85,17 +85,17 @@ public class OBudget2 implements EntryPoint {
 
               TreeNode[] nodes = new TreeNode[result.length];
               for (int i = 0; i < result.length; i++) {
-                nodes[i] = new ExpenseRecordTreeNode(result[i]);
+                nodes[i] = new SectionRecordTreeNode(result[i]);
               }
 
               System.out.println("Updating tree for [" + year + "] ");
-              Tree expensesTreeModel = new Tree();
-              expensesTreeModel.setModelType(TreeModelType.PARENT);
-              expensesTreeModel.setNameProperty("ID");
-              expensesTreeModel.setChildrenProperty("directReports");
-              expensesTreeModel.setData(nodes);
-              budgetTreesCache.put(year, expensesTreeModel);
-              budgetTree.setData(expensesTreeModel);              
+              Tree sectionsTreeModel = new Tree();
+              sectionsTreeModel.setModelType(TreeModelType.PARENT);
+              sectionsTreeModel.setNameProperty("ID");
+              sectionsTreeModel.setChildrenProperty("directReports");
+              sectionsTreeModel.setData(nodes);
+              budgetTreesCache.put(year, sectionsTreeModel);
+              budgetTree.setData(sectionsTreeModel);              
             }
 
             @Override
@@ -120,7 +120,7 @@ public class OBudget2 implements EntryPoint {
     employeeTreeGrid.setBorder("0px");
     employeeTreeGrid.setBodyStyleName("normal");
     employeeTreeGrid.setLeaveScrollbarGap(false);
-    employeeTreeGrid.setEmptyMessage("<br>Choose year to see budget expenses");
+    employeeTreeGrid.setEmptyMessage("<br>Choose year to see budget sections");
 
     employeeTreeGrid.setCanReorderRecords(true);
     employeeTreeGrid.setCanAcceptDroppedRecords(true);
@@ -147,7 +147,7 @@ public class OBudget2 implements EntryPoint {
     tree.setBorder("0px");
     tree.setBodyStyleName("normal");
     tree.setLeaveScrollbarGap(false);
-    tree.setEmptyMessage("<br>Drag & drop expenses here");
+    tree.setEmptyMessage("<br>Drag & drop sections here");
     tree.setCanReorderRecords(true);
     tree.setCanAcceptDrop(true);
     tree.setCanDragRecordsOut(true);
@@ -161,7 +161,7 @@ public class OBudget2 implements EntryPoint {
     bucketModel.setModelType(TreeModelType.PARENT);
     bucketModel.setNameProperty("ID");
     bucketModel.setChildrenProperty("directReports");
-    // expensesTreeModel.setData(nodes);
+    // sectionsTreeModel.setData(nodes);
     tree.setData(bucketModel);
 
     bucketModel.addDataChangedHandler(new DataChangedHandler() {
@@ -170,10 +170,10 @@ public class OBudget2 implements EntryPoint {
       public void onDataChanged(DataChangedEvent event) {
         System.out.println("dropped something?");
         TreeNode[] nodes = bucketModel.getAllNodes();
-        List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
+        List<SectionRecord> list = new ArrayList<SectionRecord>();
 
         for (int i = 0; i < nodes.length; i++) {
-          list.add(((ExpenseRecordTreeNode) nodes[i]).getRecord());
+          list.add(((SectionRecordTreeNode) nodes[i]).getRecord());
         }
 
         graph.updateGraph(list);
@@ -229,10 +229,10 @@ public class OBudget2 implements EntryPoint {
     commitButton.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
 
-        final ExpenseRecord e = new ExpenseRecord("001122", 9999, "SomeName",
+        final SectionRecord e = new SectionRecord("001122", 9999, "SomeName",
             101, 102, 103, 104, 105, 106);
 
-        expensesService.addExpenseRecord(e, new AsyncCallback<Void>() {
+        sectionsService.addSectionRecord(e, new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
@@ -261,8 +261,8 @@ public class OBudget2 implements EntryPoint {
           return;
         }
 
-        expensesService.getExpensesByYear(Integer.parseInt(content),
-            new AsyncCallback<ExpenseRecord[]>() {
+        sectionsService.getSectionsByYear(Integer.parseInt(content),
+            new AsyncCallback<SectionRecord[]>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -270,7 +270,7 @@ public class OBudget2 implements EntryPoint {
               }
 
               @Override
-              public void onSuccess(ExpenseRecord[] result) {
+              public void onSuccess(SectionRecord[] result) {
                 retrieveText.setValue("Success!");
 
                 textCanvas.setContents(textCanvas.getPrefix() + " Retrieved "
@@ -286,7 +286,7 @@ public class OBudget2 implements EntryPoint {
     deleteAll.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
 
-        expensesService.removeAll(new AsyncCallback<Void>() {
+        sectionsService.removeAll(new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
@@ -315,7 +315,7 @@ public class OBudget2 implements EntryPoint {
         }
         System.out.println("Updating data for year " + content);
 
-        expensesService.loadYearData(content, new AsyncCallback<Void>() {
+        sectionsService.loadYearData(content, new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
@@ -429,7 +429,7 @@ public class OBudget2 implements EntryPoint {
     v.addMember(form);
     v.addMember(h);
 
-    v.addMember(generateDBZone());
+    //v.addMember(generateDBZone());
 
     v.draw();
 

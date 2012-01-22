@@ -3,7 +3,11 @@ package com.yossale.server.cron;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Date;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -16,7 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.yossale.server.PMF;
-import com.yossale.server.data.Expense;
+import com.yossale.server.data.Section;
 
 public class UpdateDBFromYedaServlet extends HttpServlet {
 	private Logger logger = Logger.getLogger(UpdateDBFromYedaServlet.class.getName());
@@ -31,6 +35,8 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
       throws IOException {
 		JSONArray sections;
 
+		logger.warning("doGet started");
+		Date start = new Date();
 		if (req.getParameter(FROM_YEAR) == null || req.getParameter(TO_YEAR) == null) {
 			throw new IOException("both " + FROM_YEAR + " and " + TO_YEAR + " parameters must be specified");
 		}
@@ -42,20 +48,26 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
 				
 	  for (int year = from; year <= to; ++year) {
 			try {
+				logger.warning("starting " + year);
 				sections = fetchYearSections(year);
+				logger.warning("fetched, going to store " + year);
 				storeSections(sections);
+				logger.warning("stored " + year);
 			} catch (JSONException e) {
 				throw new IOException(e);
 			}
 	  }
-		resp.getWriter().println("yay!");
+		resp.getWriter().println("yay!\ntook " + (new Date().getTime() - start.getTime()) / 1000 + " secs");
   }
 	
 	private JSONArray fetchYearSections(int requestedYear) throws IOException, JSONException {
   	logger.warning("fetching: " + requestedYear);
   	URL url = new URL("http://api.yeda.us/data/gov/mof/budget/?o=json&query=%7B%22year%22:" 
 	      + requestedYear + "%7D&limit=" + MAX_SECTIONS_PER_YEAR);
-  	BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+  	HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+  	connection.setConnectTimeout(50000);
+  	connection.setReadTimeout(50000);
+  	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
   	String line = reader.readLine();
   	JSONArray sections = new JSONArray(line);
   	return sections;
@@ -69,26 +81,28 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
 		}
 	}
 	
-	private void storeSections(JSONArray sections) throws JSONException {
+	private void storeSections(JSONArray sectionArray) throws JSONException {
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-  	for (int i = 0; i < sections.length(); ++i) {
-  		JSONObject section = (JSONObject) sections.get(i);
-      String expenseCode = section.get("code").toString();
-      String name = section.get("title").toString();
-      Integer year = getIntField(section, "year");    
-      Integer netAmountAllocated = getIntField(section, "net_allocated");
-      Integer netAmountRevised = getIntField(section, "net_revised");
-      Integer netAmountUsed = getIntField(section, "net_used");
-      Integer grosAmountAllocated = getIntField(section, "gross_allocated");
-      Integer grossAmountRevised = getIntField(section, "gross_revised");
-      Integer grossAmountUsed = getIntField(section, "gross_used");
+    Vector<Section> sections = new Vector<Section>();
+  	for (int i = 0; i < sectionArray.length(); ++i) {
+  		JSONObject sectionObject = (JSONObject) sectionArray.get(i);
+      String sectionCode = sectionObject.get("code").toString();
+      String name = sectionObject.get("title").toString();
+      Integer year = getIntField(sectionObject, "year");    
+      Integer netAmountAllocated = getIntField(sectionObject, "net_allocated");
+      Integer netAmountRevised = getIntField(sectionObject, "net_revised");
+      Integer netAmountUsed = getIntField(sectionObject, "net_used");
+      Integer grosAmountAllocated = getIntField(sectionObject, "gross_allocated");
+      Integer grossAmountRevised = getIntField(sectionObject, "gross_revised");
+      Integer grossAmountUsed = getIntField(sectionObject, "gross_used");
       
-      Expense expense = new Expense(expenseCode, year, name,
+      Section section = new Section(sectionCode, year, name,
           netAmountAllocated, netAmountRevised, netAmountUsed,
           grosAmountAllocated, grossAmountRevised, grossAmountUsed);
       
-      pm.makePersistent(expense);
+      sections.add(section);
   	}
+    pm.makePersistent(sections);
   	pm.close();
 	}
 }

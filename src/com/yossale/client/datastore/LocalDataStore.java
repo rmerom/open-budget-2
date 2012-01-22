@@ -9,13 +9,13 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.yossale.shared.RpcExpenseObject;
+import com.yossale.shared.RpcSectionObject;
 
 public class LocalDataStore extends DataSource {
 
   private List<Record> recsList;
   
-  public LocalDataStore(List<RpcExpenseObject> list) {
+  public LocalDataStore(List<RpcSectionObject> list) {
     this.recsList = tranformToRecord(list);
     
     setTitleField("title");
@@ -45,10 +45,10 @@ public class LocalDataStore extends DataSource {
 
   }
   
-  private List<Record> tranformToRecord(List<RpcExpenseObject> rpcList) {
+  private List<Record> tranformToRecord(List<RpcSectionObject> rpcList) {
       
     List<Record> recs = new ArrayList<Record>();
-    for (RpcExpenseObject o : rpcList) {
+    for (RpcSectionObject o : rpcList) {
       recs.add(new Record(o.convertToPropertiesMap()));
     }
     return recs;

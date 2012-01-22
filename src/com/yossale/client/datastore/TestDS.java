@@ -9,13 +9,13 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.DSProtocol;
-import com.yossale.client.data.ExpenseRecord;
+import com.yossale.client.data.SectionRecord;
 
 public class TestDS extends DataSource {
 
   private List<Record> recsList;
   
-  public TestDS(List<ExpenseRecord> list) {
+  public TestDS(List<SectionRecord> list) {
     this.recsList = tranformToRecord(list);   
     
     setDataProtocol(DSProtocol.POSTXML);
@@ -33,12 +33,12 @@ public class TestDS extends DataSource {
     setFields(topicName, codeAsText);
   }
   
-  private List<Record> tranformToRecord(List<ExpenseRecord> rpcList) {      
+  private List<Record> tranformToRecord(List<SectionRecord> rpcList) {      
     List<Record> recs = new ArrayList<Record>();
-    for (ExpenseRecord o : rpcList) {
+    for (SectionRecord o : rpcList) {
       Record r = new Record();
       r.setAttribute("Name", o.getName());
-      r.setAttribute("code", o.getExpenseCode());
+      r.setAttribute("code", o.getSectionCode());
       recs.add(r);
     }
     return recs;
