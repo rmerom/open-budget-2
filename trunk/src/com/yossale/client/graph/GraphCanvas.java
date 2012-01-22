@@ -16,7 +16,7 @@ import com.google.gwt.visualization.client.visualizations.corechart.AreaChart;
 import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.yossale.client.data.ExpenseRecord;
+import com.yossale.client.data.SectionRecord;
 
 public class GraphCanvas extends Composite {
 
@@ -41,7 +41,7 @@ public class GraphCanvas extends Composite {
 
   }
   
-  public void updateGraph(List<ExpenseRecord> nodes) {
+  public void updateGraph(List<SectionRecord> nodes) {
 
     
     if (nodes == null || nodes.isEmpty()) {    	
@@ -56,26 +56,26 @@ public class GraphCanvas extends Composite {
     options.setWidth(600);
     options.setHeight(400);
 //     options.set3D(true);
-    options.setTitle("Government expenses");    
+    options.setTitle("Government sections");    
     return options;
   }
   
-  private List<ExpenseRecord> summarizeResults(List<ExpenseRecord> topics) {
+  private List<SectionRecord> summarizeResults(List<SectionRecord> topics) {
 	  
-	  Map<Integer, ExpenseRecord> map = new HashMap<Integer, ExpenseRecord>();
+	  Map<Integer, SectionRecord> map = new HashMap<Integer, SectionRecord>();
 	  
-	  for(ExpenseRecord t : topics) {		  
-		  ExpenseRecord sum = map.get(t.getYear()) == null ? new ExpenseRecord() : map.get(t.getYear());		  
+	  for(SectionRecord t : topics) {		  
+		  SectionRecord sum = map.get(t.getYear()) == null ? new SectionRecord() : map.get(t.getYear());		  
 		  sum.add(t);
 		  sum.setYear(t.getYear());
 		  map.put(t.getYear(), sum);		  
 	  }
 	  
-	  return new ArrayList<ExpenseRecord>(map.values());
+	  return new ArrayList<SectionRecord>(map.values());
 	  
   }
 
-  private DataTable createTable(List<ExpenseRecord> topics) {
+  private DataTable createTable(List<SectionRecord> topics) {
 	  
 	System.out.println("Updating graph");
 	
@@ -90,16 +90,16 @@ public class GraphCanvas extends Composite {
       return data;
     }
     
-    List<ExpenseRecord> sums = summarizeResults(topics);
-    Collections.sort(sums, new Comparator<ExpenseRecord>() {
+    List<SectionRecord> sums = summarizeResults(topics);
+    Collections.sort(sums, new Comparator<SectionRecord>() {
 
       @Override
-      public int compare(ExpenseRecord o1, ExpenseRecord o2) {        
+      public int compare(SectionRecord o1, SectionRecord o2) {        
         return (new Integer(o1.getYear()).compareTo(new Integer(o2.getYear()))  );
       }
     });
 
-    for (ExpenseRecord t : sums) {
+    for (SectionRecord t : sums) {
       int rowIndex = data.addRow();
       data.setValue(rowIndex, 0, t.getYear()+"");
       data.setValue(rowIndex, 1, t.getNetAmountAllocated());

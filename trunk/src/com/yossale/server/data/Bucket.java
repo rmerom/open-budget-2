@@ -23,7 +23,7 @@ public class Bucket {
 	private String name;
 	
 	@Persistent
-	private List<Expense> expenses;
+	private List<Section> sections;
 
 	public Key getKey() {
 		return key;
@@ -41,12 +41,12 @@ public class Bucket {
 		this.name = name;
 	}
 
-	public List<Expense> getExpenses() {
-		return expenses;
+	public List<Section> getSections() {
+		return sections;
 	}
 
-	public void setExpenses(List<Expense> expenses) {
-		this.expenses = expenses;
+	public void setSections(List<Section> sections) {
+		this.sections = sections;
 	}
 	
 	public BucketRecord toBucketRecord() {
