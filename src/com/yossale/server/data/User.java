@@ -1,5 +1,6 @@
 package com.yossale.server.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -23,7 +24,6 @@ public class User {
 	private List<Bucket> buckets;
 
 	public User() {
-	  super();
 	}
 
 	public Key getKey() {
@@ -43,12 +43,13 @@ public class User {
 	}
 
 	public List<Bucket> getBuckets() {
+		if (buckets == null) {
+			return new ArrayList<Bucket>();
+		}
 	  return buckets;
 	}
 
 	public void setBuckets(List<Bucket> buckets) {
 	  this.buckets = buckets;
 	}
-	
-	
 }
