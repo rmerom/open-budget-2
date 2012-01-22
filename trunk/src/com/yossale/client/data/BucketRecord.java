@@ -8,6 +8,10 @@ public class BucketRecord implements Serializable {
 	private String name;
 	private long id;
 	
+	public BucketRecord() {		
+		super();
+	}
+	
 	public BucketRecord(long id, String name) {
 	  super();
 	  this.name = name;

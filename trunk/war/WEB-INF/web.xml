@@ -17,13 +17,13 @@
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>expenseService</servlet-name>
+    <servlet-name>sectionService</servlet-name>
     <servlet-class>com.yossale.server.actions.SectionServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>expenseService</servlet-name>
-    <url-pattern>/obudget2/expense</url-pattern>
+    <servlet-name>sectionService</servlet-name>
+    <url-pattern>/obudget2/section</url-pattern>
   </servlet-mapping>
   
   <servlet>

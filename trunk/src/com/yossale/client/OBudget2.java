@@ -30,10 +30,13 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.yossale.client.actions.BucketService;
+import com.yossale.client.actions.BucketServiceAsync;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.actions.LoginService;
 import com.yossale.client.actions.LoginServiceAsync;
+import com.yossale.client.data.BucketRecord;
 import com.yossale.client.data.SectionRecord;
 import com.yossale.client.data.LoginInfo;
 import com.yossale.client.graph.GraphCanvas;
@@ -48,6 +51,8 @@ public class OBudget2 implements EntryPoint {
   private final GraphCanvas graph = new GraphCanvas();
   private final SectionServiceAsync sectionsService = GWT
       .create(SectionService.class);
+  private final BucketServiceAsync bucketService = GWT
+  .create(BucketService.class);
   private final Map<Integer, Tree> budgetTreesCache = new HashMap<Integer, Tree>();
 
   private TreeGrid bucketTree;
@@ -345,12 +350,41 @@ public class OBudget2 implements EntryPoint {
         updateTree(Integer.parseInt(content));
       }
     });
+    
+    IButton addBucket = new IButton("AddBucket");
+    addBucket.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+
+        String content = jsonText.getValueAsString();
+        if (content == null) {
+          return;
+        }
+        System.out.println("adding bucket " + content);
+
+        bucketService.addBucket(content, new AsyncCallback<BucketRecord>() {
+
+          @Override
+          public void onSuccess(BucketRecord bucket) {
+            commitText.setValue("Success!");
+            textCanvas.setContents(textCanvas.getPrefix());
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            commitText.setValue("Failure :(");
+          }
+        });
+      }
+    });
 
     buttonLayout.addMember(commitButton);
     buttonLayout.addMember(retrieveButton);
     buttonLayout.addMember(deleteAll);
     buttonLayout.addMember(commitJson);
     buttonLayout.addMember(updateBudget);
+    buttonLayout.addMember(addBucket);
 
     HLayout layout = new HLayout(15);
     layout.setAutoHeight();
@@ -424,12 +458,12 @@ public class OBudget2 implements EntryPoint {
     Label userLabel = new Label(currentUser);
     v.setAutoHeight();
     v.setMembersMargin(30);
-    // v.addMember(userLabel);
+    v.addMember(userLabel);
     v.addMember(createTitle());
     v.addMember(form);
     v.addMember(h);
 
-    //v.addMember(generateDBZone());
+    v.addMember(generateDBZone());
 
     v.draw();
 
