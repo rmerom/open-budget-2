@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <cron>
+    <url>/cron/addupdatetask</url>
+    <description>Adds a task to retrieve one year's worth from api.yeda.us </description>
+    <schedule>every day 08:20</schedule>
+    <timezone>Asia/Jerusalem</timezone>
+  </cron>
+</cronentries>
+

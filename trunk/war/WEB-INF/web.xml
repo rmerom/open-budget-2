@@ -39,6 +39,16 @@
 
   <!--  Cron servlets -->
   <servlet>
+    <servlet-name>addUpdateTaskervlet</servlet-name>
+    <servlet-class>com.yossale.server.cron.AddUpdateDBTaskServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>addUpdateTaskervlet</servlet-name>
+    <url-pattern>/cron/addupdatetask</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>updateDBServlet</servlet-name>
     <servlet-class>com.yossale.server.cron.UpdateDBFromYedaServlet</servlet-class>
   </servlet>
