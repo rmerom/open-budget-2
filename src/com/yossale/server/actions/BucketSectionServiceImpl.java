@@ -8,15 +8,15 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.yossale.client.actions.BucketSectionService;
-import com.yossale.client.data.BucketRecord;
 import com.yossale.client.data.SectionRecord;
 import com.yossale.server.PMF;
 import com.yossale.server.data.Bucket;
 import com.yossale.server.data.Section;
-import com.yossale.server.data.User;
 
 public class BucketSectionServiceImpl extends RemoteServiceServlet implements
     BucketSectionService {
+
+	private static final long serialVersionUID = -4964841133537947859L;
 
 	@Override
 	public SectionRecord[] getSections(long bucketId) {

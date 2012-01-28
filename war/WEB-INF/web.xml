@@ -38,6 +38,8 @@
 
 
   <!--  Cron servlets -->
+  <!-- Adds an update task to the task queue. Goes through the years "round robin",
+       unless a "year=XXXX" parameter is specified. -->
   <servlet>
     <servlet-name>addUpdateTaskervlet</servlet-name>
     <servlet-class>com.yossale.server.cron.AddUpdateDBTaskServlet</servlet-class>
@@ -48,6 +50,7 @@
     <url-pattern>/cron/addupdatetask</url-pattern>
   </servlet-mapping>
 
+  <!--  Do not run directly. This takes >60 secs and should only be run as a task. -->
   <servlet>
     <servlet-name>updateDBServlet</servlet-name>
     <servlet-class>com.yossale.server.cron.UpdateDBFromYedaServlet</servlet-class>

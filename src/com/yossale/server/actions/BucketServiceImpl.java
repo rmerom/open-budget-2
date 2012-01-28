@@ -20,7 +20,7 @@ public class BucketServiceImpl extends RemoteServiceServlet implements
 	private Logger logger = Logger.getLogger(BucketServiceImpl.class.getName());
 	
 	@Override
-	public BucketRecord[] getBuckets(int id) {
+	public BucketRecord[] getBucketsOfLoggedInUser() {
 		User user = Common.getLoggedInUserRecord();
 		List<Bucket> buckets = user.getBuckets();
 		BucketRecord[] output = new BucketRecord[buckets.size()];
