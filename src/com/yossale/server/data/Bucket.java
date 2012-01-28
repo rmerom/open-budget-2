@@ -26,6 +26,9 @@ public class Bucket {
 	@Persistent
 	private List<Section> sections;
 
+	@Persistent
+	private Boolean isPublic;
+
 	public Key getKey() {
 		return key;
 	}
@@ -56,4 +59,13 @@ public class Bucket {
 	public BucketRecord toBucketRecord() {
 		return new BucketRecord(getKey().getId(), getName());
 	}
+
+	public Boolean getIsPublic() {
+		return isPublic == null ? false : isPublic;
+	}
+
+	public void setIsPublic(Boolean isPublic) {
+		this.isPublic = isPublic;
+	}
+
 }

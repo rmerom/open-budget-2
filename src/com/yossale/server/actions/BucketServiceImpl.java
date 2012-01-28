@@ -1,9 +1,11 @@
 package com.yossale.server.actions;
 
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.data.BucketRecord;
@@ -11,6 +13,9 @@ import com.yossale.server.Common;
 import com.yossale.server.PMF;
 import com.yossale.server.data.Bucket;
 import com.yossale.server.data.User;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 @SuppressWarnings("serial")
@@ -48,5 +53,19 @@ public class BucketServiceImpl extends RemoteServiceServlet implements
       pm.close();
     }
     return b.toBucketRecord();
+	}
+
+	@Override
+	public BucketRecord[] getAllPublicBuckets() {
+		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+		Query query = pm.newQuery("select from Bucket where isPublic == true sort by name");
+		Vector<BucketRecord> bucketRecords = new Vector<BucketRecord>(); 
+		@SuppressWarnings("unchecked")
+		List<Bucket> buckets = (List<Bucket>)query.execute();
+		for (Bucket bucket : buckets) {
+			bucketRecords.add(bucket.toBucketRecord());
+			
+		}
+		return bucketRecords.toArray(new BucketRecord[0]);
 	}
 }
