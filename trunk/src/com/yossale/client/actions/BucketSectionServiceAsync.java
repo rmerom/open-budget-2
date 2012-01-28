@@ -5,4 +5,6 @@ import com.yossale.client.data.SectionRecord;
 
 public interface BucketSectionServiceAsync {
 	void getSections(long bucketId, AsyncCallback<SectionRecord[]> callback);
+	void updateBucketSections(long bucketId, SectionRecord[] sectionRecords,
+			AsyncCallback<Void> callback);
 }

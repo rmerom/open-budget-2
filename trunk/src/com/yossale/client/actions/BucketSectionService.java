@@ -7,4 +7,6 @@ import com.yossale.client.data.SectionRecord;
 @RemoteServiceRelativePath("bucket_section")
 public interface BucketSectionService extends RemoteService {
 	SectionRecord[] getSections(long bucketId);
+	void updateBucketSections(long bucketId, SectionRecord[] sectionRecords);
+	
 }

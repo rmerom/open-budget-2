@@ -1,5 +1,6 @@
 package com.yossale.server.actions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -39,6 +40,29 @@ public class BucketSectionServiceImpl extends RemoteServiceServlet implements
 			output[i++] = section.toSectionRecord();
 		}
 		return output;
+	}
+	
+	public void updateBucketSections(long bucketId, SectionRecord[] sectionRecords) {
+		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+		Key key = KeyFactory.createKey(Bucket.class.getSimpleName(), bucketId);
+		Bucket bucket = null;
+		try {
+		  bucket = pm.getObjectById(Bucket.class, key);
+		} catch (Exception e) {
+			bucket = null;
+		}
+		if (bucket == null) {
+			throw new IllegalStateException("could not read bucket");
+		}
+		List<Section> sections = new ArrayList<Section>();
+		for (SectionRecord sectionRecord : sectionRecords) {
+			sections.add(new Section(sectionRecord));
+		}
+		bucket.setSections(sections);
+		pm.makePersistent(bucket);
+		return;
+		
+		
 	}
 
 }
