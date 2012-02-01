@@ -3,8 +3,9 @@ package com.yossale.client.data;
 import java.io.Serializable;
 
 import com.google.gwt.json.client.JSONObject;
+import com.smartgwt.client.data.Record;
 
-public class SectionRecord implements Serializable {
+public class SectionRecord extends Record implements Serializable  {
 
 	private static final long serialVersionUID = -2358987888595684650L;
 	
@@ -36,6 +37,13 @@ public class SectionRecord implements Serializable {
 		this.grosAmountAllocated = grosAmountAllocated;
 		this.grossAmountRevised = grossAmountRevised;
 		this.grossAmountUsed = grossAmountUsed;
+		
+		String id = year + "_" + sectionCode ;		    
+	    setAttribute("parentId", id.substring(0, id.length() - 2));    
+	    setAttribute("ID", id);
+	    setAttribute("#", sectionCode);
+	    setAttribute("Name", name);    
+	    setAttribute("Year", year);    
 	}
 	
 	public SectionRecord(JSONObject j) {
