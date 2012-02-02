@@ -10,6 +10,8 @@ public interface SectionService extends RemoteService {
 	SectionRecord[] getSections(int year);
 	void addSectionRecord(SectionRecord record);
 	SectionRecord[] getSectionsByYear(int year);
+	SectionRecord[] getSectionsByYearAndParent(int year, String parentCode);
+	String[] getAvailableBudgetYears();
 	void removeAll();
 	void loadYearData(String year);
 

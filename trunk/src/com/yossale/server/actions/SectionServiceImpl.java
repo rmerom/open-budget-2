@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -13,7 +15,6 @@ import javax.jdo.Query;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.yossale.client.actions.SectionService;
@@ -175,5 +176,68 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     }
 
     return sectionsArr;
+  }
+
+  @Override
+  public SectionRecord[] getSectionsByYearAndParent(int year, String parentCode) {
+    
+    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+    Query query = pm.newQuery(Section.class);
+    query.setFilter("year == sectionYearParam && sectionCode == sectionCodeParam");
+    
+    query.setOrdering("sectionCode desc");
+    query.declareParameters("Integer sectionYearParam, String sectionCodeParam");
+
+    List<Section> results = (List<Section>) query.execute(year, parentCode);
+
+    if (results == null || results.isEmpty()) {
+      return new SectionRecord[] {};
+    }
+
+    SectionRecord[] sectionsArr = new SectionRecord[results.size()];
+    System.out.println("Found " + results.size() + " records");
+    for (int i = 0; i < results.size(); i++) {
+      Section e = results.get(i);
+      sectionsArr[i] = e.toSectionRecord();
+    }
+
+    return sectionsArr;
+    
+  }
+
+  @Override
+  public String[] getAvailableBudgetYears() {    
+    
+    System.out.println("Querying getAvailableBudgetYears");
+    
+    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+    
+    Query query = pm.newQuery(Section.class);
+    query.setFilter("sectionCode == sectionCodeParam");   
+    query.declareParameters("String sectionCodeParam");        
+
+    List<Section> results = (List<Section>) query.execute("00");
+    
+    System.out.println("Querying getAvailableBudgetYears - query passed");   
+    
+    if (results == null || results.isEmpty()) {
+      return new String[] {};
+    }
+
+    String[] yearsArr = new String[results.size()];
+    Collections.sort(results, new Comparator<Section>() {
+      @Override
+      public int compare(Section lhs, Section rhs) {        
+        return lhs.getYear().compareTo(rhs.getYear());
+      }
+    });
+    
+    System.out.println("Found " + results.size() + " years");
+    for (int i = 0; i < results.size(); i++) {
+      Section e = results.get(i);
+      yearsArr[i] = ""+e.getYear();
+    }
+
+    return yearsArr;
   }
 }

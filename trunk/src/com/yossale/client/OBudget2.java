@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.SelectOtherItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -32,13 +32,13 @@ import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.actions.BucketServiceAsync;
-import com.yossale.client.actions.SectionService;
-import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.actions.LoginService;
 import com.yossale.client.actions.LoginServiceAsync;
+import com.yossale.client.actions.SectionService;
+import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.data.BucketRecord;
-import com.yossale.client.data.SectionRecord;
 import com.yossale.client.data.LoginInfo;
+import com.yossale.client.data.SectionRecord;
 import com.yossale.client.graph.GraphCanvas;
 import com.yossale.client.gui.dataobj.SectionRecordTreeNode;
 
@@ -99,6 +99,7 @@ public class OBudget2 implements EntryPoint {
               sectionsTreeModel.setNameProperty("ID");
               sectionsTreeModel.setChildrenProperty("directReports");
               sectionsTreeModel.setData(nodes);
+              
               budgetTreesCache.put(year, sectionsTreeModel);
               budgetTree.setData(sectionsTreeModel);              
             }
@@ -400,12 +401,23 @@ public class OBudget2 implements EntryPoint {
     DynamicForm form = new DynamicForm();
     form.setWidth(250);
 
-    SelectOtherItem selectOtherItem = new SelectOtherItem();
-    // selectOtherItem.setOtherTitle("Other..");
-    // selectOtherItem.setOtherValue("OtherVal");
+    final SelectItem selectOtherItem = new SelectItem();    
+       
+    sectionsService.getAvailableBudgetYears(new AsyncCallback<String[]>() {
 
-    selectOtherItem.setTitle("Select year");
-    selectOtherItem.setValueMap("2008", "2009", "2010");
+      @Override
+      public void onFailure(Throwable caught) {
+        System.out.println("Failed to retrieve years!");        
+      }
+
+      @Override
+      public void onSuccess(String[] result) {
+        selectOtherItem.setValueMap(result);
+        
+      }
+    });
+    
+    selectOtherItem.setTitle("Select year");    
     selectOtherItem.addChangedHandler(new ChangedHandler() {
 
       @Override
@@ -445,10 +457,11 @@ public class OBudget2 implements EntryPoint {
 
     final DynamicForm form = generateDynamicForm();
 
-    HLayout h = new HLayout();
+    HLayout h = new HLayout();    
     h.addMember(budgetTree);
     h.addMember(bucketTree);
     h.addMember(graph);
+    h.addMember(form);
 
     VLayout v = new VLayout();
 

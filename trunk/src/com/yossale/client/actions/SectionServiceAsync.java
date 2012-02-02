@@ -13,4 +13,9 @@ public interface SectionServiceAsync {
   void removeAll(AsyncCallback<Void> callback);
 
   void loadYearData(String year, AsyncCallback<Void> callback);
+
+  void getSectionsByYearAndParent(int year, String parentCode,
+      AsyncCallback<SectionRecord[]> callback);
+
+  void getAvailableBudgetYears(AsyncCallback<String[]> callback);
 }
