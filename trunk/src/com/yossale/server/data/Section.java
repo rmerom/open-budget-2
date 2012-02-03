@@ -12,9 +12,19 @@ import com.yossale.client.data.SectionRecord;
 @PersistenceCapable
 public class Section {
 
+  @PrimaryKey
+  @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+  private Key key;
+
+  public Key getKey() {
+    return key;
+  }
   // Mispar Se'if Takzivi as string.
   @Persistent
   private String sectionCode;
+  
+  @Persistent
+  private String parentCode;
 
   @Persistent
   private Integer year;
@@ -40,10 +50,13 @@ public class Section {
   @Persistent
   private Integer grossAmountUsed;
 
-  public Section(String sectionCode, Integer year, String name,
+  public Section(String sectionCode, String parentCode, Integer year, String name,
       Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
       Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
-    this.sectionCode = sectionCode;
+    this.sectionCode = sectionCode;  
+//    this.parentCode = sectionCode.length() == 2 ? "" : sectionCode
+//        .substring(0, sectionCode.length() - 2);
+    this.parentCode = parentCode;
     this.year = year;
     this.name = name;
     this.netAmountAllocated = netAmountAllocated;
@@ -60,6 +73,7 @@ public class Section {
 
   public Section(SectionRecord r) {
     this.sectionCode = r.getSectionCode();
+    this.parentCode = r.getParentCode();
     this.year = r.getYear();
     this.name = r.getName();
     this.netAmountAllocated = r.getNetAmountAllocated();
@@ -71,12 +85,14 @@ public class Section {
     generateKey();
   }
 
-  @PrimaryKey
-  @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-  private Key key;
+  
 
-  public Key getKey() {
-    return key;
+  public String getParentCode() {
+    return parentCode;
+  }
+
+  public void setParentCode(String parentCode) {
+    this.parentCode = parentCode;
   }
 
   public String getSectionCode() {
@@ -152,7 +168,7 @@ public class Section {
   }
 
   public SectionRecord toSectionRecord() {
-    return new SectionRecord(sectionCode, year, name, netAmountAllocated,
+    return new SectionRecord(sectionCode, parentCode, year, name, netAmountAllocated,
         netAmountRevised, netAmountUsed, grossAmountAllocated,
         grossAmountRevised, grossAmountUsed);
   }

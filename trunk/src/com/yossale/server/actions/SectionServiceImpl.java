@@ -21,6 +21,7 @@ import com.yossale.client.actions.SectionService;
 import com.yossale.client.data.SectionRecord;
 import com.yossale.server.PMF;
 import com.yossale.server.data.Section;
+import com.yossale.server.util.Emailer;
 
 @SuppressWarnings("serial")
 public class SectionServiceImpl extends RemoteServiceServlet implements
@@ -28,13 +29,13 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
 
   public SectionRecord[] getSections(int year) {
 
-    SectionRecord rec1 = new SectionRecord("00", year, "section1", 101, 102,
+    SectionRecord rec1 = new SectionRecord("00", "", year, "section1", 101, 102,
         103, 104, 105, 106);
-    SectionRecord rec2 = new SectionRecord("0001", year, "section2", 201, 202,
+    SectionRecord rec2 = new SectionRecord("0001", "00", year, "section2", 201, 202,
         203, 204, 205, 206);
-    SectionRecord rec3 = new SectionRecord("000101", year, "section3", 301,
+    SectionRecord rec3 = new SectionRecord("000101", "0001", year, "section3", 301,
         302, 303, 304, 305, 306);
-    SectionRecord rec4 = new SectionRecord("0002", year, "section4", 401, 402,
+    SectionRecord rec4 = new SectionRecord("0002", "00", year, "section4", 401, 402,
         403, 404, 405, 406);
 
     return new SectionRecord[] { rec1, rec2, rec3, rec4 };
@@ -71,6 +72,12 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   private SectionRecord generateSectionRecord(JSONObject j) throws JSONException {    
 
     String sectionCode = j.getString("code");
+    /**
+     * Forgive me father, for I have sinned. This line is a logic duplication... :(
+     * The same happens in the UpdateDBFromYedaServlet
+     */
+    String parentCode = sectionCode.length() == 2 ? "" : sectionCode
+        .substring(0, sectionCode.length() - 2);
     String name = j.get("title").toString();
     Integer year = parseJson(j,"year");    
     Integer netAmountAllocated = parseJson(j, "net_allocated");
@@ -80,7 +87,7 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     Integer grossAmountRevised = parseJson(j, "gross_revised");
     Integer grossAmountUsed = parseJson(j, "gross_used");
 
-    SectionRecord r = new SectionRecord(sectionCode, year, name,
+    SectionRecord r = new SectionRecord(sectionCode, parentCode, year, name,
         netAmountAllocated, netAmountRevised, netAmountUsed,
         grosAmountAllocated, grossAmountRevised, grossAmountUsed);
 
@@ -145,7 +152,6 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
         if (er != null) {
           addSectionRecord(er);
         }
-
       }
 
     } catch (Exception e) {
@@ -210,7 +216,9 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     
     System.out.println("Querying getAvailableBudgetYears");
     
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+    new Emailer().sendEmail("yossale@gmail.com", "yossale@gmail.com", "Working", "worked!");
+    
+    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();    
     
     Query query = pm.newQuery(Section.class);
     query.setFilter("sectionCode == sectionCodeParam");   
