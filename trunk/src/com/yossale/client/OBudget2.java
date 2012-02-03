@@ -46,6 +46,8 @@ import com.yossale.client.gui.dataobj.SectionRecordTreeNode;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class OBudget2 implements EntryPoint {
+  
+  public static final String VERSION_ID = "1-1";
 
   private TreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
@@ -115,11 +117,9 @@ public class OBudget2 implements EntryPoint {
 
   private TreeGrid generateBudgetTree() {
     TreeGrid employeeTreeGrid = new TreeGrid();
-    employeeTreeGrid.setShowOpenIcons(true);
-    employeeTreeGrid.setClosedIconSuffix("");
+    employeeTreeGrid.setShowOpenIcons(true);    
     employeeTreeGrid.setFields(new TreeGridField("#"),
-        new TreeGridField("Name"), new TreeGridField("Year"));
-    // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
+        new TreeGridField("Name"), new TreeGridField("Year"));    
     employeeTreeGrid.setSize("400", "400");
 
     employeeTreeGrid.setShowEdges(true);
@@ -471,6 +471,8 @@ public class OBudget2 implements EntryPoint {
     Label userLabel = new Label(currentUser);
     v.setAutoHeight();
     v.setMembersMargin(30);
+    
+    v.addMember(new Label("Version :" + VERSION_ID));
     v.addMember(userLabel);
     v.addMember(createTitle());
     v.addMember(form);

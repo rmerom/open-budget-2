@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -31,39 +33,49 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
   
   private static final long serialVersionUID = 1773352816547081584L;
   private static final int MAX_SECTIONS_PER_YEAR = 1000000;
-  private static final String YEAR = "year"; // GET parameter
-  
-  private void emailAdmins(String subject) {
-    
-    emailer.sendEmail("yossale@gmail.com", new String[]{"yossale@gmail.com"}, subject, "");
-    
-  }
-  
+  private static final String YEAR = "year"; // GET parameter    
 
   public void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws IOException {
 
     logger.warning("doGet started");
-    Date start = new Date();
+    boolean succeeded = false;
+    Date startTime = null;
+    Date endTime = null;
+    
     if (req.getParameter(YEAR) == null) {
       throw new IOException(YEAR + " parameter must be specified");
     }
     int year = Integer.valueOf(req.getParameter(YEAR));
     String sectionsLine = null;
     try {
+      startTime = GregorianCalendar.getInstance().getTime();
       logger.warning("starting " + year);
       sectionsLine = fetchYearSections(year);
       JSONArray sections = new JSONArray(sectionsLine);
       logger.warning("fetched, going to store " + year);
       storeSections(sections);
       logger.warning("stored " + year);
+      endTime = GregorianCalendar.getInstance().getTime();
+      
+      succeeded = true;           
 
     } catch (JSONException e) {
       logger.warning("got JSONException for " + sectionsLine);
       throw new IOException(e);
+    } finally {
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");      
+      if (succeeded) {
+        emailer.sendHappyMailToAdmins("Cron load for year" + year + " succeded",
+            "Started at " + df.format(startTime) + " and ended at " + df.format(endTime));
+      } else {
+        emailer.sendSadMailToAdmins("Cron load for year" + year + " failed",
+            "Started at " + df.format(startTime));
+      }
+      
     }
     resp.getWriter().println(
-        "yay!\ntook " + (new Date().getTime() - start.getTime()) / 1000
+        "yay!\ntook " + (endTime.getTime() - startTime.getTime()) / 1000
             + " secs");
   }
 

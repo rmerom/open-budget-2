@@ -214,9 +214,7 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   @Override
   public String[] getAvailableBudgetYears() {    
     
-    System.out.println("Querying getAvailableBudgetYears");
-    
-    new Emailer().sendEmail("yossale@gmail.com", "yossale@gmail.com", "Working", "worked!");
+    System.out.println("Querying getAvailableBudgetYears");   
     
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();    
     
