@@ -235,7 +235,7 @@ public class OBudget2 implements EntryPoint {
     commitButton.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
 
-        final SectionRecord e = new SectionRecord("001122", 9999, "SomeName",
+        final SectionRecord e = new SectionRecord("001122", "0011",9999, "SomeName",
             101, 102, 103, 104, 105, 106);
 
         sectionsService.addSectionRecord(e, new AsyncCallback<Void>() {

@@ -2,14 +2,13 @@ package com.yossale.client.data;
 
 import java.io.Serializable;
 
-import com.google.gwt.json.client.JSONObject;
-
 public class SectionRecord implements Serializable  {
 
 	private static final long serialVersionUID = -2358987888595684650L;
 	
 	// Mispar Se'if Takzivi as string.
 	private String sectionCode = "";	
+	private String parentCode = "";	
 	private String name = "";
 	private Integer year = 0;
 	private Integer netAmountAllocated = 0;
@@ -23,11 +22,12 @@ public class SectionRecord implements Serializable  {
 	  
 	}
 
-	public SectionRecord(String sectionCode, Integer year, String name,
+	public SectionRecord(String sectionCode, String parentCode, Integer year, String name,
 	    Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
 	    Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
 		super();
 		this.sectionCode = sectionCode;
+		this.parentCode = parentCode;
 		this.year = year;
 		this.name = name;
 		this.netAmountAllocated = netAmountAllocated;
@@ -40,19 +40,19 @@ public class SectionRecord implements Serializable  {
 		
 	}
 	
-	public SectionRecord(JSONObject j) {
-	  
-	  this.sectionCode = j.get("code").toString();
-    this.year = Integer.parseInt(j.get("year").toString());
-    this.name = j.get("title").toString();
-    this.netAmountAllocated = Integer.parseInt(j.get("net_allocated").toString());;
-    this.netAmountRevised = Integer.parseInt(j.get("net_revised").toString());;
-    this.netAmountUsed = Integer.parseInt(j.get("net_used").toString());;
-    this.grosAmountAllocated = Integer.parseInt(j.get("gross_allocated").toString());;
-    this.grossAmountRevised = Integer.parseInt(j.get("gross_revised").toString());;
-    this.grossAmountUsed = Integer.parseInt(j.get("gross_used").toString());;
-	  
-	}
+//	public SectionRecord(JSONObject j) {
+//	  
+//	  this.sectionCode = j.get("code").toString();
+//    this.year = Integer.parseInt(j.get("year").toString());
+//    this.name = j.get("title").toString();
+//    this.netAmountAllocated = Integer.parseInt(j.get("net_allocated").toString());;
+//    this.netAmountRevised = Integer.parseInt(j.get("net_revised").toString());;
+//    this.netAmountUsed = Integer.parseInt(j.get("net_used").toString());;
+//    this.grosAmountAllocated = Integer.parseInt(j.get("gross_allocated").toString());;
+//    this.grossAmountRevised = Integer.parseInt(j.get("gross_revised").toString());;
+//    this.grossAmountUsed = Integer.parseInt(j.get("gross_used").toString());;
+//	  
+//	}
 
 	public String getSectionCode() {
 		return sectionCode;
@@ -62,7 +62,15 @@ public class SectionRecord implements Serializable  {
 		this.sectionCode = sectionCode;
 	}
 
-	public int getYear() {
+	public String getParentCode() {
+    return parentCode;
+  }
+
+  public void setParentCode(String parentCode) {
+    this.parentCode = parentCode;
+  }
+
+  public int getYear() {
 		return year;
 	}
 
