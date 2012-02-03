@@ -14,15 +14,36 @@ import javax.mail.internet.MimeMessage;
 
 public class Emailer {
   
+  private static final String[] ADMINS = 
+    new String[]{"yossale+obudget@gmail.com","rmerom+obudget@gmail.com",
+                                          "oded+obudget@poncz.com"};
+  private static final String APP_ADDRESS = "obudget2@appspot.gserviceaccount.com";
+  
   private Logger logger = Logger.getLogger(Emailer.class
       .getName());
 
-  public void sendEmail(String aFromEmailAddr, String aToEmailAddr,
+  public void sendEmail(String aToEmailAddr,
       String aSubject, String aBody) {
-     sendEmail(aFromEmailAddr, new String[]{aToEmailAddr}, aSubject, aBody); 
+     sendEmail(new String[]{aToEmailAddr}, aSubject, aBody); 
+  } 
+  
+  public void sendHappyMailToAdmins(String subject, String info) {
+    sendEmail(ADMINS, "Happy mail! - " + subject, info);
   }
   
-  public void sendEmail(String aFromEmailAddr, String[] aToEmailAddr,
+  public void sendSadMailToAdmins(String subject, String info) {
+    sendEmail(ADMINS, "Sad mail :( - " + subject, info);
+  }
+  
+  public void sendBoringMailToAdmins(String subject, String info) {
+    sendEmail(ADMINS, "Boring mail - " + subject, info);
+  }  
+  
+  public void sendMailToAdmins(String subject, String info) {
+    sendEmail(ADMINS, subject, info);
+  }
+  
+  public void sendEmail(String[] aToEmailAddr,
       String aSubject, String aBody) {
     
     System.out.println("Sending mail");
@@ -31,7 +52,7 @@ public class Emailer {
 
     try {
       Message msg = new MimeMessage(session);
-      msg.setFrom(new InternetAddress("yossale@gmail.com", "Obudget2 Overlord"));
+      msg.setFrom(new InternetAddress(APP_ADDRESS, "OBudget Overlord"));
       for (String to : aToEmailAddr) {
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
       }     
