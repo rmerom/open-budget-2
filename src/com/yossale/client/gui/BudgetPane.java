@@ -1,30 +1,29 @@
 package com.yossale.client.gui;
 
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.SplitPane;
+import com.smartgwt.client.widgets.layout.HLayout;
 
-public class BudgetPane extends Canvas {
-  
-  private final SplitPane sp = new SplitPane();
+public class BudgetPane extends HLayout {
   
   public BudgetPane(Canvas left, Canvas right) {
-    super();
     setBorder("5px solid blue");
-    sp.setBorder("3px solid red");
-    
-    addChild(sp);
-    sp.setSize("750","400");
-    setLeftPane(left);
-    setRightPane(right);
-    setSize("800","400");
+    addMember(left, 0);
+    addMember(right, 1);
+    setShowResizeBar(true);
   }
   
-  public void setLeftPane(Canvas left) {
-    sp.setNavigationPane(left);
+  public void updateBudgetTree(Canvas left) {
+    left.animateFade(25);
+    Canvas member = getMember(0);
+    removeMember(member);
+    addMember(left,0);    
   }
   
-  public void setRightPane(Canvas right) {
-    sp.setDetailPane(right);
+  public void updateBucketTree(Canvas right) {
+    right.animateFade(25);
+    Canvas member = getMember(1);
+    removeMember(member);
+    addMember(right,1);
   }
 
 }
