@@ -51,7 +51,7 @@ public class OBudget2 implements EntryPoint {
 
   public static final String VERSION_ID = "1.1 - added mail support";
 
-  private TreeGrid budgetTree;
+  private BudgetTreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
   private final SectionServiceAsync sectionsService = GWT
       .create(SectionService.class);
@@ -95,9 +95,8 @@ public class OBudget2 implements EntryPoint {
   private TreeGrid generateBucket() {
 
     TreeGrid tree = new TreeGrid();
-    tree.setFields(new TreeGridField("#"), new TreeGridField("Name"),
-        new TreeGridField("Year"));
-    // employeeTreeGrid.setData(generateSimpleTreeGrid(2002));
+    tree.setFields(new TreeGridField("sectionCode"), new TreeGridField("name"),
+        new TreeGridField("year"));
     tree.setSize("400", "400");
     tree.setShowOpenIcons(true);
     tree.setShowEdges(true);
@@ -421,7 +420,7 @@ public class OBudget2 implements EntryPoint {
 
   }
 
-  private TreeGrid generateBudgetTree() {
+  private BudgetTreeGrid generateBudgetTree() {
     int curYear = 2010;
     System.out.println("Retrieving year: " + curYear);
     return new BudgetTreeGrid(curYear);
