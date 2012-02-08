@@ -17,7 +17,7 @@ public class Emailer {
   private static final String[] ADMINS = 
     new String[]{"yossale+obudget@gmail.com","rmerom+obudget@gmail.com",
                                           "oded+obudget@poncz.com"};
-  private static final String APP_ADDRESS = "obudget2@appspot.gserviceaccount.com";
+  private static final String APP_ADDRESS = "open.budget.proffesionals@gmail.com";
   
   private Logger logger = Logger.getLogger(Emailer.class
       .getName());

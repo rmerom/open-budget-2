@@ -7,16 +7,13 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.data.BucketRecord;
 import com.yossale.server.Common;
 import com.yossale.server.PMF;
 import com.yossale.server.data.Bucket;
 import com.yossale.server.data.User;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 @SuppressWarnings("serial")
 public class BucketServiceImpl extends RemoteServiceServlet implements
