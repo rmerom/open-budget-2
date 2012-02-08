@@ -1,7 +1,6 @@
 package com.yossale.client;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.calendar.Calendar;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -81,15 +79,15 @@ public class OBudget2 implements EntryPoint {
     if (budgetTreesCache.containsKey(year)) {
       System.out.println("Cache hit on " + year);
       BudgetTreeGrid budgetTree = budgetTreesCache.get(year);
-      budgetPane.setLeftPane(budgetTree);
-      budgetPane.redraw();
+      budgetPane.updateBudgetTree(budgetTree);
+      
 
     } else {
 
       System.out.println("Generating new tree");
       BudgetTreeGrid budgetTree = new BudgetTreeGrid(year);
       budgetTreesCache.put(year, budgetTree);
-      budgetPane.setLeftPane(budgetTree);
+      budgetPane.updateBudgetTree(budgetTree);
     }
   }
 
