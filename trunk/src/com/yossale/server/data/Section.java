@@ -176,4 +176,13 @@ public class Section {
   private void generateKey() {
   	key =	KeyFactory.createKey(getClass().getSimpleName(), "" + year + sectionCode);
   }
+
+  @Override
+  public String toString() {
+    return "Section [key=" + key + ", sectionCode=" + sectionCode
+        + ", parentCode=" + parentCode + ", year=" + year + ", name=" + name
+        + "]";
+  }
+  
+  
 }

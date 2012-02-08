@@ -21,7 +21,6 @@ import com.yossale.client.actions.SectionService;
 import com.yossale.client.data.SectionRecord;
 import com.yossale.server.PMF;
 import com.yossale.server.data.Section;
-import com.yossale.server.util.Emailer;
 
 @SuppressWarnings("serial")
 public class SectionServiceImpl extends RemoteServiceServlet implements
@@ -189,10 +188,12 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Section.class);
-    query.setFilter("year == sectionYearParam && sectionCode == sectionCodeParam");
+    query.setFilter("year == sectionYearParam && parentCode == sectionParentCode");
+    
+    parentCode = parentCode == null ? "" : parentCode;
     
     query.setOrdering("sectionCode desc");
-    query.declareParameters("Integer sectionYearParam, String sectionCodeParam");
+    query.declareParameters("Integer sectionYearParam, String sectionParentCode");
 
     List<Section> results = (List<Section>) query.execute(year, parentCode);
 
@@ -204,6 +205,7 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     System.out.println("Found " + results.size() + " records");
     for (int i = 0; i < results.size(); i++) {
       Section e = results.get(i);
+      System.out.println(e);      
       sectionsArr[i] = e.toSectionRecord();
     }
 
