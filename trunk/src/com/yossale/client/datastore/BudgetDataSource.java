@@ -33,27 +33,16 @@ public class BudgetDataSource extends DataSource {
     
     this.year = year;
     
-//    setID("BudgetDataStore_"+year);
     setTitleField("name"); 
     
     DataSourceTextField idField = new DataSourceTextField("id", "ID");
-//    idField.setPrimaryKey(true);
-//    idField.setRequired(true);
-
+    DataSourceTextField sectionField = new DataSourceTextField("sectionCode", "Code");
     DataSourceTextField nameField = new DataSourceTextField("name", "Name");
-//    nameField.setRequired(true);
-
     DataSourceTextField yearField = new DataSourceTextField("year", "Year");
-//    yearField.setRequired(true);
-
     DataSourceTextField parentField = new DataSourceTextField("parentId",
         "Parent");
-    
-//    parentField.setRequired(true);
-//    parentField.setForeignKey("id");
-//    parentField.setRootValue("");
 
-    setFields(idField, nameField, yearField, parentField);
+    setFields(idField, sectionField, nameField, yearField, parentField);
 
   }
 
@@ -97,7 +86,7 @@ public class BudgetDataSource extends DataSource {
               String id = year + "_" + s.getSectionCode();
               r.setAttribute("parentId", id.substring(0, id.length() - 2));
               r.setAttribute("id", id);
-              r.setAttribute("#", s.getSectionCode());
+              r.setAttribute("sectionCode", s.getSectionCode());
               r.setAttribute("name", s.getName());
               r.setAttribute("year", s.getYear());
               recs[i++] = r;

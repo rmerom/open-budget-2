@@ -12,7 +12,7 @@ public class BudgetTreeGrid extends TreeGrid {
     setDataSource(ds);
     setAutoFetchData(true);
     setShowOpenIcons(true);
-    setFields(new TreeGridField("name"),
+    setFields(new TreeGridField("sectionCode"),new TreeGridField("name"),
         new TreeGridField("year"));
     
     setSize("400", "400");
@@ -26,7 +26,7 @@ public class BudgetTreeGrid extends TreeGrid {
     setCanAcceptDroppedRecords(true);
     setCanDragRecordsOut(true);
     
-//    setShowFilterEditor(true);
+    setShowFilterEditor(true);
 //    setFilterOnKeypress(true);
 
   }
