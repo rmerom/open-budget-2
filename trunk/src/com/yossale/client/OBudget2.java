@@ -8,6 +8,7 @@ import java.util.Map;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -126,10 +127,11 @@ public class OBudget2 implements EntryPoint {
       public void onDataChanged(DataChangedEvent event) {
         System.out.println("dropped something?");
         TreeNode[] nodes = bucketModel.getAllNodes();
+        
         List<SectionRecord> list = new ArrayList<SectionRecord>();
 
         for (int i = 0; i < nodes.length; i++) {
-          list.add(((SectionRecordTreeNode) nodes[i]).getRecord());
+          list.add(SectionRecord.getSectionRecord(nodes[i]));
         }
 
         graph.updateGraph(list);

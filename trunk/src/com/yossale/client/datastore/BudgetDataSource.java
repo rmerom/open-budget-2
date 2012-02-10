@@ -39,7 +39,7 @@ public class BudgetDataSource extends DataSource {
     DataSourceTextField sectionField = new DataSourceTextField("sectionCode", "Code");
     DataSourceTextField nameField = new DataSourceTextField("name", "Name");
     DataSourceTextField yearField = new DataSourceTextField("year", "Year");
-    DataSourceTextField parentField = new DataSourceTextField("parentId",
+    DataSourceTextField parentField = new DataSourceTextField("parentCode",
         "Parent");
 
     setFields(idField, sectionField, nameField, yearField, parentField);
@@ -80,16 +80,8 @@ public class BudgetDataSource extends DataSource {
           public void onSuccess(SectionRecord[] result) {
             Record[] recs = new Record[result.length];
             int i = 0;
-            for (SectionRecord s : result) {
-              Record r = new Record();
-              
-              String id = year + "_" + s.getSectionCode();
-              r.setAttribute("parentId", id.substring(0, id.length() - 2));
-              r.setAttribute("id", id);
-              r.setAttribute("sectionCode", s.getSectionCode());
-              r.setAttribute("name", s.getName());
-              r.setAttribute("year", s.getYear());
-              recs[i++] = r;
+            for (SectionRecord s : result) {              
+              recs[i++] = SectionRecord.getRecord(s);
             }
             response.setStatus(RPCResponse.STATUS_SUCCESS);
             response.setData(recs);

@@ -2,6 +2,8 @@ package com.yossale.client.data;
 
 import java.io.Serializable;
 
+import com.smartgwt.client.data.Record;
+
 public class SectionRecord implements Serializable  {
 
 	private static final long serialVersionUID = -2358987888595684650L;
@@ -18,8 +20,39 @@ public class SectionRecord implements Serializable  {
 	private Integer grossAmountRevised = 0;
 	private Integer grossAmountUsed = 0;
 	
+	public static Record getRecord(SectionRecord s) {
+	  Record r = new Record();
+	  r.setAttribute("sectionCode", s.getSectionCode());
+	  r.setAttribute("parentCode", s.getParentCode());
+	  r.setAttribute("name", s.getName());
+	  r.setAttribute("year", s.getYear());
+	  r.setAttribute("netAmountAllocated", s.getNetAmountAllocated());
+	  r.setAttribute("netAmountRevised", s.getNetAmountRevised());
+	  r.setAttribute("netAmountUsed", s.getNetAmountUsed());
+	  r.setAttribute("grosAmountAllocated", s.getGrossAmountAllocated());
+	  r.setAttribute("grossAmountRevised", s.getGrossAmountRevised());
+	  r.setAttribute("grossAmountUsed", s.getGrossAmountUsed());
+	  r.setAttribute("id", s.getYear()+"_"+s.getSectionCode());
+	  return r;
+	}
+	
+	public static SectionRecord getSectionRecord(Record r) {
+    SectionRecord s = new SectionRecord();
+    s.setSectionCode(r.getAttribute("sectionCode"));
+    s.setSectionCode(r.getAttribute("parentCode"));
+    s.setName(r.getAttribute("name"));
+    
+    s.setYear(r.getAttributeAsInt("year"));
+    s.setNetAmountAllocated(r.getAttributeAsInt("netAmountAllocated"));
+    s.setNetAmountRevised(r.getAttributeAsInt("netAmountRevised"));
+    s.setNetAmountUsed(r.getAttributeAsInt("netAmountUsed"));
+    s.setGrosAmountAllocated(r.getAttributeAsInt("grosAmountAllocated"));
+    s.setGrossAmountRevised(r.getAttributeAsInt("grossAmountRevised"));
+    s.setGrossAmountUsed(r.getAttributeAsInt("grossAmountUsed"));
+    return s;
+  }
+	
 	public SectionRecord() {  
-	  
 	}
 
 	public SectionRecord(String sectionCode, String parentCode, Integer year, String name,
@@ -36,23 +69,7 @@ public class SectionRecord implements Serializable  {
 		this.grosAmountAllocated = grosAmountAllocated;
 		this.grossAmountRevised = grossAmountRevised;
 		this.grossAmountUsed = grossAmountUsed;
-		
-		
 	}
-	
-//	public SectionRecord(JSONObject j) {
-//	  
-//	  this.sectionCode = j.get("code").toString();
-//    this.year = Integer.parseInt(j.get("year").toString());
-//    this.name = j.get("title").toString();
-//    this.netAmountAllocated = Integer.parseInt(j.get("net_allocated").toString());;
-//    this.netAmountRevised = Integer.parseInt(j.get("net_revised").toString());;
-//    this.netAmountUsed = Integer.parseInt(j.get("net_used").toString());;
-//    this.grosAmountAllocated = Integer.parseInt(j.get("gross_allocated").toString());;
-//    this.grossAmountRevised = Integer.parseInt(j.get("gross_revised").toString());;
-//    this.grossAmountUsed = Integer.parseInt(j.get("gross_used").toString());;
-//	  
-//	}
 
 	public String getSectionCode() {
 		return sectionCode;
