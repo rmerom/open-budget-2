@@ -1,6 +1,8 @@
 package com.yossale.client.datastore;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,18 +28,19 @@ public class BudgetDataSource extends DataSource {
   private final int year;
 
   public BudgetDataSource(int year) {
-    
+
     super();
     setClientOnly(false);
     setDataProtocol(DSProtocol.CLIENTCUSTOM);
-    setDataFormat (DSDataFormat.CUSTOM);
+    setDataFormat(DSDataFormat.CUSTOM);
     
     this.year = year;
-    
-    setTitleField("name"); 
-    
+
+    setTitleField("name");
+
     DataSourceTextField idField = new DataSourceTextField("id", "ID");
-    DataSourceTextField sectionField = new DataSourceTextField("sectionCode", "Code");
+    DataSourceTextField sectionField = new DataSourceTextField("sectionCode",
+        "Code");
     DataSourceTextField nameField = new DataSourceTextField("name", "Name");
     DataSourceTextField yearField = new DataSourceTextField("year", "Year");
     DataSourceTextField parentField = new DataSourceTextField("parentCode",
@@ -51,11 +54,11 @@ public class BudgetDataSource extends DataSource {
   protected Object transformRequest(final DSRequest dsRequest) {
 
     DSOperationType opType = dsRequest.getOperationType();
-    
+
     System.out.println("Operation type:" + opType);
     final DSResponse response = new DSResponse();
     final String requestId = dsRequest.getRequestId();
-    
+
     switch (opType) {
     case FETCH:
       executeFetch(requestId, dsRequest, response);
@@ -63,32 +66,81 @@ public class BudgetDataSource extends DataSource {
     default:
       System.out.println();
     }
-    
+
     return dsRequest.getData();
   }
 
   private void executeFetch(final String requestId, DSRequest dsRequest,
       final DSResponse response) {
-    
+
     String parentId = null;
+    String sectionCode = null;
+    String sectionName = null;
 
     Criteria criteria = dsRequest.getCriteria();
     if (criteria != null) {
-      Collection values = criteria.getValues().values();
-      if (values.size() > 0) {
-        for (Object searchTermObj : values) {
-          if (searchTermObj instanceof String) {
-            parentId = (String) searchTermObj;
-            System.out.println("QuerySpecDataSource:: ParentId = " + parentId);
-            break;
-          }
-        }
-      }
+      Map<?, ?> testValues = criteria.getValues();
+      parentId = (String) testValues.get("parentId");
+      sectionCode = (String) testValues.get("sectionCode");
+      sectionName = (String) testValues.get("sectionName");
+      System.out.println("Found values: Parent " + parentId + "," + sectionCode
+          + "," + sectionName);
     }
 
-    if (parentId != null && parentId.contains("_")) {
-      parentId = parentId.split("_")[1];
-    }
+    if ((sectionCode == null && sectionName == null) || (parentId != null) ) {
+      /**
+       * We got a regular fetch request - usually called when you open a parent
+       * node and request it's Children
+       */
+      if (parentId != null && parentId.contains("_")) {
+        parentId = parentId.split("_")[1];
+      }
+      executeFetchByParent(parentId, response, requestId);
+    } else if (sectionCode != null) {
+      /**
+       * If we're being called via a filter, 
+       * either the sectionCode or sectionName should be legit.
+       */
+      filterByCode(sectionCode, response, requestId);
+      
+    } else if (sectionName != null) {
+      
+      System.out.println("Should have filtered by name , isn't supported yet");
+      
+    } 
+
+  }
+
+  private void filterByCode(final String sectionCode,
+      final DSResponse response, final String requestId) {
+
+    sectionsService.getSectionByYearAndCode(year, sectionCode,
+        new AsyncCallback<SectionRecord[]>() {
+
+          @Override
+          public void onSuccess(SectionRecord[] result) {
+            Record[] recs = new Record[result.length];
+            int i = 0;
+            for (SectionRecord s : result) {
+              recs[i++] = SectionRecord.getRecord(s);
+            }
+            response.setStatus(RPCResponse.STATUS_SUCCESS);
+            response.setData(recs);
+            processResponse(requestId, response);
+            response.setAttribute("reportCollisions", false);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            response.setStatus(RPCResponse.STATUS_FAILURE);
+            processResponse(requestId, response);
+          }
+        });
+
+  }
+
+  private void executeFetchByParent(final String parentId,
+      final DSResponse response, final String requestId) {
 
     sectionsService.getSectionsByYearAndParent(year, parentId,
         new AsyncCallback<SectionRecord[]>() {
@@ -97,7 +149,7 @@ public class BudgetDataSource extends DataSource {
           public void onSuccess(SectionRecord[] result) {
             Record[] recs = new Record[result.length];
             int i = 0;
-            for (SectionRecord s : result) {              
+            for (SectionRecord s : result) {
               recs[i++] = SectionRecord.getRecord(s);
             }
             response.setStatus(RPCResponse.STATUS_SUCCESS);
@@ -111,6 +163,6 @@ public class BudgetDataSource extends DataSource {
             processResponse(requestId, response);
           }
         });
-    
+
   }
 }

@@ -8,7 +8,6 @@ import java.util.Map;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -43,14 +42,13 @@ import com.yossale.client.data.SectionRecord;
 import com.yossale.client.graph.GraphCanvas;
 import com.yossale.client.gui.BudgetPane;
 import com.yossale.client.gui.BudgetTreeGrid;
-import com.yossale.client.gui.dataobj.SectionRecordTreeNode;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class OBudget2 implements EntryPoint {
 
-  public static final String VERSION_ID = "1.1 - added mail support";
+  public static final String VERSION_ID = "0.2 - search by ID";
 
   private BudgetTreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
@@ -92,16 +90,16 @@ public class OBudget2 implements EntryPoint {
     }
   }
 
-
   private TreeGrid generateBucket() {
 
     TreeGrid tree = new TreeGrid();
-    tree.setFields(new TreeGridField("sectionCode"), new TreeGridField("name"),
-        new TreeGridField("year"));
+    tree.setFields(new TreeGridField("sectionCode","Code"),
+        new TreeGridField("name","Name"),
+        new TreeGridField("year","Year"));
     tree.setSize("400", "400");
     tree.setShowOpenIcons(true);
     tree.setShowEdges(true);
-    tree.setBorder("0px");
+    tree.setBorder("1px solid black");
     tree.setBodyStyleName("normal");
     tree.setLeaveScrollbarGap(false);
     tree.setEmptyMessage("<br>Drag & drop sections here");
@@ -111,8 +109,6 @@ public class OBudget2 implements EntryPoint {
     tree.setCanAcceptDroppedRecords(true);
     tree.setDragDataAction(DragDataAction.MOVE);
     tree.setCanRemoveRecords(true);
-    tree.setShowFilterEditor(true);
-    tree.setFilterOnKeypress(true);
 
     final Tree bucketModel = new Tree();
     bucketModel.setModelType(TreeModelType.PARENT);
@@ -353,7 +349,7 @@ public class OBudget2 implements EntryPoint {
     DynamicForm form = new DynamicForm();
     form.setWidth(250);
 
-    final SelectItem selectOtherItem = new SelectItem();
+    final SelectItem yearSelector = new SelectItem();
 
     sectionsService.getAvailableBudgetYears(new AsyncCallback<String[]>() {
 
@@ -364,13 +360,13 @@ public class OBudget2 implements EntryPoint {
 
       @Override
       public void onSuccess(String[] result) {
-        selectOtherItem.setValueMap(result);
-
+        yearSelector.setValueMap(result);
+        yearSelector.setValue(result[result.length - 1]);
       }
     });
 
-    selectOtherItem.setTitle("Select year");
-    selectOtherItem.addChangedHandler(new ChangedHandler() {
+    yearSelector.setTitle("Select year");
+    yearSelector.addChangedHandler(new ChangedHandler() {
 
       @Override
       public void onChanged(ChangedEvent event) {
@@ -379,7 +375,7 @@ public class OBudget2 implements EntryPoint {
       }
     });
 
-    form.setFields(selectOtherItem);
+    form.setFields(yearSelector);
     return form;
   }
 
@@ -395,9 +391,7 @@ public class OBudget2 implements EntryPoint {
     final DynamicForm form = generateDynamicForm();
 
     HLayout h = new HLayout();
-    h.addMember(budgetPane);  
-//    h.addMember(new BudgetTreeGrid(2010));
-    
+    h.addMember(budgetPane);    
     h.addMember(graph);
     h.addMember(form);
 

@@ -16,7 +16,7 @@ public class BudgetTreeGrid extends TreeGrid {
         new TreeGridField("year"));
     
     setSize("400", "400");
-
+    
     setShowEdges(true);
     setBorder("1px solid black");
     setBodyStyleName("normal");
@@ -26,7 +26,7 @@ public class BudgetTreeGrid extends TreeGrid {
     setCanAcceptDroppedRecords(true);
     setCanDragRecordsOut(true);
     
-    setShowFilterEditor(true);
+//    setShowFilterEditor(true);
 //    setFilterOnKeypress(true);
 
   }

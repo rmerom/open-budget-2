@@ -248,4 +248,35 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
 
     return yearsArr;
   }
+
+  @Override
+  public SectionRecord[] getSectionByYearAndCode(int year, String sectionCode) {
+    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+    Query query = pm.newQuery(Section.class);
+    query.setFilter("year == sectionYearParam && sectionCode == sectionCodeParam");
+    
+    query.setOrdering("sectionCode desc");
+    query.declareParameters("Integer sectionYearParam, String sectionCodeParam");
+
+    List<Section> results = (List<Section>) query.execute(year, sectionCode);
+
+    if (results == null || results.isEmpty()) {
+      return new SectionRecord[] {};
+    }
+
+    SectionRecord[] sectionsArr = new SectionRecord[results.size()];
+    System.out.println("Found " + results.size() + " records");
+    for (int i = 0; i < results.size(); i++) {
+      Section e = results.get(i);
+      System.out.println(e);      
+      sectionsArr[i] = e.toSectionRecord();
+    }
+
+    return sectionsArr;
+  }
+
+  @Override
+  public SectionRecord[] getSectionsByNameAndCode(int year, String nameLike) {
+    return new SectionRecord[]{};
+  }
 }
