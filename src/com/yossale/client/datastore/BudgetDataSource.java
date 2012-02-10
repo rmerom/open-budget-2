@@ -12,6 +12,7 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
@@ -49,7 +50,26 @@ public class BudgetDataSource extends DataSource {
   @Override
   protected Object transformRequest(final DSRequest dsRequest) {
 
-    System.out.println("ReqType:" + dsRequest.getOperationType());
+    DSOperationType opType = dsRequest.getOperationType();
+    
+    System.out.println("Operation type:" + opType);
+    final DSResponse response = new DSResponse();
+    final String requestId = dsRequest.getRequestId();
+    
+    switch (opType) {
+    case FETCH:
+      executeFetch(requestId, dsRequest, response);
+      break;
+    default:
+      System.out.println();
+    }
+    
+    return dsRequest.getData();
+  }
+
+  private void executeFetch(final String requestId, DSRequest dsRequest,
+      final DSResponse response) {
+    
     String parentId = null;
 
     Criteria criteria = dsRequest.getCriteria();
@@ -66,9 +86,6 @@ public class BudgetDataSource extends DataSource {
       }
     }
 
-    final DSResponse response = new DSResponse();
-    final String requestId = dsRequest.getRequestId();
-    
     if (parentId != null && parentId.contains("_")) {
       parentId = parentId.split("_")[1];
     }
@@ -94,7 +111,6 @@ public class BudgetDataSource extends DataSource {
             processResponse(requestId, response);
           }
         });
-
-    return dsRequest.getData();
+    
   }
 }
