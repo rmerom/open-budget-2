@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -25,6 +26,8 @@ import com.yossale.server.data.Section;
 @SuppressWarnings("serial")
 public class SectionServiceImpl extends RemoteServiceServlet implements
     SectionService {
+  
+  private static Logger logger = Logger.getLogger(SectionServiceImpl.class.getName());
 
   public SectionRecord[] getSections(int year) {
 
@@ -160,7 +163,8 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
  
   @SuppressWarnings("unchecked")
   public SectionRecord[] getSectionsByYear(int year) {
-  	
+    
+    logger.info("Loading secions by year: " + year);  	
   	PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Section.class);
     query.setFilter("year == sectionYearParam");
@@ -186,6 +190,8 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   @Override
   public SectionRecord[] getSectionsByYearAndParent(int year, String parentCode) {
     
+    logger.info("getSectionsByYearAndParent : " + year + "," + parentCode);
+    
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Section.class);
     query.setFilter("year == sectionYearParam && parentCode == sectionParentCode");
@@ -198,11 +204,13 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     List<Section> results = (List<Section>) query.execute(year, parentCode);
 
     if (results == null || results.isEmpty()) {
+      logger.info("No results found for getSectionsByYearAndParent : " + year + "," + parentCode);
       return new SectionRecord[] {};
     }
 
     SectionRecord[] sectionsArr = new SectionRecord[results.size()];
     System.out.println("Found " + results.size() + " records");
+    logger.info("Found " + results.size()  + " results found for getSectionsByYearAndParent : " + year + "," + parentCode);
     for (int i = 0; i < results.size(); i++) {
       Section e = results.get(i);
       System.out.println(e);      
@@ -216,7 +224,8 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   @Override
   public String[] getAvailableBudgetYears() {    
     
-    System.out.println("Querying getAvailableBudgetYears");   
+    System.out.println("Querying getAvailableBudgetYears");
+    logger.info("Querying getAvailableBudgetYears");
     
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();    
     
@@ -225,8 +234,6 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     query.declareParameters("String sectionCodeParam");        
 
     List<Section> results = (List<Section>) query.execute("00");
-    
-    System.out.println("Querying getAvailableBudgetYears - query passed");   
     
     if (results == null || results.isEmpty()) {
       return new String[] {};
@@ -251,6 +258,8 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
 
   @Override
   public SectionRecord[] getSectionByYearAndCode(int year, String sectionCode) {
+    
+    logger.info("getSectionByYearAndCode : " + year + "," + sectionCode);
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
     Query query = pm.newQuery(Section.class);
     query.setFilter("year == sectionYearParam && sectionCode == sectionCodeParam");
@@ -261,14 +270,15 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     List<Section> results = (List<Section>) query.execute(year, sectionCode);
 
     if (results == null || results.isEmpty()) {
+      logger.info("No results were found for getSectionByYearAndCode : " + year + "," + sectionCode);
       return new SectionRecord[] {};
     }
 
     SectionRecord[] sectionsArr = new SectionRecord[results.size()];
     System.out.println("Found " + results.size() + " records");
+    logger.info(results.size() +  "Results were found for getSectionByYearAndCode : " + year + "," + sectionCode);
     for (int i = 0; i < results.size(); i++) {
-      Section e = results.get(i);
-      System.out.println(e);      
+      Section e = results.get(i);      
       sectionsArr[i] = e.toSectionRecord();
     }
 

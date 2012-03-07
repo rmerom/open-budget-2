@@ -1,13 +1,18 @@
 package com.yossale.client.gui;
 
+import java.util.logging.Logger;
+
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.yossale.client.datastore.BudgetDataSource;
 
 public class BudgetTreeGrid extends TreeGrid {
 
+  private static final Logger logger = Logger.getLogger(BudgetTreeGrid.class.getName());
+  
   public BudgetTreeGrid(int year) {
     
+    logger.info("Creating new budgetTree for year:" + year);
     BudgetDataSource ds = new BudgetDataSource(year);
     setDataSource(ds);
     setAutoFetchData(true);
