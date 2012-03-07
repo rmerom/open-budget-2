@@ -1,8 +1,7 @@
 package com.yossale.client.datastore;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,13 +21,14 @@ import com.yossale.client.data.SectionRecord;
 
 public class BudgetDataSource extends DataSource {
 
+  private static final Logger logger = Logger.getLogger(BudgetDataSource.class.getName());
   private final SectionServiceAsync sectionsService = GWT
       .create(SectionService.class);
 
   private final int year;
 
   public BudgetDataSource(int year) {
-
+    
     super();
     setClientOnly(false);
     setDataProtocol(DSProtocol.CLIENTCUSTOM);
@@ -55,7 +55,8 @@ public class BudgetDataSource extends DataSource {
 
     DSOperationType opType = dsRequest.getOperationType();
 
-    System.out.println("Operation type:" + opType);
+    logger.info("Recieved DS request, operation type: " + opType);
+    
     final DSResponse response = new DSResponse();
     final String requestId = dsRequest.getRequestId();
 
@@ -76,6 +77,8 @@ public class BudgetDataSource extends DataSource {
     String parentId = null;
     String sectionCode = null;
     String sectionName = null;
+    
+    logger.info("executing fetch");
 
     Criteria criteria = dsRequest.getCriteria();
     if (criteria != null) {
@@ -83,7 +86,7 @@ public class BudgetDataSource extends DataSource {
       parentId = (String) testValues.get("parentId");
       sectionCode = (String) testValues.get("sectionCode");
       sectionName = (String) testValues.get("sectionName");
-      System.out.println("Found values: Parent " + parentId + "," + sectionCode
+      logger.info("Found values: Parent " + parentId + "," + sectionCode
           + "," + sectionName);
     }
 
@@ -114,6 +117,7 @@ public class BudgetDataSource extends DataSource {
   private void filterByCode(final String sectionCode,
       final DSResponse response, final String requestId) {
 
+    logger.info("Filtering tree by section code: " + sectionCode);
     sectionsService.getSectionByYearAndCode(year, sectionCode,
         new AsyncCallback<SectionRecord[]>() {
 
@@ -132,6 +136,7 @@ public class BudgetDataSource extends DataSource {
 
           @Override
           public void onFailure(Throwable caught) {
+            logger.info("Failed to filter tree by section code: " + sectionCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }
@@ -139,10 +144,11 @@ public class BudgetDataSource extends DataSource {
 
   }
 
-  private void executeFetchByParent(final String parentId,
+  private void executeFetchByParent(final String parentCode,
       final DSResponse response, final String requestId) {
 
-    sectionsService.getSectionsByYearAndParent(year, parentId,
+    logger.info("Filtering tree by parentCode : " + parentCode);
+    sectionsService.getSectionsByYearAndParent(year, parentCode,
         new AsyncCallback<SectionRecord[]>() {
 
           @Override
@@ -159,6 +165,7 @@ public class BudgetDataSource extends DataSource {
 
           @Override
           public void onFailure(Throwable caught) {
+            logger.info("Failed filtering tree by parentCode : " + parentCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }
