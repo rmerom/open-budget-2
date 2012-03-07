@@ -39,7 +39,7 @@ import com.yossale.client.gui.DBPanel;
  */
 public class OBudget2 implements EntryPoint {
 
-  public static final String VERSION_ID = "0.2 - search by ID";
+  public static final String VERSION_ID = "0.3 - search by ID";
   private static final Logger logger = Logger.getLogger(OBudget2.class.getName());
 
   private BudgetTreeGrid budgetTree;
