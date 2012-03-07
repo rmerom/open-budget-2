@@ -55,7 +55,7 @@ public class BudgetDataSource extends DataSource {
 
     DSOperationType opType = dsRequest.getOperationType();
 
-    logger.warning("Recieved DS request, operation type: " + opType);
+    logger.info("Recieved DS request, operation type: " + opType);
     
     final DSResponse response = new DSResponse();
     final String requestId = dsRequest.getRequestId();
@@ -78,7 +78,7 @@ public class BudgetDataSource extends DataSource {
     String sectionCode = null;
     String sectionName = null;
     
-    logger.warning("executing fetch");
+    logger.info("executing fetch");
 
     Criteria criteria = dsRequest.getCriteria();
     if (criteria != null) {
@@ -86,7 +86,7 @@ public class BudgetDataSource extends DataSource {
       parentId = (String) testValues.get("parentId");
       sectionCode = (String) testValues.get("sectionCode");
       sectionName = (String) testValues.get("sectionName");
-      logger.warning("Found values: Parent " + parentId + "," + sectionCode
+      logger.info("Found values: Parent " + parentId + "," + sectionCode
           + "," + sectionName);
     }
 
@@ -117,7 +117,7 @@ public class BudgetDataSource extends DataSource {
   private void filterByCode(final String sectionCode,
       final DSResponse response, final String requestId) {
 
-    logger.warning("Filtering tree by section code: " + sectionCode);
+    logger.info("Filtering tree by section code: " + sectionCode);
     sectionsService.getSectionByYearAndCode(year, sectionCode,
         new AsyncCallback<SectionRecord[]>() {
 
@@ -136,7 +136,7 @@ public class BudgetDataSource extends DataSource {
 
           @Override
           public void onFailure(Throwable caught) {
-            logger.warning("Failed to filter tree by section code: " + sectionCode);
+            logger.info("Failed to filter tree by section code: " + sectionCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }
@@ -147,7 +147,7 @@ public class BudgetDataSource extends DataSource {
   private void executeFetchByParent(final String parentCode,
       final DSResponse response, final String requestId) {
 
-    logger.warning("Filtering tree by parentCode : " + parentCode);
+    logger.info("Filtering tree by parentCode : " + parentCode);
     sectionsService.getSectionsByYearAndParent(year, parentCode,
         new AsyncCallback<SectionRecord[]>() {
 
@@ -165,7 +165,7 @@ public class BudgetDataSource extends DataSource {
 
           @Override
           public void onFailure(Throwable caught) {
-            logger.warning("Failed filtering tree by parentCode : " + parentCode);
+            logger.info("Failed filtering tree by parentCode : " + parentCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }
