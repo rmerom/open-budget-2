@@ -26,8 +26,11 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.yossale.client.actions.LoginService;
+import com.yossale.client.actions.LoginServiceAsync;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
+import com.yossale.client.data.LoginInfo;
 import com.yossale.client.data.SectionRecord;
 import com.yossale.client.graph.GraphCanvas;
 import com.yossale.client.gui.BudgetPane;
@@ -163,7 +166,7 @@ public class OBudget2 implements EntryPoint {
   /**
    * This is the entry point method.
    */
-  public void loadOBudget() {
+  public void loadOBudget(LoginInfo loginInfo) {
 
     logger.info("OBudget loading started");
     budgetTree = generateBudgetTree();
@@ -179,10 +182,10 @@ public class OBudget2 implements EntryPoint {
 
     VLayout v = new VLayout();
 
-//    String currentUser = (loginInfo.isLoggedIn() ? "<a href='"
-//        + loginInfo.getLogoutUrl() + "'>" + loginInfo.getEmailAddress()
-//        + "</a>" : "<a href='" + loginInfo.getLoginUrl() + "'>log in</a>");
-//    Label userLabel = new Label(currentUser);
+    String currentUser = (loginInfo.isLoggedIn() ? "<a href='"
+        + loginInfo.getLogoutUrl() + "'>" + loginInfo.getEmailAddress()
+        + "</a>" : "<a href='" + loginInfo.getLoginUrl() + "'>log in</a>");
+    Label userLabel = new Label(currentUser);
     v.setAutoHeight();
     v.setMembersMargin(30);
 
@@ -213,7 +216,15 @@ public class OBudget2 implements EntryPoint {
 
   @Override
   public void onModuleLoad() {
-    loadOBudget();
+    LoginServiceAsync loginService = GWT.create(LoginService.class);
+    loginService.login(GWT.getModuleBaseURL(), new AsyncCallback<LoginInfo>() {
+      public void onFailure(Throwable error) {
+      }
+
+      public void onSuccess(LoginInfo result) {
+        loadOBudget(result);
+      }
+    });
   }
 
 }
