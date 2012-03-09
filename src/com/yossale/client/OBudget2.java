@@ -8,7 +8,10 @@ import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -18,6 +21,7 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.DataChangedEvent;
@@ -26,10 +30,13 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.yossale.client.actions.BucketService;
+import com.yossale.client.actions.BucketServiceAsync;
 import com.yossale.client.actions.LoginService;
 import com.yossale.client.actions.LoginServiceAsync;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
+import com.yossale.client.data.BucketRecord;
 import com.yossale.client.data.LoginInfo;
 import com.yossale.client.data.SectionRecord;
 import com.yossale.client.graph.GraphCanvas;
@@ -167,10 +174,11 @@ public class OBudget2 implements EntryPoint {
    * This is the entry point method.
    */
   public void loadOBudget(LoginInfo loginInfo) {
-
+  	final BucketServiceAsync bucketService = GWT.create(BucketService.class); 
     logger.info("OBudget loading started");
     budgetTree = generateBudgetTree();
     bucketTree = generateBucket();
+    final TreeGrid bucketTreeFinal = bucketTree;
     budgetPane = new BudgetPane(budgetTree, bucketTree);
 
     final DynamicForm form = generateDynamicForm();
@@ -190,7 +198,41 @@ public class OBudget2 implements EntryPoint {
     v.setMembersMargin(30);
 
     v.addMember(new Label("Version :" + VERSION_ID));
-//    v.addMember(userLabel);
+    v.addMember(userLabel);
+    v.addMember(new Button("save doNotPress", new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				bucketService.addBucket("myNewBucket", new AsyncCallback<BucketRecord>() {
+					
+					@Override
+					public void onSuccess(BucketRecord result) {
+						ListGridRecord[] records = bucketTreeFinal.getRecords();
+						for (ListGridRecord record : records) {
+							result.getSections().add(SectionRecord.getSectionRecord(record));
+						}
+						bucketService.updateBucket(result, new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								logger.warning("failure to update bucket: " + caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								// TODO Auto-generated method stub
+								
+							}
+						});
+						
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						logger.warning("failure to add bucket: " + caught);
+					}
+				});
+			}
+    	
+    }));
     v.addMember(createTitle());
     v.addMember(form);
     v.addMember(h);

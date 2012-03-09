@@ -6,10 +6,8 @@ import com.yossale.client.data.BucketRecord;
 
 @RemoteServiceRelativePath("bucket")
 public interface BucketService extends RemoteService {
-  
 	BucketRecord[] getBucketsOfLoggedInUser();	
 	BucketRecord addBucket(String name);
 	BucketRecord[] getAllPublicBuckets();
-	//BucketRecord updateBucket(BucketRecord bucket);
-	
+	void updateBucket(BucketRecord bucketRecord);
 }

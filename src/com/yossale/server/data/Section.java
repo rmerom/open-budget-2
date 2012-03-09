@@ -70,7 +70,7 @@ public class Section {
 
   public Section() {
   }
-
+  
   public Section(SectionRecord r) {
     this.sectionCode = r.getSectionCode();
     this.parentCode = r.getParentCode();

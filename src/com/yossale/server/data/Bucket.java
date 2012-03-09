@@ -10,12 +10,11 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 import com.yossale.client.data.BucketRecord;
+import com.yossale.client.data.SectionRecord;
 
 @PersistenceCapable
 public class Bucket {
 
-	public Bucket() {}
-	
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
@@ -28,6 +27,24 @@ public class Bucket {
 
 	@Persistent
 	private Boolean isPublic;
+
+	public Bucket() {
+		sections = new ArrayList<Section>();
+	}
+	
+	public Bucket(BucketRecord bucketRecord) {
+		assignBucketRecord(bucketRecord);
+	}
+	
+	public Bucket assignBucketRecord(BucketRecord bucketRecord) {
+		name = bucketRecord.getName();
+		isPublic = bucketRecord.isPublic();
+		sections = new ArrayList<Section>();
+		for (SectionRecord sectionRecord : bucketRecord.getSections()) {
+			sections.add(new Section(sectionRecord));
+		}
+		return this;
+	}
 
 	public Key getKey() {
 		return key;
@@ -57,7 +74,11 @@ public class Bucket {
 	}
 	
 	public BucketRecord toBucketRecord() {
-		return new BucketRecord(getKey().getId(), getName());
+		List<SectionRecord> sectionRecords = new ArrayList<SectionRecord>();
+		for (Section section : sections) {
+			sectionRecords.add(section.toSectionRecord());
+		}
+		return new BucketRecord(getKey().getId(), getName(), sectionRecords);
 	}
 
 	public Boolean getIsPublic() {
