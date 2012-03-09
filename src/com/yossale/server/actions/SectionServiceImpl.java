@@ -29,20 +29,6 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   
   private static Logger logger = Logger.getLogger(SectionServiceImpl.class.getName());
 
-  public SectionRecord[] getSections(int year) {
-
-    SectionRecord rec1 = new SectionRecord("00", "", year, "section1", 101, 102,
-        103, 104, 105, 106);
-    SectionRecord rec2 = new SectionRecord("0001", "00", year, "section2", 201, 202,
-        203, 204, 205, 206);
-    SectionRecord rec3 = new SectionRecord("000101", "0001", year, "section3", 301,
-        302, 303, 304, 305, 306);
-    SectionRecord rec4 = new SectionRecord("0002", "00", year, "section4", 401, 402,
-        403, 404, 405, 406);
-
-    return new SectionRecord[] { rec1, rec2, rec3, rec4 };
-  }
-
   public void addSectionRecord(SectionRecord record) {
 
     PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
@@ -209,7 +195,7 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     }
 
     SectionRecord[] sectionsArr = new SectionRecord[results.size()];
-    System.out.println("Found " + results.size() + " records");
+    
     logger.info("Found " + results.size()  + " results found for getSectionsByYearAndParent : " + year + "," + parentCode);
     for (int i = 0; i < results.size(); i++) {
       Section e = results.get(i);
@@ -275,8 +261,7 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     }
 
     SectionRecord[] sectionsArr = new SectionRecord[results.size()];
-    System.out.println("Found " + results.size() + " records");
-    logger.info(results.size() +  "Results were found for getSectionByYearAndCode : " + year + "," + sectionCode);
+    logger.info(results.size() +  " Results were found for getSectionByYearAndCode : " + year + "," + sectionCode);
     for (int i = 0; i < results.size(); i++) {
       Section e = results.get(i);      
       sectionsArr[i] = e.toSectionRecord();
