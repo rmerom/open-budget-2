@@ -1,6 +1,7 @@
 package com.yossale.client.data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class BucketRecord implements Serializable {
@@ -8,6 +9,7 @@ public class BucketRecord implements Serializable {
 	private String name;
 	private long id;
 	private boolean isPublic;
+	List<SectionRecord> sections;
 	
 	public boolean isPublic() {
 		return isPublic;
@@ -21,11 +23,12 @@ public class BucketRecord implements Serializable {
 		super();
 	}
 	
-	public BucketRecord(long id, String name) {
+	public BucketRecord(long id, String name, List<SectionRecord> sections) {
 	  super();
 	  this.name = name;
 	  this.id = id;
 	  this.isPublic = false;
+	  this.sections = sections;
   }
 
 	public String getName() {
@@ -38,6 +41,10 @@ public class BucketRecord implements Serializable {
 	
 	public long getId() {
 		return id;
+	}
+	
+	public List<SectionRecord> getSections() {
+		return sections;
 	}
 	
 	public void setId(long id) {

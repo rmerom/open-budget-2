@@ -7,4 +7,5 @@ public interface BucketServiceAsync {
 	void getBucketsOfLoggedInUser(AsyncCallback<BucketRecord[]> callback);
 	void addBucket(String name, AsyncCallback<BucketRecord> callback);
 	void getAllPublicBuckets(AsyncCallback<BucketRecord[]> callback);
+	void updateBucket(BucketRecord bucketRecord, AsyncCallback<Void> callback);
 }

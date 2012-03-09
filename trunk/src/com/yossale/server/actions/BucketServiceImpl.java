@@ -65,4 +65,17 @@ public class BucketServiceImpl extends RemoteServiceServlet implements
 		}
 		return bucketRecords.toArray(new BucketRecord[0]);
 	}
+
+	@Override
+	public void updateBucket(BucketRecord bucketRecord) {
+		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+		User user = Common.getLoggedInUserRecord();
+		for (Bucket bucket : user.getBuckets()) {
+			if (bucket.getName().equals(bucketRecord.getName())) {
+				bucket.assignBucketRecord(bucketRecord);
+				break;
+			}
+		}
+		pm.makePersistent(user);
+	}
 }
