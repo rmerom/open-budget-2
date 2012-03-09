@@ -1,6 +1,7 @@
 package com.yossale.client.datastore;
 
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.GWT;
@@ -18,22 +19,22 @@ import com.smartgwt.client.types.DSProtocol;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.data.SectionRecord;
+import com.allen_sauer.gwt.log.client.Log;
 
 public class BudgetDataSource extends DataSource {
-
-  private static final Logger logger = Logger.getLogger(BudgetDataSource.class.getName());
+  
   private final SectionServiceAsync sectionsService = GWT
       .create(SectionService.class);
 
   private final int year;
 
   public BudgetDataSource(int year) {
-    
+
     super();
     setClientOnly(false);
     setDataProtocol(DSProtocol.CLIENTCUSTOM);
     setDataFormat(DSDataFormat.CUSTOM);
-    
+
     this.year = year;
 
     setTitleField("name");
@@ -55,8 +56,8 @@ public class BudgetDataSource extends DataSource {
 
     DSOperationType opType = dsRequest.getOperationType();
 
-    logger.info("Recieved DS request, operation type: " + opType);
-    
+    Log.info("Recieved DS request, operation type: " + opType);
+
     final DSResponse response = new DSResponse();
     final String requestId = dsRequest.getRequestId();
 
@@ -65,9 +66,10 @@ public class BudgetDataSource extends DataSource {
       executeFetch(requestId, dsRequest, response);
       break;
     default:
-      System.out.println();
+      Log.error("We recieved a request we don't know how to handle ");
     }
 
+    Log.info("Fetch finished, returning from transform");
     return dsRequest.getData();
   }
 
@@ -77,8 +79,8 @@ public class BudgetDataSource extends DataSource {
     String parentId = null;
     String sectionCode = null;
     String sectionName = null;
-    
-    logger.info("executing fetch");
+
+    Log.info("Executing Fetch");
 
     Criteria criteria = dsRequest.getCriteria();
     if (criteria != null) {
@@ -86,11 +88,12 @@ public class BudgetDataSource extends DataSource {
       parentId = (String) testValues.get("parentId");
       sectionCode = (String) testValues.get("sectionCode");
       sectionName = (String) testValues.get("sectionName");
-      logger.info("Found values: Parent " + parentId + "," + sectionCode
-          + "," + sectionName);
+      Log.info("Found values: Parent " + parentId + "," + sectionCode + ","
+          + sectionName);
+      
     }
 
-    if ((sectionCode == null && sectionName == null) || (parentId != null) ) {
+    if ((sectionCode == null && sectionName == null) || (parentId != null)) {
       /**
        * We got a regular fetch request - usually called when you open a parent
        * node and request it's Children
@@ -101,23 +104,24 @@ public class BudgetDataSource extends DataSource {
       executeFetchByParent(parentId, response, requestId);
     } else if (sectionCode != null) {
       /**
-       * If we're being called via a filter, 
-       * either the sectionCode or sectionName should be legit.
+       * If we're being called via a filter, either the sectionCode or
+       * sectionName should be legit.
        */
       filterByCode(sectionCode, response, requestId);
-      
+
     } else if (sectionName != null) {
-      
-      System.out.println("Should have filtered by name , isn't supported yet");
-      
-    } 
+
+      Log.info("Should have filtered by name , isn't supported yet");
+
+    }
+    
 
   }
 
   private void filterByCode(final String sectionCode,
       final DSResponse response, final String requestId) {
 
-    logger.info("Filtering tree by section code: " + sectionCode);
+    Log.info("Filtering tree by section code: " + sectionCode);
     sectionsService.getSectionByYearAndCode(year, sectionCode,
         new AsyncCallback<SectionRecord[]>() {
 
@@ -136,7 +140,8 @@ public class BudgetDataSource extends DataSource {
 
           @Override
           public void onFailure(Throwable caught) {
-            logger.info("Failed to filter tree by section code: " + sectionCode);
+            Log
+                .info("Failed to filter tree by section code: " + sectionCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }
@@ -147,7 +152,7 @@ public class BudgetDataSource extends DataSource {
   private void executeFetchByParent(final String parentCode,
       final DSResponse response, final String requestId) {
 
-    logger.info("Filtering tree by parentCode : " + parentCode);
+    Log.info("Filtering tree by parentCode : " + parentCode);
     sectionsService.getSectionsByYearAndParent(year, parentCode,
         new AsyncCallback<SectionRecord[]>() {
 
@@ -156,16 +161,21 @@ public class BudgetDataSource extends DataSource {
             Record[] recs = new Record[result.length];
             int i = 0;
             for (SectionRecord s : result) {
+              if (s == null) {
+                continue;
+              }
               recs[i++] = SectionRecord.getRecord(s);
             }
             response.setStatus(RPCResponse.STATUS_SUCCESS);
             response.setData(recs);
+            Log.info("Recieved " + recs.length + " records in response to " 
+                + year + "," + parentCode );
             processResponse(requestId, response);
           }
 
           @Override
           public void onFailure(Throwable caught) {
-            logger.info("Failed filtering tree by parentCode : " + parentCode);
+            Log.info("Failed filtering tree by parentCode : " + parentCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }

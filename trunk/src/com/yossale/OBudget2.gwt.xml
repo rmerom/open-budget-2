@@ -22,6 +22,11 @@
 	<!-- Other module inherits -->
 	<inherits name='com.google.gwt.json.JSON' />
 	
+	<!-- gwt-logging package 
+	 For development, a default of `DEBUG` is recommended.
+	 
+	 For production mode, replace the word DEBUG with OFF-->
+  <inherits name="com.allen_sauer.gwt.log.gwt-log-OFF" />
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='com.yossale.client.OBudget2' />

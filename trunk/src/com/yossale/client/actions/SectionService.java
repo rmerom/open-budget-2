@@ -7,7 +7,6 @@ import com.yossale.client.data.SectionRecord;
 @RemoteServiceRelativePath("section")
 public interface SectionService extends RemoteService {
 
-	SectionRecord[] getSections(int year);	
 	SectionRecord[] getSectionsByYear(int year);
 	SectionRecord[] getSectionsByYearAndParent(int year, String parentCode);
 	String[] getAvailableBudgetYears();

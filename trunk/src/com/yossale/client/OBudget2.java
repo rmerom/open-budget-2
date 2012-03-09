@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -50,7 +50,6 @@ import com.yossale.client.gui.DBPanel;
 public class OBudget2 implements EntryPoint {
 
   public static final String VERSION_ID = "0.3 - search by ID";
-  private static final Logger logger = Logger.getLogger(OBudget2.class.getName());
 
   private BudgetTreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
@@ -76,13 +75,13 @@ public class OBudget2 implements EntryPoint {
      */
 
     if (budgetTreesCache.containsKey(year)) {
-      logger.info("Cache hit on " + year);
+      Log.info("Cache hit on " + year);
       BudgetTreeGrid budgetTree = budgetTreesCache.get(year);
       budgetPane.updateBudgetTree(budgetTree);
 
     } else {
 
-      logger.info("Generating new tree");
+      Log.info("Generating new tree for " + year);
       BudgetTreeGrid budgetTree = new BudgetTreeGrid(year);
       budgetTreesCache.put(year, budgetTree);
       budgetPane.updateBudgetTree(budgetTree);
@@ -91,6 +90,7 @@ public class OBudget2 implements EntryPoint {
 
   private TreeGrid generateBucket() {
 
+    Log.info("Generating new bucket");
     TreeGrid tree = new TreeGrid();
     tree.setFields(new TreeGridField("sectionCode", "Code"), new TreeGridField(
         "name", "Name"), new TreeGridField("year", "Year"));
@@ -175,7 +175,8 @@ public class OBudget2 implements EntryPoint {
    */
   public void loadOBudget(LoginInfo loginInfo) {
   	final BucketServiceAsync bucketService = GWT.create(BucketService.class); 
-    logger.info("OBudget loading started");
+    Log.debug("Tommy can you see me?");
+    Log.info("OBudget loading started");
     budgetTree = generateBudgetTree();
     bucketTree = generateBucket();
     final TreeGrid bucketTreeFinal = bucketTree;
@@ -243,9 +244,8 @@ public class OBudget2 implements EntryPoint {
   }
 
   private BudgetTreeGrid generateBudgetTree() {
-    logger.info("Generating budget tree");
     int curYear = 2010;
-    System.out.println("Retrieving year: " + curYear);
+    Log.info("Generating budget tree - retrieving year: " + curYear);
     return new BudgetTreeGrid(curYear);
   }
 
@@ -258,6 +258,8 @@ public class OBudget2 implements EntryPoint {
 
   @Override
   public void onModuleLoad() {
+    Log.setUncaughtExceptionHandler();
+    
     LoginServiceAsync loginService = GWT.create(LoginService.class);
     loginService.login(GWT.getModuleBaseURL(), new AsyncCallback<LoginInfo>() {
       public void onFailure(Throwable error) {

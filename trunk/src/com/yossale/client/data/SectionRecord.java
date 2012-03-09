@@ -1,7 +1,7 @@
 package com.yossale.client.data;
 
 import java.io.Serializable;
-
+import com.allen_sauer.gwt.log.client.Log;
 import com.smartgwt.client.data.Record;
 
 public class SectionRecord implements Serializable  {
@@ -22,6 +22,7 @@ public class SectionRecord implements Serializable  {
 	
 	public static Record getRecord(SectionRecord s) {
 	  Record r = new Record();
+	  Log.info(s.toString());
 	  r.setAttribute("sectionCode", s.getSectionCode());
 	  r.setAttribute("parentCode", s.getParentCode());
 	  r.setAttribute("name", s.getName());
@@ -35,7 +36,7 @@ public class SectionRecord implements Serializable  {
 	  r.setAttribute("id", s.getYear()+"_"+s.getSectionCode());
 	  return r;
 	}
-	
+		
 	public static SectionRecord getSectionRecord(Record r) {
     SectionRecord s = new SectionRecord();
     s.setSectionCode(r.getAttribute("sectionCode"));
@@ -87,7 +88,7 @@ public class SectionRecord implements Serializable  {
     this.parentCode = parentCode;
   }
 
-  public int getYear() {
+  public Integer getYear() {
 		return year;
 	}
 
@@ -103,7 +104,7 @@ public class SectionRecord implements Serializable  {
 		this.name = name;
 	}
 
-	public int getNetAmountAllocated() {
+	public Integer getNetAmountAllocated() {
 		return netAmountAllocated;
 	}
 
@@ -111,7 +112,7 @@ public class SectionRecord implements Serializable  {
 		this.netAmountAllocated = netAmountAllocated;
 	}
 
-	public int getNetAmountRevised() {
+	public Integer getNetAmountRevised() {
 		return netAmountRevised;
 	}
 
@@ -119,7 +120,7 @@ public class SectionRecord implements Serializable  {
 		this.netAmountRevised = netAmountRevised;
 	}
 
-	public int getNetAmountUsed() {
+	public Integer getNetAmountUsed() {
 		return netAmountUsed;
 	}
 
@@ -127,7 +128,7 @@ public class SectionRecord implements Serializable  {
 		this.netAmountUsed = netAmountUsed;
 	}
 
-	public int getGrossAmountAllocated() {
+	public Integer getGrossAmountAllocated() {
 		return grosAmountAllocated;
 	}
 
@@ -135,7 +136,7 @@ public class SectionRecord implements Serializable  {
 		this.grosAmountAllocated = grosAmountAllocated;
 	}
 
-	public int getGrossAmountRevised() {
+	public Integer getGrossAmountRevised() {
 		return grossAmountRevised;
 	}
 
@@ -143,7 +144,7 @@ public class SectionRecord implements Serializable  {
 		this.grossAmountRevised = grossAmountRevised;
 	}
 
-	public int getGrossAmountUsed() {
+	public Integer getGrossAmountUsed() {
 		return grossAmountUsed;
 	}
 

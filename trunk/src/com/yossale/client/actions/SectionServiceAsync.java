@@ -5,8 +5,6 @@ import com.yossale.client.data.SectionRecord;
 
 public interface SectionServiceAsync {
   
-  void getSections(int years, AsyncCallback<SectionRecord[]> callback);
-
   void addSectionRecord(SectionRecord record, AsyncCallback<Void> callback);
 
   void getSectionsByYear(int year, AsyncCallback<SectionRecord[]> callback);
