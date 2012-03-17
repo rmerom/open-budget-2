@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -15,12 +16,12 @@ import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.corechart.AreaChart;
 import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.smartgwt.client.data.Record;
 import com.yossale.client.data.SectionRecord;
 
 public class GraphCanvas extends Composite {
 
   private AreaChart pie;
+  private static final Logger logger = Logger.getLogger(GraphCanvas.class.getName());
 
   /* The pie creation part should be in a different class * */
 
@@ -61,6 +62,7 @@ public class GraphCanvas extends Composite {
 
   private List<SectionRecord> summarizeResults(List<SectionRecord> topics) {
 
+    logger.info("Summarizing results");
     Map<Integer, SectionRecord> map = new HashMap<Integer, SectionRecord>();
 
     for (SectionRecord t : topics) {
@@ -75,10 +77,10 @@ public class GraphCanvas extends Composite {
 
   }
 
-  private DataTable createTable(List<SectionRecord> topics) {
+  private DataTable createTable(List<SectionRecord> topics) {   
 
-    System.out.println("Updating graph");
-
+    logger.info("Updating graph with " + (null == topics ? 0 : topics.size()) + " topics");
+    
     DataTable data = DataTable.create();
     data.addColumn(ColumnType.STRING, "Year");
     data.addColumn(ColumnType.NUMBER, "Net Allocated");

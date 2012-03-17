@@ -14,7 +14,6 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
-import com.yossale.client.OBudget2;
 
 public class BudgetPane extends HLayout {
 
