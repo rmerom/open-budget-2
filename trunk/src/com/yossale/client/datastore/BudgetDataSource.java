@@ -1,9 +1,8 @@
 package com.yossale.client.datastore;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.Criteria;
@@ -19,7 +18,6 @@ import com.smartgwt.client.types.DSProtocol;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.data.SectionRecord;
-import com.allen_sauer.gwt.log.client.Log;
 
 public class BudgetDataSource extends DataSource {
   
@@ -64,6 +62,8 @@ public class BudgetDataSource extends DataSource {
     switch (opType) {
     case FETCH:
       executeFetch(requestId, dsRequest, response);
+      break;
+    case REMOVE:
       break;
     default:
       Log.error("We recieved a request we don't know how to handle ");

@@ -40,18 +40,33 @@ public class SectionRecord implements Serializable  {
 	public static SectionRecord getSectionRecord(Record r) {
     SectionRecord s = new SectionRecord();
     s.setSectionCode(r.getAttribute("sectionCode"));
-    s.setSectionCode(r.getAttribute("parentCode"));
+    s.setParentCode(r.getAttribute("parentCode"));
     s.setName(r.getAttribute("name"));
     
     s.setYear(r.getAttributeAsInt("year"));
-    s.setNetAmountAllocated(r.getAttributeAsInt("netAmountAllocated"));
-    s.setNetAmountRevised(r.getAttributeAsInt("netAmountRevised"));
-    s.setNetAmountUsed(r.getAttributeAsInt("netAmountUsed"));
-    s.setGrosAmountAllocated(r.getAttributeAsInt("grosAmountAllocated"));
-    s.setGrossAmountRevised(r.getAttributeAsInt("grossAmountRevised"));
-    s.setGrossAmountUsed(r.getAttributeAsInt("grossAmountUsed"));
+    s.setNetAmountAllocated(getIntAttribute(r,"netAmountAllocated"));
+    s.setNetAmountRevised(getIntAttribute(r,"netAmountRevised"));
+    s.setNetAmountUsed(getIntAttribute(r,"netAmountUsed"));
+    s.setGrosAmountAllocated(getIntAttribute(r,"grosAmountAllocated"));
+    s.setGrossAmountRevised(getIntAttribute(r,"grossAmountRevised"));
+    s.setGrossAmountUsed(getIntAttribute(r,"grossAmountUsed"));
     return s;
   }
+	
+	private static int getIntAttribute(Record r, String att, int defaultValue) {
+	  String val = r.getAttribute(att);
+	  if (val == null) {
+	    return defaultValue;
+	  }
+	  
+	  return Integer.parseInt(val);
+	}
+	
+	private static int getIntAttribute(Record r, String att) {        
+    return getIntAttribute(r, att, 0);
+  }
+	
+	
 	
 	public SectionRecord() {  
 	}
