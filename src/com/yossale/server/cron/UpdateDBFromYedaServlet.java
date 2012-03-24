@@ -25,6 +25,9 @@ import com.yossale.server.PMF;
 import com.yossale.server.data.Section;
 import com.yossale.server.util.Emailer;
 
+/**
+ * This servlet is broken right now, needs to be moved to Objectify.
+ */
 public class UpdateDBFromYedaServlet extends HttpServlet {
   private Logger logger = Logger.getLogger(UpdateDBFromYedaServlet.class
       .getName());
@@ -37,7 +40,9 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
 
   public void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws IOException {
-
+    if (1 == 1) {  // Fix this servlet
+    	return;
+    }
     logger.warning("doGet started");
     boolean succeeded = false;
     Date startTime = null;
@@ -106,7 +111,7 @@ public class UpdateDBFromYedaServlet extends HttpServlet {
   }
 
   private void storeSections(JSONArray sectionArray) throws JSONException {
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+    PersistenceManager pm = null; // PMF.INSTANCE.getPersistenceManager();
     Vector<Section> sections = new Vector<Section>();
     int errors = 0;
     for (int i = 0; i < sectionArray.length(); ++i) {

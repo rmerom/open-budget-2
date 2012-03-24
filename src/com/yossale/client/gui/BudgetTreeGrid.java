@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
-import com.yossale.client.datastore.BudgetDataSource;
+import com.yossale.client.data.BudgetDataSource;
 
 public class BudgetTreeGrid extends TreeGrid {
 

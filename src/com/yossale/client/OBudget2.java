@@ -8,10 +8,13 @@ import java.util.Map;
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -49,7 +52,7 @@ import com.yossale.client.gui.DBPanel;
  */
 public class OBudget2 implements EntryPoint {
 
-  public static final String VERSION_ID = "0.3 - search by ID";
+  public static final String VERSION_ID = "0.4 - initial buckets";
 
   private BudgetTreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
@@ -191,19 +194,48 @@ public class OBudget2 implements EntryPoint {
 
     VLayout v = new VLayout();
 
-    String currentUser = (loginInfo.isLoggedIn() ? "<a href='"
-        + loginInfo.getLogoutUrl() + "'>" + loginInfo.getEmailAddress()
-        + "</a>" : "<a href='" + loginInfo.getLoginUrl() + "'>log in</a>");
+    String currentUser;
+    if (loginInfo != null) {
+    	currentUser = (loginInfo.isLoggedIn() ? "<a href='"
+    			 + loginInfo.getLogoutUrl() + "'>" + loginInfo.getEmailAddress()
+           + "</a>" : "<a href='" + loginInfo.getLoginUrl() + "'>log in</a>");
+    } else {
+    	currentUser = "login currently not working";
+    }
+        
     Label userLabel = new Label(currentUser);
     v.setAutoHeight();
     v.setMembersMargin(30);
 
     v.addMember(new Label("Version :" + VERSION_ID));
     v.addMember(userLabel);
-    v.addMember(new Button("save doNotPress", new ClickHandler() {
+    final ListBox listBox = new ListBox();
+    
+    v.addMember(listBox);
+
+    bucketService.getBucketsOfLoggedInUser(new AsyncCallback<BucketRecord[]>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Log.warn("unable to get list of buckets");
+			}
+
+			@Override
+			public void onSuccess(BucketRecord[] result) {
+				Log.warn("Got " + result.length + " buckets");
+				for (BucketRecord bucketRecord : result) {
+					listBox.addItem(bucketRecord.getName());
+				}
+			}
+    	
+    });
+    HLayout horizontalSavePanel = new HLayout();
+    final TextBox textBox = new TextBox();
+    horizontalSavePanel.addMember(textBox);
+
+    horizontalSavePanel.addMember(new Button("save doNotPress", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				bucketService.addBucket("myNewBucket", new AsyncCallback<BucketRecord>() {
+				bucketService.addBucket(textBox.getText(), new AsyncCallback<BucketRecord>() {
 					
 					@Override
 					public void onSuccess(BucketRecord result) {
@@ -214,13 +246,12 @@ public class OBudget2 implements EntryPoint {
 						bucketService.updateBucket(result, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								logger.warning("failure to update bucket: " + caught);
+								Log.warn("failure to update bucket: " + caught);
 							}
 
 							@Override
 							public void onSuccess(Void result) {
 								// TODO Auto-generated method stub
-								
 							}
 						});
 						
@@ -228,12 +259,14 @@ public class OBudget2 implements EntryPoint {
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						logger.warning("failure to add bucket: " + caught);
+						Log.warn("failure to add bucket: " + caught);
 					}
 				});
 			}
     	
     }));
+    
+    v.addMember(horizontalSavePanel);
     v.addMember(createTitle());
     v.addMember(form);
     v.addMember(h);
@@ -258,8 +291,16 @@ public class OBudget2 implements EntryPoint {
 
   @Override
   public void onModuleLoad() {
-    Log.setUncaughtExceptionHandler();
+//    Log.setUncaughtExceptionHandler();
     
+    GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			@Override
+			public void onUncaughtException(Throwable e) {
+				Log.fatal("there will be a merge issue here", e);
+			}
+		});
+    
+    // loadOBudget(null);
     LoginServiceAsync loginService = GWT.create(LoginService.class);
     loginService.login(GWT.getModuleBaseURL(), new AsyncCallback<LoginInfo>() {
       public void onFailure(Throwable error) {

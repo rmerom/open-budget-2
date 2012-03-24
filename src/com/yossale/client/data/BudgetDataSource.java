@@ -1,4 +1,4 @@
-package com.yossale.client.datastore;
+package com.yossale.client.data;
 
 import java.util.Map;
 
@@ -17,7 +17,6 @@ import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.actions.SectionServiceAsync;
-import com.yossale.client.data.SectionRecord;
 
 public class BudgetDataSource extends DataSource {
   

@@ -15,6 +15,7 @@
 	<inherits name="com.smartgwt.SmartGwtNoTheme" />
 	<inherits name='com.google.gwt.visualization.Visualization' />	
 
+  <inherits name="com.googlecode.objectify.Objectify" />
 	<!-- <inherits name="com.smartclient.theme.enterpriseblue.EnterpriseBlue" 
 		/> <inherits name="com.smartclient.theme.enterpriseblue.EnterpriseBlueResources" 
 		/> -->
@@ -26,7 +27,7 @@
 	 For development, a default of `DEBUG` is recommended.
 	 
 	 For production mode, replace the word DEBUG with OFF-->
-  <inherits name="com.allen_sauer.gwt.log.gwt-log-DEBUG" />
+  <inherits name="com.allen_sauer.gwt.log.gwt-log-OFF" />
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='com.yossale.client.OBudget2' />
@@ -34,7 +35,6 @@
 	<!-- Specify the paths for translatable code -->
 	<source path='client' />	
 	<source path='shared' />
-	<source path='server' />
 
 </module>
 
