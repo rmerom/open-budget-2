@@ -19,6 +19,7 @@ public class SectionRecord implements Serializable  {
 	private Integer grosAmountAllocated = 0;
 	private Integer grossAmountRevised = 0;
 	private Integer grossAmountUsed = 0;
+	private String id;
 	
 	public static Record getRecord(SectionRecord s) {
 	  Record r = new Record();
@@ -33,7 +34,7 @@ public class SectionRecord implements Serializable  {
 	  r.setAttribute("grosAmountAllocated", s.getGrossAmountAllocated());
 	  r.setAttribute("grossAmountRevised", s.getGrossAmountRevised());
 	  r.setAttribute("grossAmountUsed", s.getGrossAmountUsed());
-	  r.setAttribute("id", s.getYear()+"_"+s.getSectionCode());
+	  r.setAttribute("id", generateKey(s.getYear(), s.getSectionCode()));
 	  return r;
 	}
 		
@@ -50,6 +51,7 @@ public class SectionRecord implements Serializable  {
     s.setGrosAmountAllocated(getIntAttribute(r,"grosAmountAllocated"));
     s.setGrossAmountRevised(getIntAttribute(r,"grossAmountRevised"));
     s.setGrossAmountUsed(getIntAttribute(r,"grossAmountUsed"));
+    s.setId(generateKey(s.getYear(), s.getSectionCode()));
     return s;
   }
 	
@@ -85,6 +87,15 @@ public class SectionRecord implements Serializable  {
 		this.grosAmountAllocated = grosAmountAllocated;
 		this.grossAmountRevised = grossAmountRevised;
 		this.grossAmountUsed = grossAmountUsed;
+		this.id = generateKey(year, sectionCode);
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getSectionCode() {
@@ -165,6 +176,11 @@ public class SectionRecord implements Serializable  {
 
 	public void setGrossAmountUsed(int grossAmountUsed) {
 		this.grossAmountUsed = grossAmountUsed;
+	}
+	
+	// TODO(ronme): integrate with Section.generateKey().
+	public static String generateKey(int year, String sectionCode) {
+		return new StringBuilder().append(year).append("_").append(sectionCode).toString();
 	}
 
 	@Override

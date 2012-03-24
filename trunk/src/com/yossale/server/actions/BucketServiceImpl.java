@@ -4,15 +4,17 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
-
+import com.google.appengine.api.datastore.QueryResultIterable;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.data.BucketRecord;
 import com.yossale.server.Common;
-import com.yossale.server.PMF;
 import com.yossale.server.data.Bucket;
+import com.yossale.server.data.DAO;
 import com.yossale.server.data.User;
 
 @SuppressWarnings("serial")
@@ -24,37 +26,32 @@ public class BucketServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public BucketRecord[] getBucketsOfLoggedInUser() {
 		User user = Common.getLoggedInUserRecord();
-		List<Bucket> buckets = user.getBuckets();
-		BucketRecord[] output = new BucketRecord[buckets.size()];
-		int i = 0;
-		for (Bucket bucket : buckets) {
-			output[i++] = bucket.toBucketRecord();
+		if (user == null) {
+			return new BucketRecord[0];
 		}
-		return output;
+		Vector<BucketRecord> output = new Vector<BucketRecord>();
+		QueryResultIterator<Bucket> bucketIterator = 
+				new DAO().ofy().query(Bucket.class).filter("owner", Key.create(User.class, user.getEmail())).fetch().iterator();
+		while (bucketIterator.hasNext()) {
+			Bucket bucket = bucketIterator.next();
+			output.add(bucket.toBucketRecord());
+		}
+		logger.info("got " + output.size() + " buckets for user " + user.getEmail());
+		return output.toArray(new BucketRecord[0]);
 	}
 	
 	@Override
 	public BucketRecord addBucket(String name) {
-		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
 		User user = Common.getLoggedInUserRecord();
-		List<Bucket> buckets = user.getBuckets();
-		Bucket b = new Bucket();
-		try {
-    	b.setName(name);
-  		buckets.add(b);
-  		user.setBuckets(buckets);
-  		pm.makePersistent(user);
-    } catch (Exception ex) {
-    	logger.severe("Could not add bucket to the DB:" + ex.getMessage());
-    } finally {
-      pm.close();
-    }
-    return b.toBucketRecord();
+		Bucket bucket = new Bucket().setOwner(user.getEmail()).setName(name).setIsPublic(false);
+		Objectify oty = new DAO().ofy();
+		oty.put(bucket);
+		return bucket.toBucketRecord();
 	}
 
 	@Override
 	public BucketRecord[] getAllPublicBuckets() {
-		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
+/*		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
 		Query query = pm.newQuery("select from Bucket where isPublic == true sort by name");
 		Vector<BucketRecord> bucketRecords = new Vector<BucketRecord>(); 
 		@SuppressWarnings("unchecked")
@@ -63,19 +60,17 @@ public class BucketServiceImpl extends RemoteServiceServlet implements
 			bucketRecords.add(bucket.toBucketRecord());
 			
 		}
-		return bucketRecords.toArray(new BucketRecord[0]);
+		return bucketRecords.toArray(new BucketRecord[0]);*/
+		return null;
 	}
 
 	@Override
 	public void updateBucket(BucketRecord bucketRecord) {
-		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
 		User user = Common.getLoggedInUserRecord();
-		for (Bucket bucket : user.getBuckets()) {
-			if (bucket.getName().equals(bucketRecord.getName())) {
-				bucket.assignBucketRecord(bucketRecord);
-				break;
-			}
-		}
-		pm.makePersistent(user);
+		Objectify ofy = new DAO().ofy();
+		// TODO(ronme): add error handling, check against curent user;
+		Bucket bucket = ofy.get(Bucket.class, bucketRecord.getId());
+		bucket.assignBucketRecord(bucketRecord, user);
+		ofy.put(bucket);
 	}
 }

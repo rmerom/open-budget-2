@@ -2,91 +2,95 @@ package com.yossale.server.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
+import javax.persistence.Id;
 
-import com.google.appengine.api.datastore.Key;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
 import com.yossale.client.data.BucketRecord;
 import com.yossale.client.data.SectionRecord;
 
-@PersistenceCapable
 public class Bucket {
 
-	@PrimaryKey
-	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key key;
-	
-	@Persistent
-	private String name;
-	
-	@Persistent
-	private List<Section> sections;
+	@Id
+	private Long key;
 
-	@Persistent
+	Key<User> owner;
+	
+	private String name;
+
+	private List<String> sections;
+
 	private Boolean isPublic;
 
 	public Bucket() {
-		sections = new ArrayList<Section>();
+		sections = new ArrayList<String>();
 	}
 	
-	public Bucket(BucketRecord bucketRecord) {
-		assignBucketRecord(bucketRecord);
+	public Bucket(BucketRecord bucketRecord, User owner) {
+		assignBucketRecord(bucketRecord, owner);
 	}
 	
-	public Bucket assignBucketRecord(BucketRecord bucketRecord) {
+	public Bucket assignBucketRecord(BucketRecord bucketRecord, User owner) {
 		name = bucketRecord.getName();
 		isPublic = bucketRecord.isPublic();
-		sections = new ArrayList<Section>();
+		sections = new ArrayList<String>();
 		for (SectionRecord sectionRecord : bucketRecord.getSections()) {
-			sections.add(new Section(sectionRecord));
+			sections.add(new Section(sectionRecord).getKey());
 		}
+		this.owner = Key.create(User.class, owner.getEmail()); 
+		
 		return this;
 	}
 
-	public Key getKey() {
-		return key;
+	public Bucket setOwner(String ownerEmail) {
+		this.owner = Key.create(User.class, ownerEmail);
+		return this;
 	}
-
-	public void setKey(Key key) {
-		this.key = key;
+	
+	public Long getKey() {
+		return key;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public Bucket setName(String name) {
 		this.name = name;
+		return this;
 	}
 
-	public List<Section> getSections() {
+	public List<String> getSections() {
 		if (sections == null) {
-			return new ArrayList<Section>();
+			return new ArrayList<String>();
 		}
 		return sections;
 	}
 
-	public void setSections(List<Section> sections) {
+	public Bucket setSections(List<String> sections) {
 		this.sections = sections;
+		return this;
 	}
 	
 	public BucketRecord toBucketRecord() {
+		Objectify otfy = new DAO().fact().begin();
+		Map<String, Section> loadedSections = otfy.get(Section.class, sections);
 		List<SectionRecord> sectionRecords = new ArrayList<SectionRecord>();
-		for (Section section : sections) {
-			sectionRecords.add(section.toSectionRecord());
+		for (Section loadedSection : loadedSections.values()) {
+			sectionRecords.add(loadedSection.toSectionRecord());
 		}
-		return new BucketRecord(getKey().getId(), getName(), sectionRecords);
+		return new BucketRecord(getKey(), getName(), sectionRecords);
 	}
 
 	public Boolean getIsPublic() {
 		return isPublic == null ? false : isPublic;
 	}
 
-	public void setIsPublic(Boolean isPublic) {
+	public Bucket setIsPublic(Boolean isPublic) {
 		this.isPublic = isPublic;
+		return this;
 	}
 
 }

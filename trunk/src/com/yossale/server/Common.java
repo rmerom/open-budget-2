@@ -1,10 +1,10 @@
 package com.yossale.server;
 
-import javax.jdo.PersistenceManager;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.googlecode.objectify.NotFoundException;
+import com.googlecode.objectify.Objectify;
+import com.yossale.server.data.DAO;
 import com.yossale.server.data.User;
 
 public class Common {
@@ -29,33 +29,17 @@ public class Common {
 	 * @return User object from the database.
 	 */
 	public static User getUserByEmail(String email) {
-		PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-		Key key = getUserKey(email);
+		Objectify otfy = new DAO().fact().begin();
+		User user;
 		try {
-			User user = null;
-			try {
-			  user = pm.getObjectById(User.class, key);
-			} catch (Exception e) {
-				user = null;
-			}
-			if (user == null) {
-				user = new User();
-			  user.setKey(key);
-			  user.setEmail(email);
-			  pm.makePersistent(user);
-			}
-			return user;
-		} finally {
-			pm.close();
+		  user = otfy.get(User.class, email);
+		} catch (NotFoundException e) {
+			user = null;
 		}
-	}
-	
-	/**
-	 * Return the key to retrieve the user row from the database.
-	 * @param email email address of the logged-in user.
-	 * @return
-	 */
-	public static Key getUserKey(String email) {
-		return KeyFactory.createKey(User.class.getSimpleName(), email);
+		if (user == null) {
+			user = new User().setEmail(email);
+			otfy.put(user);
+		}
+		return user;
 	}
 }

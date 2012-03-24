@@ -1,61 +1,39 @@
 package com.yossale.server.data;
 
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
+import javax.persistence.Id;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.yossale.client.data.SectionRecord;
 
-@PersistenceCapable
 public class Section {
 
-  @PrimaryKey
-  @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-  private Key key;
+	@Id
+  private String key;
 
-  public Key getKey() {
-    return key;
-  }
   // Mispar Se'if Takzivi as string.
-  @Persistent
   private String sectionCode;
   
-  @Persistent
   private String parentCode;
 
-  @Persistent
   private Integer year;
 
-  @Persistent
   private String name;
 
-  @Persistent
   private Integer netAmountAllocated;
 
-  @Persistent
   private Integer netAmountRevised;
 
-  @Persistent
   private Integer netAmountUsed;
 
-  @Persistent
   private Integer grossAmountAllocated;
 
-  @Persistent
   private Integer grossAmountRevised;
 
-  @Persistent
   private Integer grossAmountUsed;
 
   public Section(String sectionCode, String parentCode, Integer year, String name,
       Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
       Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
     this.sectionCode = sectionCode;  
-//    this.parentCode = sectionCode.length() == 2 ? "" : sectionCode
-//        .substring(0, sectionCode.length() - 2);
     this.parentCode = parentCode;
     this.year = year;
     this.name = name;
@@ -68,9 +46,18 @@ public class Section {
     generateKey();
   }
 
-  public Section() {
+	public Section() {
   }
-  
+
+  public String getKey() {
+    return key;
+  }
+
+  public Section setKey(String key) {
+    this.key = key;
+    return this;
+  }
+
   public Section(SectionRecord r) {
     this.sectionCode = r.getSectionCode();
     this.parentCode = r.getParentCode();
@@ -82,89 +69,98 @@ public class Section {
     this.grossAmountAllocated = r.getGrossAmountAllocated();
     this.grossAmountRevised = r.getGrossAmountRevised();
     this.grossAmountUsed = r.getGrossAmountUsed();
+    		
     generateKey();
   }
-
-  
 
   public String getParentCode() {
     return parentCode;
   }
 
-  public void setParentCode(String parentCode) {
+  public Section setParentCode(String parentCode) {
     this.parentCode = parentCode;
+    return this;
   }
 
   public String getSectionCode() {
     return sectionCode;
   }
 
-  public void setSectionCode(String sectionCode) {
+  public Section setSectionCode(String sectionCode) {
     this.sectionCode = sectionCode;
+    return this;
   }
 
   public Integer getYear() {
     return year;
   }
 
-  public void setYear(Integer year) {
+  public Section setYear(Integer year) {
     this.year = year;
+    return this;
   }
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public Section setName(String name) {
     this.name = name;
+    return this;
   }
 
   public Integer getNetAmountAllocated() {
     return netAmountAllocated;
   }
 
-  public void setNetAmountAllocated(Integer netAmountAllocated) {
+  public Section setNetAmountAllocated(Integer netAmountAllocated) {
     this.netAmountAllocated = netAmountAllocated;
+    return this;
   }
 
   public Integer getNetAmountRevised() {
     return netAmountRevised;
   }
 
-  public void setNetAmountRevised(Integer netAmountRevised) {
+  public Section setNetAmountRevised(Integer netAmountRevised) {
     this.netAmountRevised = netAmountRevised;
+    return this;
   }
 
   public Integer getNetAmountUsed() {
     return netAmountUsed;
   }
 
-  public void setNetAmountUsed(Integer netAmountUsed) {
+  public Section setNetAmountUsed(Integer netAmountUsed) {
     this.netAmountUsed = netAmountUsed;
+    return this;
   }
 
   public Integer getGrossAmountAllocated() {
     return grossAmountAllocated;
   }
 
-  public void setGrossAmountAllocated(Integer grossAmountAllocated) {
+  public Section setGrossAmountAllocated(Integer grossAmountAllocated) {
     this.grossAmountAllocated = grossAmountAllocated;
+    return this;
   }
 
   public Integer getGrossAmountRevised() {
     return grossAmountRevised;
   }
 
-  public void setGrossAmountRevised(Integer grossAmountRevised) {
+  public Section setGrossAmountRevised(Integer grossAmountRevised) {
     this.grossAmountRevised = grossAmountRevised;
+    return this;
   }
 
   public Integer getGrossAmountUsed() {
     return grossAmountUsed;
   }
 
-  public void setGrossAmountUsed(Integer grossAmountUsed) {
+  public Section setGrossAmountUsed(Integer grossAmountUsed) {
     this.grossAmountUsed = grossAmountUsed;
+    return this;
   }
 
   public SectionRecord toSectionRecord() {
@@ -173,8 +169,9 @@ public class Section {
         grossAmountRevised, grossAmountUsed);
   }
   
+	// TODO(ronme): integrate with SectionRecord.generateKey().
   private void generateKey() {
-  	key =	KeyFactory.createKey(getClass().getSimpleName(), "" + year + sectionCode);
+  	key =	new StringBuilder().append(year).append("_").append(sectionCode).toString();
   }
 
   @Override
@@ -183,6 +180,4 @@ public class Section {
         + ", parentCode=" + parentCode + ", year=" + year + ", name=" + name
         + "]";
   }
-  
-  
 }

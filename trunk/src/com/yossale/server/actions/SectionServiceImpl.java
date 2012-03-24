@@ -5,22 +5,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
-
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.appengine.api.datastore.QueryResultIterable;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Query;
 import com.yossale.client.actions.SectionService;
 import com.yossale.client.data.SectionRecord;
-import com.yossale.server.PMF;
+import com.yossale.server.data.DAO;
 import com.yossale.server.data.Section;
 
 @SuppressWarnings("serial")
@@ -30,35 +29,22 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   private static Logger logger = Logger.getLogger(SectionServiceImpl.class.getName());
 
   public void addSectionRecord(SectionRecord record) {
-
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-    Section e = new Section(record);
+    Section section = new Section(record);
+    Objectify ofy = new DAO().ofy();
     try {
-      pm.makePersistent(e);
+      ofy.put(section);
     } catch (Exception ex) {
       System.out.println("Failed to commit to DB");
-    } finally {
-      pm.close();
     }
   }
 
-  @SuppressWarnings("unchecked")
   public void removeAll() {
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-    Query query = pm.newQuery(Section.class);
-
-    try {
-      List<Section> results = (List<Section>) query.execute();
-      pm.deletePersistentAll(results);
-    } catch (Exception e) {
-      System.out.println("Failed to remove all instances");
-    } finally {
-      pm.close();
-    }
+  	Objectify ofy = new DAO().ofy();
+  	QueryResultIterable<Section> results = ofy.query(Section.class).fetch();
+  	ofy.delete(results);
   }
 
   private SectionRecord generateSectionRecord(JSONObject j) throws JSONException {    
-
     String sectionCode = j.getString("code");
     /**
      * Forgive me father, for I have sinned. This line is a logic duplication... :(
@@ -83,7 +69,6 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   }
 
   private Integer parseJson(JSONObject j, String property) {
-
     if (!j.has(property)) {
       return 0;
     } 
@@ -147,64 +132,31 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     }
   }
  
-  @SuppressWarnings("unchecked")
   public SectionRecord[] getSectionsByYear(int year) {
+    Objectify ofy = new DAO().ofy();
+    logger.info("Loading sections by year: " + year);  	
+    Query<Section> query = ofy.query(Section.class).filter("year", year).order("sectionCode");
     
-    logger.info("Loading secions by year: " + year);  	
-  	PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-    Query query = pm.newQuery(Section.class);
-    query.setFilter("year == sectionYearParam");
-    query.setOrdering("sectionCode desc");
-    query.declareParameters("Integer sectionYearParam");
+    SectionRecord[] results = executeQuery(query);
 
-    List<Section> results = (List<Section>) query.execute(year);
+    System.out.println("Found " + results.length + " records");
 
-    if (results == null || results.isEmpty()) {
-      return new SectionRecord[] {};
-    }
-
-    SectionRecord[] sectionsArr = new SectionRecord[results.size()];
-    System.out.println("Found " + results.size() + " records");
-    for (int i = 0; i < results.size(); i++) {
-      Section e = results.get(i);
-      sectionsArr[i] = e.toSectionRecord();
-    }
-
-    return sectionsArr;
+    return results;
   }
 
   @Override
   public SectionRecord[] getSectionsByYearAndParent(int year, String parentCode) {
-    
     logger.info("getSectionsByYearAndParent : " + year + "," + parentCode);
     
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-    Query query = pm.newQuery(Section.class);
-    query.setFilter("year == sectionYearParam && parentCode == sectionParentCode");
+    String parentCodeFixed = (parentCode == null) ? "" : parentCode;
+    Objectify ofy = new DAO().ofy();
+    Query<Section> query = ofy.query(Section.class).filter("year", year).filter("parentCode", parentCodeFixed).order("sectionCode");
     
-    parentCode = parentCode == null ? "" : parentCode;
-    
-    query.setOrdering("sectionCode desc");
-    query.declareParameters("Integer sectionYearParam, String sectionParentCode");
+    SectionRecord[] results = executeQuery(query);
 
-    List<Section> results = (List<Section>) query.execute(year, parentCode);
+    logger.info("Found " + results.length  + " results for getSectionsByYearAndParent : " + year + "," + parentCode);
 
-    if (results == null || results.isEmpty()) {
-      logger.info("No results found for getSectionsByYearAndParent : " + year + "," + parentCode);
-      return new SectionRecord[] {};
-    }
-
-    SectionRecord[] sectionsArr = new SectionRecord[results.size()];
-    
-    logger.info("Found " + results.size()  + " results found for getSectionsByYearAndParent : " + year + "," + parentCode);
-    for (int i = 0; i < results.size(); i++) {
-      Section e = results.get(i);
-      System.out.println(e);      
-      sectionsArr[i] = e.toSectionRecord();
-    }
-
-    return sectionsArr;
-    
+    return results;
   }
 
   @Override
@@ -212,64 +164,51 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     
     System.out.println("Querying getAvailableBudgetYears");
     logger.info("Querying getAvailableBudgetYears");
-    
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();    
-    
-    Query query = pm.newQuery(Section.class);
-    query.setFilter("sectionCode == sectionCodeParam");   
-    query.declareParameters("String sectionCodeParam");        
 
-    List<Section> results = (List<Section>) query.execute("00");
-    
-    if (results == null || results.isEmpty()) {
-      return new String[] {};
+    Objectify ofy = new DAO().ofy();
+    Query<Section> query = ofy.query(Section.class).filter("sectionCode", "00").order("year");
+
+    QueryResultIterator<Section> results = query.fetch().iterator();
+
+    Vector<String> years = new Vector<String>();
+    while (results.hasNext()) {
+    	Section section = results.next();
+    	years.add(Integer.valueOf(section.getYear()).toString());
     }
-
-    String[] yearsArr = new String[results.size()];
-    Collections.sort(results, new Comparator<Section>() {
-      @Override
-      public int compare(Section lhs, Section rhs) {        
-        return lhs.getYear().compareTo(rhs.getYear());
-      }
-    });
-    
-    System.out.println("Found " + results.size() + " years");
-    for (int i = 0; i < results.size(); i++) {
-      Section e = results.get(i);
-      yearsArr[i] = ""+e.getYear();
-    }
-
-    return yearsArr;
+    System.out.println("Found " + years.size() + " years");
+    return years.toArray(new String[0]);
   }
 
   @Override
   public SectionRecord[] getSectionByYearAndCode(int year, String sectionCode) {
     
-    logger.info("getSectionByYearAndCode : " + year + "," + sectionCode);
-    PersistenceManager pm = PMF.INSTANCE.getPersistenceManager();
-    Query query = pm.newQuery(Section.class);
-    query.setFilter("year == sectionYearParam && sectionCode == sectionCodeParam");
+    logger.info("getSectionsByYearAndCode: " + year + "," + sectionCode);
     
-    query.setOrdering("sectionCode desc");
-    query.declareParameters("Integer sectionYearParam, String sectionCodeParam");
+    Objectify ofy = new DAO().ofy();
+    Query<Section> query = ofy.query(Section.class).filter("year", year).filter("sectionCode", sectionCode).order("sectionCode");
+    
+    SectionRecord[] results = executeQuery(query);
 
-    List<Section> results = (List<Section>) query.execute(year, sectionCode);
+    logger.info("Found " + results.length  + " results found for getSectionsByYearAndCode: " + year + "," + sectionCode);
 
-    if (results == null || results.isEmpty()) {
-      logger.info("No results were found for getSectionByYearAndCode : " + year + "," + sectionCode);
-      return new SectionRecord[] {};
-    }
-
-    SectionRecord[] sectionsArr = new SectionRecord[results.size()];
-    logger.info(results.size() +  " Results were found for getSectionByYearAndCode : " + year + "," + sectionCode);
-    for (int i = 0; i < results.size(); i++) {
-      Section e = results.get(i);      
-      sectionsArr[i] = e.toSectionRecord();
-    }
-
-    return sectionsArr;
+    return results;
   }
 
+  private SectionRecord[] executeQuery(Query<Section> query) {
+    QueryResultIterator<Section> results = query.fetch().iterator();
+
+    Vector<SectionRecord> sections = new Vector<SectionRecord>();
+    while (results.hasNext()) {
+      Section section = results.next();
+      sections.add(section.toSectionRecord());
+    }
+
+    System.out.println("Found " + sections.size() + " records");
+
+    return sections.toArray(new SectionRecord[0]);
+  	
+  }
+  
   @Override
   public SectionRecord[] getSectionsByNameAndCode(int year, String nameLike) {
     return new SectionRecord[]{};

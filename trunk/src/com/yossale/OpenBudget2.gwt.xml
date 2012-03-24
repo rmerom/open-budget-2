@@ -17,6 +17,7 @@
 	<inherits name="com.smartgwt.SmartGwtNoTheme" />
 	<inherits name='com.google.gwt.visualization.Visualization' />
 
+ <inherits name="com.googlecode.objectify.Objectify" />
 	<!-- <inherits name="com.smartclient.theme.enterpriseblue.EnterpriseBlue" 
 		/> <inherits name="com.smartclient.theme.enterpriseblue.EnterpriseBlueResources" 
 		/> -->
@@ -29,6 +30,5 @@
 	<!-- Specify the paths for translatable code -->
 	<source path='client' />	
 	<source path='shared' />
-	<source path='server' />
 
 </module>
