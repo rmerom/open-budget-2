@@ -215,9 +215,19 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
   }
 
 	@Override
-	public void clear1000Expenses() {
+	public ExpenseRecord[] getExpensesByCodeAndYear(String expenseCode,
+			int[] years) {
+    
+    logger.info("getExpensesByYearAndCode: " + expenseCode);
+/*    
     Objectify ofy = new DAO().ofy();
-    Query<Expense> query = ofy.query(Expense.class);
-    ofy.delete(query.fetch());
+    Query<Expense> query = ofy.query(Expense.class).filter("year", year).filter("expenseCode", expenseCode).order("expenseCode");
+    
+    ExpenseRecord[] results = executeQuery(query);
+
+    logger.info("Found " + results.length  + " results found for getExpensesByYearAndCode: " + year + "," + expenseCode);
+
+    return results;*/
+		return null;
 	}
 }

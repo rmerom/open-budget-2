@@ -211,7 +211,8 @@ public class OBudget2 implements EntryPoint {
     bucketLabel.setText("Load bucket:");
     bucketLayout.addMember(bucketLabel);
     final ListBox bucketListBox = new ListBox();
-    
+
+//    bucketListBox.
     bucketLayout.addMember(bucketListBox);
 
     bucketService.getBucketsOfLoggedInUser(new AsyncCallback<BucketRecord[]>() {
