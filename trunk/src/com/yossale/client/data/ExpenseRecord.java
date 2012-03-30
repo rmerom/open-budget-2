@@ -1,6 +1,8 @@
 package com.yossale.client.data;
 
 import java.io.Serializable;
+import java.util.List;
+
 import com.allen_sauer.gwt.log.client.Log;
 import com.smartgwt.client.data.Record;
 
@@ -36,6 +38,21 @@ public class ExpenseRecord implements Serializable  {
 	  r.setAttribute("grossAmountUsed", s.getGrossAmountUsed());
 	  r.setAttribute("id", generateKey(s.getYear(), s.getExpenseCode()));
 	  return r;
+	}
+	
+	public static Record[] getRecords(List<ExpenseRecord> expenses) {
+	  
+	  Record[] recs = new Record[expenses.size()];
+	  for(int i=0; i < expenses.size(); i++) {
+	    recs[i] = ExpenseRecord.getRecord(expenses.get(i));
+	  }
+	  
+	  return recs;
+	}
+	
+	public static ExpenseRecord[] getExpenseRecordsArray(List<ExpenseRecord> expenses){
+	  ExpenseRecord[] recs = new ExpenseRecord[0];
+	  return expenses.toArray(recs);
 	}
 		
 	public static ExpenseRecord getExpenseRecord(Record r) {

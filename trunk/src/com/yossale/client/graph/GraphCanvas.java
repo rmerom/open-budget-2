@@ -43,12 +43,17 @@ public class GraphCanvas extends Composite {
   }
 
   public void updateGraph(List<ExpenseRecord> nodes) {
-
-    if (nodes == null || nodes.isEmpty()) {
+    updateGraph(ExpenseRecord.getExpenseRecordsArray(nodes));
+  }
+  
+  public void updateGraph(ExpenseRecord[] nodes) {
+    
+    if (nodes == null || nodes.length == 0) {
       return;
     }
 
     pie.draw(createTable(nodes), createOptions());
+    
   }
 
   private Options createOptions() {
@@ -60,7 +65,7 @@ public class GraphCanvas extends Composite {
     return options;
   }
 
-  private List<ExpenseRecord> summarizeResults(List<ExpenseRecord> topics) {
+  private List<ExpenseRecord> summarizeResults(ExpenseRecord[] topics) {
 
     logger.info("Summarizing results");
     Map<Integer, ExpenseRecord> map = new HashMap<Integer, ExpenseRecord>();
@@ -77,9 +82,9 @@ public class GraphCanvas extends Composite {
 
   }
 
-  private DataTable createTable(List<ExpenseRecord> topics) {   
+  private DataTable createTable(ExpenseRecord[] topics) {   
 
-    logger.info("Updating graph with " + (null == topics ? 0 : topics.size()) + " topics");
+    logger.info("Updating graph with " + (null == topics ? 0 : topics.length) + " topics");
     
     DataTable data = DataTable.create();
     data.addColumn(ColumnType.STRING, "Year");
@@ -87,7 +92,7 @@ public class GraphCanvas extends Composite {
     data.addColumn(ColumnType.NUMBER, "Net Revised");
     data.addColumn(ColumnType.NUMBER, "Net Used");
 
-    if (topics == null || topics.isEmpty()) {
+    if (topics == null || topics.length == 0) {
       return data;
     }
 
