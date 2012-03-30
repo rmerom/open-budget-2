@@ -9,7 +9,7 @@ public class BucketRecord implements Serializable {
 	private String name;
 	private long id;
 	private boolean isPublic;
-	List<SectionRecord> sections;
+	private List<ExpenseRecord> expenses;
 	
 	public boolean isPublic() {
 		return isPublic;
@@ -23,12 +23,12 @@ public class BucketRecord implements Serializable {
 		super();
 	}
 	
-	public BucketRecord(long id, String name, List<SectionRecord> sections) {
+	public BucketRecord(long id, String name, List<ExpenseRecord> expenses) {
 	  super();
 	  this.name = name;
 	  this.id = id;
 	  this.isPublic = false;
-	  this.sections = sections;
+	  this.expenses = expenses;
   }
 
 	public String getName() {
@@ -43,8 +43,8 @@ public class BucketRecord implements Serializable {
 		return id;
 	}
 	
-	public List<SectionRecord> getSections() {
-		return sections;
+	public List<ExpenseRecord> getExpenses() {
+		return expenses;
 	}
 	
 	public void setId(long id) {

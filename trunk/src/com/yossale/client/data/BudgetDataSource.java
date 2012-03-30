@@ -15,13 +15,13 @@ import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
-import com.yossale.client.actions.SectionService;
-import com.yossale.client.actions.SectionServiceAsync;
+import com.yossale.client.actions.ExpenseService;
+import com.yossale.client.actions.ExpenseServiceAsync;
 
 public class BudgetDataSource extends DataSource {
   
-  private final SectionServiceAsync sectionsService = GWT
-      .create(SectionService.class);
+  private final ExpenseServiceAsync expensesService = GWT
+      .create(ExpenseService.class);
 
   private final int year;
 
@@ -37,15 +37,14 @@ public class BudgetDataSource extends DataSource {
     setTitleField("name");
 
     DataSourceTextField idField = new DataSourceTextField("id", "ID");
-    DataSourceTextField sectionField = new DataSourceTextField("sectionCode",
+    DataSourceTextField expenseField = new DataSourceTextField("expenseCode",
         "Code");
     DataSourceTextField nameField = new DataSourceTextField("name", "Name");
     DataSourceTextField yearField = new DataSourceTextField("year", "Year");
     DataSourceTextField parentField = new DataSourceTextField("parentCode",
         "Parent");
 
-    setFields(idField, sectionField, nameField, yearField, parentField);
-
+    setFields(idField, expenseField, nameField, yearField, parentField);
   }
 
   @Override
@@ -76,8 +75,8 @@ public class BudgetDataSource extends DataSource {
       final DSResponse response) {
 
     String parentId = null;
-    String sectionCode = null;
-    String sectionName = null;
+    String expenseCode = null;
+    String expenseName = null;
 
     Log.info("Executing Fetch");
 
@@ -85,14 +84,14 @@ public class BudgetDataSource extends DataSource {
     if (criteria != null) {
       Map<?, ?> testValues = criteria.getValues();
       parentId = (String) testValues.get("parentId");
-      sectionCode = (String) testValues.get("sectionCode");
-      sectionName = (String) testValues.get("sectionName");
-      Log.info("Found values: Parent " + parentId + "," + sectionCode + ","
-          + sectionName);
+      expenseCode = (String) testValues.get("expenseCode");
+      expenseName = (String) testValues.get("expenseName");
+      Log.info("Found values: Parent " + parentId + "," + expenseCode + ","
+          + expenseName);
       
     }
 
-    if ((sectionCode == null && sectionName == null) || (parentId != null)) {
+    if ((expenseCode == null && expenseName == null) || (parentId != null)) {
       /**
        * We got a regular fetch request - usually called when you open a parent
        * node and request it's Children
@@ -101,14 +100,14 @@ public class BudgetDataSource extends DataSource {
         parentId = parentId.split("_")[1];
       }
       executeFetchByParent(parentId, response, requestId);
-    } else if (sectionCode != null) {
+    } else if (expenseCode != null) {
       /**
-       * If we're being called via a filter, either the sectionCode or
-       * sectionName should be legit.
+       * If we're being called via a filter, either the expenseCode or
+       * expenseName should be legit.
        */
-      filterByCode(sectionCode, response, requestId);
+      filterByCode(expenseCode, response, requestId);
 
-    } else if (sectionName != null) {
+    } else if (expenseName != null) {
 
       Log.info("Should have filtered by name , isn't supported yet");
 
@@ -117,19 +116,19 @@ public class BudgetDataSource extends DataSource {
 
   }
 
-  private void filterByCode(final String sectionCode,
+  private void filterByCode(final String expenseCode,
       final DSResponse response, final String requestId) {
 
-    Log.info("Filtering tree by section code: " + sectionCode);
-    sectionsService.getSectionByYearAndCode(year, sectionCode,
-        new AsyncCallback<SectionRecord[]>() {
+    Log.info("Filtering tree by expense code: " + expenseCode);
+    expensesService.getExpenseByYearAndCode(year, expenseCode,
+        new AsyncCallback<ExpenseRecord[]>() {
 
           @Override
-          public void onSuccess(SectionRecord[] result) {
+          public void onSuccess(ExpenseRecord[] result) {
             Record[] recs = new Record[result.length];
             int i = 0;
-            for (SectionRecord s : result) {
-              recs[i++] = SectionRecord.getRecord(s);
+            for (ExpenseRecord s : result) {
+              recs[i++] = ExpenseRecord.getRecord(s);
             }
             response.setStatus(RPCResponse.STATUS_SUCCESS);
             response.setData(recs);
@@ -140,7 +139,7 @@ public class BudgetDataSource extends DataSource {
           @Override
           public void onFailure(Throwable caught) {
             Log
-                .info("Failed to filter tree by section code: " + sectionCode);
+                .info("Failed to filter tree by expense code: " + expenseCode);
             response.setStatus(RPCResponse.STATUS_FAILURE);
             processResponse(requestId, response);
           }
@@ -152,18 +151,18 @@ public class BudgetDataSource extends DataSource {
       final DSResponse response, final String requestId) {
 
     Log.info("Filtering tree by parentCode : " + parentCode);
-    sectionsService.getSectionsByYearAndParent(year, parentCode,
-        new AsyncCallback<SectionRecord[]>() {
+    expensesService.getExpensesByYearAndParent(year, parentCode,
+        new AsyncCallback<ExpenseRecord[]>() {
 
           @Override
-          public void onSuccess(SectionRecord[] result) {
+          public void onSuccess(ExpenseRecord[] result) {
             Record[] recs = new Record[result.length];
             int i = 0;
-            for (SectionRecord s : result) {
+            for (ExpenseRecord s : result) {
               if (s == null) {
                 continue;
               }
-              recs[i++] = SectionRecord.getRecord(s);
+              recs[i++] = ExpenseRecord.getRecord(s);
             }
             response.setStatus(RPCResponse.STATUS_SUCCESS);
             response.setData(recs);

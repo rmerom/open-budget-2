@@ -17,22 +17,22 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
-import com.yossale.client.actions.SectionService;
-import com.yossale.client.data.SectionRecord;
+import com.yossale.client.actions.ExpenseService;
+import com.yossale.client.data.ExpenseRecord;
 import com.yossale.server.data.DAO;
-import com.yossale.server.data.Section;
+import com.yossale.server.data.Expense;
 
 @SuppressWarnings("serial")
-public class SectionServiceImpl extends RemoteServiceServlet implements
-    SectionService {
+public class ExpenseServiceImpl extends RemoteServiceServlet implements
+    ExpenseService {
   
-  private static Logger logger = Logger.getLogger(SectionServiceImpl.class.getName());
+  private static Logger logger = Logger.getLogger(ExpenseServiceImpl.class.getName());
 
-  public void addSectionRecord(SectionRecord record) {
-    Section section = new Section(record);
+  public void addExpenseRecord(ExpenseRecord record) {
+    Expense expense = new Expense(record);
     Objectify ofy = new DAO().ofy();
     try {
-      ofy.put(section);
+      ofy.put(expense);
     } catch (Exception ex) {
       System.out.println("Failed to commit to DB");
     }
@@ -40,18 +40,18 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
 
   public void removeAll() {
   	Objectify ofy = new DAO().ofy();
-  	QueryResultIterable<Section> results = ofy.query(Section.class).fetch();
+  	QueryResultIterable<Expense> results = ofy.query(Expense.class).fetch();
   	ofy.delete(results);
   }
 
-  private SectionRecord generateSectionRecord(JSONObject j) throws JSONException {    
-    String sectionCode = j.getString("code");
+  private ExpenseRecord generateExpenseRecord(JSONObject j) throws JSONException {    
+    String expenseCode = j.getString("code");
     /**
      * Forgive me father, for I have sinned. This line is a logic duplication... :(
      * The same happens in the UpdateDBFromYedaServlet
      */
-    String parentCode = sectionCode.length() == 2 ? "" : sectionCode
-        .substring(0, sectionCode.length() - 2);
+    String parentCode = expenseCode.length() == 2 ? "" : expenseCode
+        .substring(0, expenseCode.length() - 2);
     String name = j.get("title").toString();
     Integer year = parseJson(j,"year");    
     Integer netAmountAllocated = parseJson(j, "net_allocated");
@@ -61,7 +61,7 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     Integer grossAmountRevised = parseJson(j, "gross_revised");
     Integer grossAmountUsed = parseJson(j, "gross_used");
 
-    SectionRecord r = new SectionRecord(sectionCode, parentCode, year, name,
+    ExpenseRecord r = new ExpenseRecord(expenseCode, parentCode, year, name,
         netAmountAllocated, netAmountRevised, netAmountUsed,
         grosAmountAllocated, grossAmountRevised, grossAmountUsed);
 
@@ -121,9 +121,9 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
       for (int i = 0; i < arr.length(); i++) {
 
         JSONObject obj = arr.getJSONObject(i);
-        final SectionRecord er = generateSectionRecord(obj);
+        final ExpenseRecord er = generateExpenseRecord(obj);
         if (er != null) {
-          addSectionRecord(er);
+          addExpenseRecord(er);
         }
       }
 
@@ -132,12 +132,12 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     }
   }
  
-  public SectionRecord[] getSectionsByYear(int year) {
+  public ExpenseRecord[] getExpensesByYear(int year) {
     Objectify ofy = new DAO().ofy();
-    logger.info("Loading sections by year: " + year);  	
-    Query<Section> query = ofy.query(Section.class).filter("year", year).order("sectionCode");
+    logger.info("Loading expenses by year: " + year);  	
+    Query<Expense> query = ofy.query(Expense.class).filter("year", year).order("expenseCode");
     
-    SectionRecord[] results = executeQuery(query);
+    ExpenseRecord[] results = executeQuery(query);
 
     System.out.println("Found " + results.length + " records");
 
@@ -145,16 +145,16 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
   }
 
   @Override
-  public SectionRecord[] getSectionsByYearAndParent(int year, String parentCode) {
-    logger.info("getSectionsByYearAndParent : " + year + "," + parentCode);
+  public ExpenseRecord[] getExpensesByYearAndParent(int year, String parentCode) {
+    logger.info("getExpensesByYearAndParent : " + year + "," + parentCode);
     
     String parentCodeFixed = (parentCode == null) ? "" : parentCode;
     Objectify ofy = new DAO().ofy();
-    Query<Section> query = ofy.query(Section.class).filter("year", year).filter("parentCode", parentCodeFixed).order("sectionCode");
+    Query<Expense> query = ofy.query(Expense.class).filter("year", year).filter("parentCode", parentCodeFixed).order("expenseCode");
     
-    SectionRecord[] results = executeQuery(query);
+    ExpenseRecord[] results = executeQuery(query);
 
-    logger.info("Found " + results.length  + " results for getSectionsByYearAndParent : " + year + "," + parentCode);
+    logger.info("Found " + results.length  + " results for getExpensesByYearAndParent : " + year + "," + parentCode);
 
     return results;
   }
@@ -166,51 +166,58 @@ public class SectionServiceImpl extends RemoteServiceServlet implements
     logger.info("Querying getAvailableBudgetYears");
 
     Objectify ofy = new DAO().ofy();
-    Query<Section> query = ofy.query(Section.class).filter("sectionCode", "00").order("year");
+    Query<Expense> query = ofy.query(Expense.class).filter("expenseCode", "00").order("year");
 
-    QueryResultIterator<Section> results = query.fetch().iterator();
+    QueryResultIterator<Expense> results = query.fetch().iterator();
 
     Vector<String> years = new Vector<String>();
     while (results.hasNext()) {
-    	Section section = results.next();
-    	years.add(Integer.valueOf(section.getYear()).toString());
+    	Expense expense = results.next();
+    	years.add(Integer.valueOf(expense.getYear()).toString());
     }
     System.out.println("Found " + years.size() + " years");
     return years.toArray(new String[0]);
   }
 
   @Override
-  public SectionRecord[] getSectionByYearAndCode(int year, String sectionCode) {
+  public ExpenseRecord[] getExpenseByYearAndCode(int year, String expenseCode) {
     
-    logger.info("getSectionsByYearAndCode: " + year + "," + sectionCode);
+    logger.info("getExpensesByYearAndCode: " + year + "," + expenseCode);
     
     Objectify ofy = new DAO().ofy();
-    Query<Section> query = ofy.query(Section.class).filter("year", year).filter("sectionCode", sectionCode).order("sectionCode");
+    Query<Expense> query = ofy.query(Expense.class).filter("year", year).filter("expenseCode", expenseCode).order("expenseCode");
     
-    SectionRecord[] results = executeQuery(query);
+    ExpenseRecord[] results = executeQuery(query);
 
-    logger.info("Found " + results.length  + " results found for getSectionsByYearAndCode: " + year + "," + sectionCode);
+    logger.info("Found " + results.length  + " results found for getExpensesByYearAndCode: " + year + "," + expenseCode);
 
     return results;
   }
 
-  private SectionRecord[] executeQuery(Query<Section> query) {
-    QueryResultIterator<Section> results = query.fetch().iterator();
+  private ExpenseRecord[] executeQuery(Query<Expense> query) {
+    QueryResultIterator<Expense> results = query.fetch().iterator();
 
-    Vector<SectionRecord> sections = new Vector<SectionRecord>();
+    Vector<ExpenseRecord> expenses = new Vector<ExpenseRecord>();
     while (results.hasNext()) {
-      Section section = results.next();
-      sections.add(section.toSectionRecord());
+      Expense expense = results.next();
+      expenses.add(expense.toExpenseRecord());
     }
 
-    System.out.println("Found " + sections.size() + " records");
+    System.out.println("Found " + expenses.size() + " records");
 
-    return sections.toArray(new SectionRecord[0]);
+    return expenses.toArray(new ExpenseRecord[0]);
   	
   }
   
   @Override
-  public SectionRecord[] getSectionsByNameAndCode(int year, String nameLike) {
-    return new SectionRecord[]{};
+  public ExpenseRecord[] getExpensesByNameAndCode(int year, String nameLike) {
+    return new ExpenseRecord[]{};
   }
+
+	@Override
+	public void clear1000Expenses() {
+    Objectify ofy = new DAO().ofy();
+    Query<Expense> query = ofy.query(Expense.class);
+    ofy.delete(query.fetch());
+	}
 }

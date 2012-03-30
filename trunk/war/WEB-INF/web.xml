@@ -17,13 +17,13 @@
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>sectionService</servlet-name>
-    <servlet-class>com.yossale.server.actions.SectionServiceImpl</servlet-class>
+    <servlet-name>expenseService</servlet-name>
+    <servlet-class>com.yossale.server.actions.ExpenseServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>sectionService</servlet-name>
-    <url-pattern>/obudget2/section</url-pattern>
+    <servlet-name>expenseService</servlet-name>
+    <url-pattern>/obudget2/expense</url-pattern>
   </servlet-mapping>
   
   <servlet>
@@ -37,30 +37,49 @@
   </servlet-mapping>
 
 
-  <!--  Cron servlets -->
+  <!--  Add task servlets -->
   <!-- Adds an update task to the task queue. Goes through the years "round robin",
        unless a "year=XXXX" parameter is specified. -->
   <servlet>
-    <servlet-name>addUpdateTaskervlet</servlet-name>
+    <servlet-name>addUpdateTaskServlet</servlet-name>
     <servlet-class>com.yossale.server.cron.AddUpdateDBTaskServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>addUpdateTaskervlet</servlet-name>
+    <servlet-name>addUpdateTaskServlet</servlet-name>
     <url-pattern>/cron/addupdatetask</url-pattern>
   </servlet-mapping>
 
-  <!--  Do not run directly. This takes >60 secs and should only be run as a task. -->
+  <servlet>
+    <servlet-name>addDeleteExpensesTaskServlet</servlet-name>
+    <servlet-class>com.yossale.server.tasks.AddDeleteExpensesTaskServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>addDeleteExpensesTaskServlet</servlet-name>
+    <url-pattern>/tasks/adddeleteexpensestask</url-pattern>
+  </servlet-mapping>
+
+  <!--  Do not run directly. These may take >60 secs and should only be run as a task. -->
   <servlet>
     <servlet-name>updateDBServlet</servlet-name>
-    <servlet-class>com.yossale.server.cron.UpdateDBFromYedaServlet</servlet-class>
+    <servlet-class>com.yossale.server.tasks.UpdateDBFromYedaTask</servlet-class>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>updateDBServlet</servlet-name>
-    <url-pattern>/cron/updatedb</url-pattern>
+    <url-pattern>/tasks/updatedb</url-pattern>
   </servlet-mapping>
     
+  <servlet>
+    <servlet-name>deleteExpensesTask</servlet-name>
+    <servlet-class>com.yossale.server.tasks.DeleteExpensesTask</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>deleteExpensesTask</servlet-name>
+    <url-pattern>/tasks/deleteexpenses</url-pattern>
+  </servlet-mapping>
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>OBudget2.html</welcome-file>

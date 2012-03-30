@@ -51,7 +51,7 @@ public class AddUpdateDBTaskServlet extends HttpServlet {
 		
 	  Queue defaultQueue = QueueFactory.getDefaultQueue();
 	  TaskOptions taskOptions = 
-	  		TaskOptions.Builder.withUrl("/cron/updatedb?year=" + year).method(Method.GET);
+	  		TaskOptions.Builder.withUrl("/tasks/updatedb?year=" + year).method(Method.GET);
 	  defaultQueue.add(taskOptions);
 		resp.getWriter().println("yay!");
   }
