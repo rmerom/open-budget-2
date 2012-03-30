@@ -1,7 +1,6 @@
 package com.yossale.client.gui;
 
-import java.util.logging.Logger;
-
+import com.allen_sauer.gwt.log.client.Log;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
@@ -17,8 +16,6 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 
 public class BudgetPane extends HLayout {
 
-  private static final Logger logger = Logger.getLogger(BudgetPane.class.getName());
-  
   VLayout vLayout = new VLayout();
   DynamicForm filtersPane = new DynamicForm();
   HLayout treesLayout = new HLayout();
@@ -27,7 +24,7 @@ public class BudgetPane extends HLayout {
 
   public BudgetPane(final BudgetTreeGrid budgetTreeGrid,
       final TreeGrid bucketTreeGrid) {
-    logger.info("Loading budget pane");
+    Log.info("Loading budget pane");
     setBorder("5px solid blue");
     budgetTree = budgetTreeGrid;
     bucketTree = bucketTreeGrid;
@@ -53,7 +50,7 @@ public class BudgetPane extends HLayout {
         new FormItemClickHandler() {
           public void onFormItemClick(FormItemIconClickEvent event) {
             event.getItem().clearValue();
-            //Remove previous filters
+            // Remove previous filters
             budgetTree.filterData();
           }
         });
@@ -98,6 +95,11 @@ public class BudgetPane extends HLayout {
     Canvas member = treesLayout.getMember(1);
     treesLayout.removeMember(member);
     treesLayout.addMember(bucket, 1);
+  }
+
+  public void addSection(String valueAsString, String[] values) {
+    // TODO Auto-generated method stub
+
   }
 
 }

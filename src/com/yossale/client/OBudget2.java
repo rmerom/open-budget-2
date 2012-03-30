@@ -48,6 +48,8 @@ import com.yossale.client.graph.GraphCanvas;
 import com.yossale.client.gui.BudgetPane;
 import com.yossale.client.gui.BudgetTreeGrid;
 import com.yossale.client.gui.DBPanel;
+import com.yossale.client.gui.InputPane;
+import com.yossale.client.gui.BucketPane;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -179,7 +181,6 @@ public class OBudget2 implements EntryPoint {
    */
   public void loadOBudget(LoginInfo loginInfo) {
   	final BucketServiceAsync bucketService = GWT.create(BucketService.class); 
-    Log.debug("Tommy can you see me?");
     Log.info("OBudget loading started");
     budgetTree = generateBudgetTree();
     bucketTree = generateBucket();
@@ -187,10 +188,6 @@ public class OBudget2 implements EntryPoint {
     budgetPane = new BudgetPane(budgetTree, bucketTree);
 
     final DynamicForm form = generateDynamicForm();
-
-    VLayout v = new VLayout();
-    v.setAutoHeight();
-    v.setMembersMargin(30);
 
     String currentUser;
     if (loginInfo != null) {
@@ -203,9 +200,6 @@ public class OBudget2 implements EntryPoint {
         
     HTML userLabel = new HTML(currentUser);
 
-    v.addMember(new Label("Version :" + VERSION_ID));
-    v.addMember(userLabel);
-    
     HLayout bucketLayout = new HLayout();
     Label bucketLabel = new Label();
     bucketLabel.setText("Load bucket:");
@@ -230,7 +224,6 @@ public class OBudget2 implements EntryPoint {
 			}
     	
     });
-    v.addMember(bucketLayout);
     HLayout horizontalSavePanel = new HLayout();
     final TextBox textBox = new TextBox();
     horizontalSavePanel.addMember(textBox);
@@ -270,16 +263,24 @@ public class OBudget2 implements EntryPoint {
     	
     }));
     
-    v.addMember(horizontalSavePanel);
-    v.addMember(createTitle());
-    v.addMember(form);
+//    v.addMember(horizontalSavePanel);
+//    v.addMember(createTitle());
+//    v.addMember(form);
 
+    VLayout v = new VLayout();
+    v.setAutoHeight();
+    v.setMembersMargin(30);
+    v.addMember(new Label("Version :" + VERSION_ID));
+    v.addMember(userLabel);
+    
+    BucketPane bucketPane = new BucketPane(graph);    
+    
     HLayout h = new HLayout();
-    h.addMember(budgetPane);
-    h.addMember(graph);
-    h.addMember(form);
-
+    h.addMember(new InputPane(bucketPane));
+    h.addMember(bucketPane);
+    
     v.addMember(h);
+    v.addMember(graph);
 
     v.addMember(new DBPanel());
     v.draw();
@@ -300,7 +301,6 @@ public class OBudget2 implements EntryPoint {
 
   @Override
   public void onModuleLoad() {
-//    Log.setUncaughtExceptionHandler();
     
     GWT.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
