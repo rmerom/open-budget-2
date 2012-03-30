@@ -1,9 +1,7 @@
 package com.yossale.client;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
@@ -18,14 +16,8 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -37,19 +29,15 @@ import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.actions.BucketServiceAsync;
-import com.yossale.client.actions.ExpenseService;
-import com.yossale.client.actions.ExpenseServiceAsync;
 import com.yossale.client.actions.LoginService;
 import com.yossale.client.actions.LoginServiceAsync;
 import com.yossale.client.data.BucketRecord;
 import com.yossale.client.data.ExpenseRecord;
 import com.yossale.client.data.LoginInfo;
 import com.yossale.client.graph.GraphCanvas;
-import com.yossale.client.gui.BudgetPane;
-import com.yossale.client.gui.BudgetTreeGrid;
+import com.yossale.client.gui.BucketPane;
 import com.yossale.client.gui.DBPanel;
 import com.yossale.client.gui.InputPane;
-import com.yossale.client.gui.BucketPane;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -58,42 +46,10 @@ public class OBudget2 implements EntryPoint {
 
   public static final String VERSION_ID = "0.4 - initial buckets";
 
-  private BudgetTreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
-  private final ExpenseServiceAsync expensesService = GWT
-      .create(ExpenseService.class);
-  private final Map<Integer, BudgetTreeGrid> budgetTreesCache = new HashMap<Integer, BudgetTreeGrid>();
 
-  private BudgetPane budgetPane;
   private TreeGrid bucketTree;
 
-  private void updateTree(final int year) {
-    /**
-     * In the data model you need to have something which extends "TreeNode",
-     * Which is very trivial..
-     * 
-     * Since we want to give it all the records and let him figure the
-     * Hierarchy, we need to tell him 2 thing : id and parentId. This is defined
-     * in the object itself (here it's at the ExpenseRecord)
-     * 
-     * So after you have a list of items, each knows who is father is and what
-     * is it's ID, you just provide them to the model as an array, and it'll
-     * take care of the rest.
-     */
-
-    if (budgetTreesCache.containsKey(year)) {
-      Log.info("Cache hit on " + year);
-      BudgetTreeGrid budgetTree = budgetTreesCache.get(year);
-      budgetPane.updateBudgetTree(budgetTree);
-
-    } else {
-
-      Log.info("Generating new tree for " + year);
-      BudgetTreeGrid budgetTree = new BudgetTreeGrid(year);
-      budgetTreesCache.put(year, budgetTree);
-      budgetPane.updateBudgetTree(budgetTree);
-    }
-  }
 
   private TreeGrid generateBucket() {
 
@@ -141,53 +97,14 @@ public class OBudget2 implements EntryPoint {
     return tree;
   }
 
-  private DynamicForm generateDynamicForm() {
-
-    DynamicForm form = new DynamicForm();
-    form.setWidth(250);
-
-    final SelectItem yearSelector = new SelectItem();
-
-    expensesService.getAvailableBudgetYears(new AsyncCallback<String[]>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        System.out.println("Failed to retrieve years!");
-      }
-
-      @Override
-      public void onSuccess(String[] result) {
-        yearSelector.setValueMap(result);
-        // yearSelector.setValue(result[result.length - 1]);
-      }
-    });
-
-    yearSelector.setTitle("Select year");
-    yearSelector.addChangedHandler(new ChangedHandler() {
-
-      @Override
-      public void onChanged(ChangedEvent event) {
-        String val = (String) event.getValue();
-        updateTree(Integer.parseInt(val));
-      }
-    });
-
-    form.setFields(yearSelector);
-    return form;
-  }
-
   /**
    * This is the entry point method.
    */
   public void loadOBudget(LoginInfo loginInfo) {
   	final BucketServiceAsync bucketService = GWT.create(BucketService.class); 
     Log.info("OBudget loading started");
-    budgetTree = generateBudgetTree();
     bucketTree = generateBucket();
     final TreeGrid bucketTreeFinal = bucketTree;
-    budgetPane = new BudgetPane(budgetTree, bucketTree);
-
-    final DynamicForm form = generateDynamicForm();
 
     String currentUser;
     if (loginInfo != null) {
@@ -263,10 +180,6 @@ public class OBudget2 implements EntryPoint {
     	
     }));
     
-//    v.addMember(horizontalSavePanel);
-//    v.addMember(createTitle());
-//    v.addMember(form);
-
     VLayout v = new VLayout();
     v.setAutoHeight();
     v.setMembersMargin(30);
@@ -276,6 +189,7 @@ public class OBudget2 implements EntryPoint {
     BucketPane bucketPane = new BucketPane(graph);    
     
     HLayout h = new HLayout();
+    h.setMembersMargin(30);
     h.addMember(new InputPane(bucketPane));
     h.addMember(bucketPane);
     
@@ -284,19 +198,6 @@ public class OBudget2 implements EntryPoint {
 
     v.addMember(new DBPanel());
     v.draw();
-  }
-
-  private BudgetTreeGrid generateBudgetTree() {
-    int curYear = 2010;
-    Log.info("Generating budget tree - retrieving year: " + curYear);
-    return new BudgetTreeGrid(curYear);
-  }
-
-  private Canvas createTitle() {
-    com.smartgwt.client.widgets.Label l = new com.smartgwt.client.widgets.Label();
-    l.setAlign(Alignment.CENTER);
-    l.setTitle("חוקר התקציב");
-    return l;
   }
 
   @Override
