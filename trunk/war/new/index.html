@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Open Budget for professionals</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="json2.js"></script>
+    <script src="/table/media/js/jquery.dataTables.js"></script> 
+    <style type="text/css" title="currentStyle">
+      @import "/table/media/css/demo_page.css";
+      @import "/table/media/css/demo_table.css";
+    </style>
+  </head>
+  <body>
+  <div id="bucket">
+    <input type="text" id="expense_code"></input>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="output_table"></table>
+  </div>
+  
+  <div id="buckets"></div>
+  
+  <script>
+  var years = [2001,2002];
+  
+  $(document).ready(function() {
+    var result = {};
+    result.aaData = [];
+    result.aoColumns = [
+      {"sTitle" : "סעיף תקציבי"},
+      {"sTitle" : "הקצאה נטו"},
+      {"sTitle" : "הקצאה מעודכנת נטו"},
+      {"sTitle" : "הקצאה מעודכנת ברוטו"},
+      {"sTitle" : "שימוש נטו"},
+      {"sTitle" : "שימוש ברוטו"}];
+   
+     oTable = $('#output_table').dataTable(result);
+   });
+   
+  
+  // Register an event on the code input to resolve the given code.
+  $('#expense_code').change(function() {
+    var code = [""+$('#expense_code').val(),"0020"];
+    getExpense(code, years, displayDataInTable);
+  });
+  
+  function displayDataInTable(data) {
+    var dataArr = [];
+    $.each(data, function(i, item) {
+      var row = [];
+      row.push(item.title);
+      row.push(item.net_allocated);
+      row.push(item.net_revised);
+      row.push(item.gross_revised);
+      row.push(item.net_used);
+      row.push(item.gross_used);
+      dataArr.push(row);
+    });
+    oTable.fnClearTable();
+    oTable.fnAddData(dataArr);
+  }
+
+
+  // Call this function to resolve the given codes and years and get their data from yeda.us
+  // Example:
+  // getExpense(["00","0020"], ["2001", "2002"], function (data) {}); 
+  function getExpense(codes, years, callback) {
+    var query = {};
+    query.code = {"$in":codes};
+    query.year = {"$in":years};
+    $.getJSON("http://api.yeda.us/data/gov/mof/budget/?callback=?", 
+      {
+        "o" : "jsonp",
+        "query" : JSON.stringify(query)
+      }, function(data) {callback(data);});
+  }
+
+//  $.getJSON("getBucket?j=?", {}, function(data) {
+//    $.each(data, function(i, item){
+//      $("<div>").html(item.num).appendTo("#buckets");
+//      if ( i == 3 ) return false;
+//    });
+//  });
+  
+  </script>
+  </body>
+</html>

@@ -7,6 +7,16 @@
   
   <!-- Servlets -->
   <servlet>
+    <servlet-name>getBucket</servlet-name>
+    <servlet-class>com.yossale.server.actions.GetBucket</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>getBucket</servlet-name>
+    <url-pattern>/getBucket</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>loginService</servlet-name>
     <servlet-class>com.yossale.server.actions.LoginServiceImpl</servlet-class>
   </servlet>
@@ -80,9 +90,19 @@
     <servlet-name>deleteExpensesTask</servlet-name>
     <url-pattern>/tasks/deleteexpenses</url-pattern>
   </servlet-mapping>
-  <!-- Default page to serve -->
+  <!-- Default page to serve -->  
   <welcome-file-list>
     <welcome-file>OBudget2.html</welcome-file>
+    <welcome-file>index.html</welcome-file>
   </welcome-file-list>
+  
+  <security-constraint>
+      <web-resource-collection>
+          <url-pattern>/new/*</url-pattern>
+      </web-resource-collection>
+      <auth-constraint>
+          <role-name>*</role-name>
+      </auth-constraint>
+  </security-constraint>
 
 </web-app>
