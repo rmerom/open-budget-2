@@ -24,6 +24,6 @@ public interface ExpenseServiceAsync {
   void getExpensesByNameAndCode(int year, String nameLike,
       AsyncCallback<ExpenseRecord[]> callback);
 
-	void getExpensesByCodeAndYear(String expenseCode, int[] years,
+	void getExpensesByCodeAndYears(String expenseCode, Integer[] years,
 			AsyncCallback<ExpenseRecord[]> callback);
 }

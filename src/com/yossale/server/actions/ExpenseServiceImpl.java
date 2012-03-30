@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -215,19 +218,22 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
   }
 
 	@Override
-	public ExpenseRecord[] getExpensesByCodeAndYear(String expenseCode,
-			int[] years) {
+	public ExpenseRecord[] getExpensesByCodeAndYears(String expenseCode,
+			Integer[] years) {
     
     logger.info("getExpensesByYearAndCode: " + expenseCode);
-/*    
+
+    List<Integer> yearList = new ArrayList<Integer>();
+    for (int year : years) {
+    	yearList.add(year);
+    }
     Objectify ofy = new DAO().ofy();
-    Query<Expense> query = ofy.query(Expense.class).filter("year", year).filter("expenseCode", expenseCode).order("expenseCode");
+    Query<Expense> query = ofy.query(Expense.class).filter("year in", yearList).filter("expenseCode", expenseCode);
     
     ExpenseRecord[] results = executeQuery(query);
 
-    logger.info("Found " + results.length  + " results found for getExpensesByYearAndCode: " + year + "," + expenseCode);
+    logger.info("Found " + results.length  + " results found for getExpensesByCodeAndYears: " + years + ", " + expenseCode);
 
-    return results;*/
-		return null;
+    return results;
 	}
 }
