@@ -16,7 +16,7 @@ import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.corechart.AreaChart;
 import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.yossale.client.data.SectionRecord;
+import com.yossale.client.data.ExpenseRecord;
 
 public class GraphCanvas extends Composite {
 
@@ -42,7 +42,7 @@ public class GraphCanvas extends Composite {
 
   }
 
-  public void updateGraph(List<SectionRecord> nodes) {
+  public void updateGraph(List<ExpenseRecord> nodes) {
 
     if (nodes == null || nodes.isEmpty()) {
       return;
@@ -56,28 +56,28 @@ public class GraphCanvas extends Composite {
     options.setWidth(600);
     options.setHeight(400);
     // options.set3D(true);
-    options.setTitle("Government sections");
+    options.setTitle("Government expenses");
     return options;
   }
 
-  private List<SectionRecord> summarizeResults(List<SectionRecord> topics) {
+  private List<ExpenseRecord> summarizeResults(List<ExpenseRecord> topics) {
 
     logger.info("Summarizing results");
-    Map<Integer, SectionRecord> map = new HashMap<Integer, SectionRecord>();
+    Map<Integer, ExpenseRecord> map = new HashMap<Integer, ExpenseRecord>();
 
-    for (SectionRecord t : topics) {
-      SectionRecord sum = map.get(t.getYear()) == null ? new SectionRecord()
+    for (ExpenseRecord t : topics) {
+      ExpenseRecord sum = map.get(t.getYear()) == null ? new ExpenseRecord()
           : map.get(t.getYear());
       sum.add(t);
       sum.setYear(t.getYear());
       map.put(t.getYear(), sum);
     }
 
-    return new ArrayList<SectionRecord>(map.values());
+    return new ArrayList<ExpenseRecord>(map.values());
 
   }
 
-  private DataTable createTable(List<SectionRecord> topics) {   
+  private DataTable createTable(List<ExpenseRecord> topics) {   
 
     logger.info("Updating graph with " + (null == topics ? 0 : topics.size()) + " topics");
     
@@ -91,16 +91,16 @@ public class GraphCanvas extends Composite {
       return data;
     }
 
-    List<SectionRecord> sums = summarizeResults(topics);
-    Collections.sort(sums, new Comparator<SectionRecord>() {
+    List<ExpenseRecord> sums = summarizeResults(topics);
+    Collections.sort(sums, new Comparator<ExpenseRecord>() {
 
       @Override
-      public int compare(SectionRecord o1, SectionRecord o2) {
+      public int compare(ExpenseRecord o1, ExpenseRecord o2) {
         return (new Integer(o1.getYear()).compareTo(new Integer(o2.getYear())));
       }
     });
 
-    for (SectionRecord t : sums) {
+    for (ExpenseRecord t : sums) {
       int rowIndex = data.addRow();
       data.setValue(rowIndex, 0, t.getYear() + "");
       data.setValue(rowIndex, 1, t.getNetAmountAllocated());
