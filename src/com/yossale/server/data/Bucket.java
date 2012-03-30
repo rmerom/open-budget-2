@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.yossale.client.data.BucketRecord;
-import com.yossale.client.data.SectionRecord;
+import com.yossale.client.data.ExpenseRecord;
 
 public class Bucket {
 
@@ -20,12 +20,12 @@ public class Bucket {
 	
 	private String name;
 
-	private List<String> sections;
+	private List<String> expenses;
 
 	private Boolean isPublic;
 
 	public Bucket() {
-		sections = new ArrayList<String>();
+		expenses = new ArrayList<String>();
 	}
 	
 	public Bucket(BucketRecord bucketRecord, User owner) {
@@ -35,9 +35,9 @@ public class Bucket {
 	public Bucket assignBucketRecord(BucketRecord bucketRecord, User owner) {
 		name = bucketRecord.getName();
 		isPublic = bucketRecord.isPublic();
-		sections = new ArrayList<String>();
-		for (SectionRecord sectionRecord : bucketRecord.getSections()) {
-			sections.add(new Section(sectionRecord).getKey());
+		expenses = new ArrayList<String>();
+		for (ExpenseRecord expenseRecord : bucketRecord.getExpenses()) {
+			expenses.add(new Expense(expenseRecord).getKey());
 		}
 		this.owner = Key.create(User.class, owner.getEmail()); 
 		
@@ -62,26 +62,26 @@ public class Bucket {
 		return this;
 	}
 
-	public List<String> getSections() {
-		if (sections == null) {
+	public List<String> getExpenses() {
+		if (expenses == null) {
 			return new ArrayList<String>();
 		}
-		return sections;
+		return expenses;
 	}
 
-	public Bucket setSections(List<String> sections) {
-		this.sections = sections;
+	public Bucket setExpenses(List<String> expenses) {
+		this.expenses = expenses;
 		return this;
 	}
 	
 	public BucketRecord toBucketRecord() {
 		Objectify otfy = new DAO().fact().begin();
-		Map<String, Section> loadedSections = otfy.get(Section.class, sections);
-		List<SectionRecord> sectionRecords = new ArrayList<SectionRecord>();
-		for (Section loadedSection : loadedSections.values()) {
-			sectionRecords.add(loadedSection.toSectionRecord());
+		Map<String, Expense> loadedExpenses = otfy.get(Expense.class, expenses);
+		List<ExpenseRecord> expenseRecords = new ArrayList<ExpenseRecord>();
+		for (Expense loadedExpense : loadedExpenses.values()) {
+			expenseRecords.add(loadedExpense.toExpenseRecord());
 		}
-		return new BucketRecord(getKey(), getName(), sectionRecords);
+		return new BucketRecord(getKey(), getName(), expenseRecords);
 	}
 
 	public Boolean getIsPublic() {

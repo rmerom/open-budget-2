@@ -2,15 +2,15 @@ package com.yossale.server.data;
 
 import javax.persistence.Id;
 
-import com.yossale.client.data.SectionRecord;
+import com.yossale.client.data.ExpenseRecord;
 
-public class Section {
+public class Expense {
 
 	@Id
   private String key;
 
   // Mispar Se'if Takzivi as string.
-  private String sectionCode;
+  private String expenseCode;
   
   private String parentCode;
 
@@ -30,10 +30,10 @@ public class Section {
 
   private Integer grossAmountUsed;
 
-  public Section(String sectionCode, String parentCode, Integer year, String name,
+  public Expense(String expenseCode, String parentCode, Integer year, String name,
       Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
       Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
-    this.sectionCode = sectionCode;  
+    this.expenseCode = expenseCode;  
     this.parentCode = parentCode;
     this.year = year;
     this.name = name;
@@ -46,20 +46,20 @@ public class Section {
     generateKey();
   }
 
-	public Section() {
+	public Expense() {
   }
 
   public String getKey() {
     return key;
   }
 
-  public Section setKey(String key) {
+  public Expense setKey(String key) {
     this.key = key;
     return this;
   }
 
-  public Section(SectionRecord r) {
-    this.sectionCode = r.getSectionCode();
+  public Expense(ExpenseRecord r) {
+    this.expenseCode = r.getExpenseCode();
     this.parentCode = r.getParentCode();
     this.year = r.getYear();
     this.name = r.getName();
@@ -77,17 +77,17 @@ public class Section {
     return parentCode;
   }
 
-  public Section setParentCode(String parentCode) {
+  public Expense setParentCode(String parentCode) {
     this.parentCode = parentCode;
     return this;
   }
 
-  public String getSectionCode() {
-    return sectionCode;
+  public String getExpenseCode() {
+    return expenseCode;
   }
 
-  public Section setSectionCode(String sectionCode) {
-    this.sectionCode = sectionCode;
+  public Expense setExpenseCode(String expenseCode) {
+    this.expenseCode = expenseCode;
     return this;
   }
 
@@ -95,7 +95,7 @@ public class Section {
     return year;
   }
 
-  public Section setYear(Integer year) {
+  public Expense setYear(Integer year) {
     this.year = year;
     return this;
   }
@@ -104,7 +104,7 @@ public class Section {
     return name;
   }
 
-  public Section setName(String name) {
+  public Expense setName(String name) {
     this.name = name;
     return this;
   }
@@ -113,7 +113,7 @@ public class Section {
     return netAmountAllocated;
   }
 
-  public Section setNetAmountAllocated(Integer netAmountAllocated) {
+  public Expense setNetAmountAllocated(Integer netAmountAllocated) {
     this.netAmountAllocated = netAmountAllocated;
     return this;
   }
@@ -122,7 +122,7 @@ public class Section {
     return netAmountRevised;
   }
 
-  public Section setNetAmountRevised(Integer netAmountRevised) {
+  public Expense setNetAmountRevised(Integer netAmountRevised) {
     this.netAmountRevised = netAmountRevised;
     return this;
   }
@@ -131,7 +131,7 @@ public class Section {
     return netAmountUsed;
   }
 
-  public Section setNetAmountUsed(Integer netAmountUsed) {
+  public Expense setNetAmountUsed(Integer netAmountUsed) {
     this.netAmountUsed = netAmountUsed;
     return this;
   }
@@ -140,7 +140,7 @@ public class Section {
     return grossAmountAllocated;
   }
 
-  public Section setGrossAmountAllocated(Integer grossAmountAllocated) {
+  public Expense setGrossAmountAllocated(Integer grossAmountAllocated) {
     this.grossAmountAllocated = grossAmountAllocated;
     return this;
   }
@@ -149,7 +149,7 @@ public class Section {
     return grossAmountRevised;
   }
 
-  public Section setGrossAmountRevised(Integer grossAmountRevised) {
+  public Expense setGrossAmountRevised(Integer grossAmountRevised) {
     this.grossAmountRevised = grossAmountRevised;
     return this;
   }
@@ -158,25 +158,25 @@ public class Section {
     return grossAmountUsed;
   }
 
-  public Section setGrossAmountUsed(Integer grossAmountUsed) {
+  public Expense setGrossAmountUsed(Integer grossAmountUsed) {
     this.grossAmountUsed = grossAmountUsed;
     return this;
   }
 
-  public SectionRecord toSectionRecord() {
-    return new SectionRecord(sectionCode, parentCode, year, name, netAmountAllocated,
+  public ExpenseRecord toExpenseRecord() {
+    return new ExpenseRecord(expenseCode, parentCode, year, name, netAmountAllocated,
         netAmountRevised, netAmountUsed, grossAmountAllocated,
         grossAmountRevised, grossAmountUsed);
   }
   
-	// TODO(ronme): integrate with SectionRecord.generateKey().
+	// TODO(ronme): integrate with ExpenseRecord.generateKey().
   private void generateKey() {
-  	key =	new StringBuilder().append(year).append("_").append(sectionCode).toString();
+  	key =	new StringBuilder().append(year).append("_").append(expenseCode).toString();
   }
 
   @Override
   public String toString() {
-    return "Section [key=" + key + ", sectionCode=" + sectionCode
+    return "Expense [key=" + key + ", expenseCode=" + expenseCode
         + ", parentCode=" + parentCode + ", year=" + year + ", name=" + name
         + "]";
   }

@@ -13,15 +13,15 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.actions.BucketServiceAsync;
-import com.yossale.client.actions.SectionService;
-import com.yossale.client.actions.SectionServiceAsync;
+import com.yossale.client.actions.ExpenseService;
+import com.yossale.client.actions.ExpenseServiceAsync;
 import com.yossale.client.data.BucketRecord;
-import com.yossale.client.data.SectionRecord;
+import com.yossale.client.data.ExpenseRecord;
 
 public class DBPanel extends HLayout {
   
-  private final SectionServiceAsync sectionsService = GWT
-  .create(SectionService.class);
+  private final ExpenseServiceAsync expensesService = GWT
+  .create(ExpenseService.class);
   
   private final BucketServiceAsync bucketService = GWT
   .create(BucketService.class);
@@ -72,10 +72,10 @@ public class DBPanel extends HLayout {
     commitButton.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
 
-        final SectionRecord e = new SectionRecord("001122", "0011", 9999,
+        final ExpenseRecord e = new ExpenseRecord("001122", "0011", 9999,
             "SomeName", 101, 102, 103, 104, 105, 106);
 
-        sectionsService.addSectionRecord(e, new AsyncCallback<Void>() {
+        expensesService.addExpenseRecord(e, new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
@@ -104,8 +104,8 @@ public class DBPanel extends HLayout {
           return;
         }
 
-        sectionsService.getSectionsByYear(Integer.parseInt(content),
-            new AsyncCallback<SectionRecord[]>() {
+        expensesService.getExpensesByYear(Integer.parseInt(content),
+            new AsyncCallback<ExpenseRecord[]>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -113,7 +113,7 @@ public class DBPanel extends HLayout {
               }
 
               @Override
-              public void onSuccess(SectionRecord[] result) {
+              public void onSuccess(ExpenseRecord[] result) {
                 retrieveText.setValue("Success!");
 
                 textCanvas.setContents(textCanvas.getPrefix() + " Retrieved "
@@ -129,7 +129,7 @@ public class DBPanel extends HLayout {
     deleteAll.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent event) {
 
-        sectionsService.removeAll(new AsyncCallback<Void>() {
+        expensesService.removeAll(new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
@@ -158,7 +158,7 @@ public class DBPanel extends HLayout {
         }
         System.out.println("Updating data for year " + content);
 
-        sectionsService.loadYearData(content, new AsyncCallback<Void>() {
+        expensesService.loadYearData(content, new AsyncCallback<Void>() {
 
           @Override
           public void onSuccess(Void result) {
@@ -226,7 +226,7 @@ public class DBPanel extends HLayout {
 //          DriverManager.registerDriver(new AppEngineDriver());
 //          Connection c = DriverManager.getConnection("jdbc:google:rdbms://open-budget-1:openbudget-1/obudget_dev");
 //          
-//          String statement ="SELECT obsc_name FROM obsc_section";
+//          String statement ="SELECT obsc_name FROM obsc_expense";
 //          PreparedStatement stmt = c.prepareStatement(statement);
 //          ResultSet res = stmt.executeQuery();
 //          System.out.println("Res: " + res.getFetchSize());

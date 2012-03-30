@@ -62,7 +62,7 @@ public class BudgetPane extends HLayout {
         new FormItemClickHandler() {
           public void onFormItemClick(FormItemIconClickEvent event) {
             String itemName = event.getItem().getName();
-            if ("sectionName".equalsIgnoreCase(itemName)) {
+            if ("expenseName".equalsIgnoreCase(itemName)) {
               SC.say("Search by String is not supported yet, Sorry :(");
               return;
             }
@@ -72,12 +72,12 @@ public class BudgetPane extends HLayout {
           }
         });
 
-    TextItem codeItem = new TextItem("sectionCode", "מספר סעיף");
+    TextItem codeItem = new TextItem("expenseCode", "מספר סעיף");
     codeItem.setRequired(false);
     codeItem.setDefaultValue("00");
     codeItem.setIcons(searchPicker, clearPicker);
 
-    TextItem nameItem = new TextItem("sectionName", "טקסט");
+    TextItem nameItem = new TextItem("expenseName", "טקסט");
     nameItem.setRequired(false);
     nameItem.setDefaultValue("הכנסות");
     nameItem.setIcons(searchPicker, clearPicker);

@@ -11,15 +11,17 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -35,13 +37,13 @@ import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.actions.BucketServiceAsync;
+import com.yossale.client.actions.ExpenseService;
+import com.yossale.client.actions.ExpenseServiceAsync;
 import com.yossale.client.actions.LoginService;
 import com.yossale.client.actions.LoginServiceAsync;
-import com.yossale.client.actions.SectionService;
-import com.yossale.client.actions.SectionServiceAsync;
 import com.yossale.client.data.BucketRecord;
+import com.yossale.client.data.ExpenseRecord;
 import com.yossale.client.data.LoginInfo;
-import com.yossale.client.data.SectionRecord;
 import com.yossale.client.graph.GraphCanvas;
 import com.yossale.client.gui.BudgetPane;
 import com.yossale.client.gui.BudgetTreeGrid;
@@ -56,8 +58,8 @@ public class OBudget2 implements EntryPoint {
 
   private BudgetTreeGrid budgetTree;
   private final GraphCanvas graph = new GraphCanvas();
-  private final SectionServiceAsync sectionsService = GWT
-      .create(SectionService.class);
+  private final ExpenseServiceAsync expensesService = GWT
+      .create(ExpenseService.class);
   private final Map<Integer, BudgetTreeGrid> budgetTreesCache = new HashMap<Integer, BudgetTreeGrid>();
 
   private BudgetPane budgetPane;
@@ -70,7 +72,7 @@ public class OBudget2 implements EntryPoint {
      * 
      * Since we want to give it all the records and let him figure the
      * Hierarchy, we need to tell him 2 thing : id and parentId. This is defined
-     * in the object itself (here it's at the SectionRecord)
+     * in the object itself (here it's at the ExpenseRecord)
      * 
      * So after you have a list of items, each knows who is father is and what
      * is it's ID, you just provide them to the model as an array, and it'll
@@ -95,7 +97,7 @@ public class OBudget2 implements EntryPoint {
 
     Log.info("Generating new bucket");
     TreeGrid tree = new TreeGrid();
-    tree.setFields(new TreeGridField("sectionCode", "Code"), new TreeGridField(
+    tree.setFields(new TreeGridField("expenseCode", "Code"), new TreeGridField(
         "name", "Name"), new TreeGridField("year", "Year"));
     tree.setSize("400", "400");
     tree.setShowOpenIcons(true);
@@ -103,7 +105,7 @@ public class OBudget2 implements EntryPoint {
     tree.setBorder("1px solid black");
     tree.setBodyStyleName("normal");
     tree.setLeaveScrollbarGap(false);
-    tree.setEmptyMessage("<br>Drag & drop sections here");
+    tree.setEmptyMessage("<br>Drag & drop expenses here");
     tree.setCanReorderRecords(true);
     tree.setCanAcceptDrop(true);
     tree.setCanDragRecordsOut(true);
@@ -115,7 +117,6 @@ public class OBudget2 implements EntryPoint {
     bucketModel.setModelType(TreeModelType.PARENT);
     bucketModel.setNameProperty("ID");
     bucketModel.setChildrenProperty("directReports");
-    // sectionsTreeModel.setData(nodes);
     tree.setData(bucketModel);
 
     bucketModel.addDataChangedHandler(new DataChangedHandler() {
@@ -125,10 +126,10 @@ public class OBudget2 implements EntryPoint {
         System.out.println("dropped something?");
         TreeNode[] nodes = bucketModel.getAllNodes();
 
-        List<SectionRecord> list = new ArrayList<SectionRecord>();
+        List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
 
         for (int i = 0; i < nodes.length; i++) {
-          list.add(SectionRecord.getSectionRecord(nodes[i]));
+          list.add(ExpenseRecord.getExpenseRecord(nodes[i]));
         }
 
         graph.updateGraph(list);
@@ -145,7 +146,7 @@ public class OBudget2 implements EntryPoint {
 
     final SelectItem yearSelector = new SelectItem();
 
-    sectionsService.getAvailableBudgetYears(new AsyncCallback<String[]>() {
+    expensesService.getAvailableBudgetYears(new AsyncCallback<String[]>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -187,12 +188,9 @@ public class OBudget2 implements EntryPoint {
 
     final DynamicForm form = generateDynamicForm();
 
-    HLayout h = new HLayout();
-    h.addMember(budgetPane);
-    h.addMember(graph);
-    h.addMember(form);
-
     VLayout v = new VLayout();
+    v.setAutoHeight();
+    v.setMembersMargin(30);
 
     String currentUser;
     if (loginInfo != null) {
@@ -203,15 +201,18 @@ public class OBudget2 implements EntryPoint {
     	currentUser = "login currently not working";
     }
         
-    Label userLabel = new Label(currentUser);
-    v.setAutoHeight();
-    v.setMembersMargin(30);
+    HTML userLabel = new HTML(currentUser);
 
     v.addMember(new Label("Version :" + VERSION_ID));
     v.addMember(userLabel);
-    final ListBox listBox = new ListBox();
     
-    v.addMember(listBox);
+    HLayout bucketLayout = new HLayout();
+    Label bucketLabel = new Label();
+    bucketLabel.setText("Load bucket:");
+    bucketLayout.addMember(bucketLabel);
+    final ListBox bucketListBox = new ListBox();
+    
+    bucketLayout.addMember(bucketListBox);
 
     bucketService.getBucketsOfLoggedInUser(new AsyncCallback<BucketRecord[]>() {
 			@Override
@@ -223,16 +224,17 @@ public class OBudget2 implements EntryPoint {
 			public void onSuccess(BucketRecord[] result) {
 				Log.warn("Got " + result.length + " buckets");
 				for (BucketRecord bucketRecord : result) {
-					listBox.addItem(bucketRecord.getName());
+					bucketListBox.addItem(bucketRecord.getName());
 				}
 			}
     	
     });
+    v.addMember(bucketLayout);
     HLayout horizontalSavePanel = new HLayout();
     final TextBox textBox = new TextBox();
     horizontalSavePanel.addMember(textBox);
 
-    horizontalSavePanel.addMember(new Button("save doNotPress", new ClickHandler() {
+    horizontalSavePanel.addMember(new Button("save bucket", new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				bucketService.addBucket(textBox.getText(), new AsyncCallback<BucketRecord>() {
@@ -241,17 +243,18 @@ public class OBudget2 implements EntryPoint {
 					public void onSuccess(BucketRecord result) {
 						ListGridRecord[] records = bucketTreeFinal.getRecords();
 						for (ListGridRecord record : records) {
-							result.getSections().add(SectionRecord.getSectionRecord(record));
+							result.getExpenses().add(ExpenseRecord.getExpenseRecord(record));
 						}
 						bucketService.updateBucket(result, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
+								Window.alert("Error saving the bucket.");
 								Log.warn("failure to update bucket: " + caught);
 							}
 
 							@Override
 							public void onSuccess(Void result) {
-								// TODO Auto-generated method stub
+								Window.alert("Saved successfully");
 							}
 						});
 						
@@ -269,11 +272,16 @@ public class OBudget2 implements EntryPoint {
     v.addMember(horizontalSavePanel);
     v.addMember(createTitle());
     v.addMember(form);
+
+    HLayout h = new HLayout();
+    h.addMember(budgetPane);
+    h.addMember(graph);
+    h.addMember(form);
+
     v.addMember(h);
 
     v.addMember(new DBPanel());
     v.draw();
-
   }
 
   private BudgetTreeGrid generateBudgetTree() {
@@ -283,7 +291,7 @@ public class OBudget2 implements EntryPoint {
   }
 
   private Canvas createTitle() {
-    Label l = new Label();
+    com.smartgwt.client.widgets.Label l = new com.smartgwt.client.widgets.Label();
     l.setAlign(Alignment.CENTER);
     l.setTitle("חוקר התקציב");
     return l;
@@ -302,7 +310,7 @@ public class OBudget2 implements EntryPoint {
     
     // loadOBudget(null);
     LoginServiceAsync loginService = GWT.create(LoginService.class);
-    loginService.login(GWT.getModuleBaseURL(), new AsyncCallback<LoginInfo>() {
+    loginService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
       public void onFailure(Throwable error) {
       }
 

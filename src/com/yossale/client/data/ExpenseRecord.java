@@ -4,12 +4,12 @@ import java.io.Serializable;
 import com.allen_sauer.gwt.log.client.Log;
 import com.smartgwt.client.data.Record;
 
-public class SectionRecord implements Serializable  {
+public class ExpenseRecord implements Serializable  {
 
 	private static final long serialVersionUID = -2358987888595684650L;
 	
 	// Mispar Se'if Takzivi as string.
-	private String sectionCode = "";	
+	private String expenseCode = "";	
 	private String parentCode = "";	
 	private String name = "";
 	private Integer year = 0;
@@ -21,10 +21,10 @@ public class SectionRecord implements Serializable  {
 	private Integer grossAmountUsed = 0;
 	private String id;
 	
-	public static Record getRecord(SectionRecord s) {
+	public static Record getRecord(ExpenseRecord s) {
 	  Record r = new Record();
 	  Log.info(s.toString());
-	  r.setAttribute("sectionCode", s.getSectionCode());
+	  r.setAttribute("expenseCode", s.getExpenseCode());
 	  r.setAttribute("parentCode", s.getParentCode());
 	  r.setAttribute("name", s.getName());
 	  r.setAttribute("year", s.getYear());
@@ -34,13 +34,13 @@ public class SectionRecord implements Serializable  {
 	  r.setAttribute("grosAmountAllocated", s.getGrossAmountAllocated());
 	  r.setAttribute("grossAmountRevised", s.getGrossAmountRevised());
 	  r.setAttribute("grossAmountUsed", s.getGrossAmountUsed());
-	  r.setAttribute("id", generateKey(s.getYear(), s.getSectionCode()));
+	  r.setAttribute("id", generateKey(s.getYear(), s.getExpenseCode()));
 	  return r;
 	}
 		
-	public static SectionRecord getSectionRecord(Record r) {
-    SectionRecord s = new SectionRecord();
-    s.setSectionCode(r.getAttribute("sectionCode"));
+	public static ExpenseRecord getExpenseRecord(Record r) {
+    ExpenseRecord s = new ExpenseRecord();
+    s.setExpenseCode(r.getAttribute("expenseCode"));
     s.setParentCode(r.getAttribute("parentCode"));
     s.setName(r.getAttribute("name"));
     
@@ -51,7 +51,7 @@ public class SectionRecord implements Serializable  {
     s.setGrosAmountAllocated(getIntAttribute(r,"grosAmountAllocated"));
     s.setGrossAmountRevised(getIntAttribute(r,"grossAmountRevised"));
     s.setGrossAmountUsed(getIntAttribute(r,"grossAmountUsed"));
-    s.setId(generateKey(s.getYear(), s.getSectionCode()));
+    s.setId(generateKey(s.getYear(), s.getExpenseCode()));
     return s;
   }
 	
@@ -70,14 +70,14 @@ public class SectionRecord implements Serializable  {
 	
 	
 	
-	public SectionRecord() {  
+	public ExpenseRecord() {  
 	}
 
-	public SectionRecord(String sectionCode, String parentCode, Integer year, String name,
+	public ExpenseRecord(String expenseCode, String parentCode, Integer year, String name,
 	    Integer netAmountAllocated, Integer netAmountRevised, Integer netAmountUsed,
 	    Integer grosAmountAllocated, Integer grossAmountRevised, Integer grossAmountUsed) {
 		super();
-		this.sectionCode = sectionCode;
+		this.expenseCode = expenseCode;
 		this.parentCode = parentCode;
 		this.year = year;
 		this.name = name;
@@ -87,7 +87,7 @@ public class SectionRecord implements Serializable  {
 		this.grosAmountAllocated = grosAmountAllocated;
 		this.grossAmountRevised = grossAmountRevised;
 		this.grossAmountUsed = grossAmountUsed;
-		this.id = generateKey(year, sectionCode);
+		this.id = generateKey(year, expenseCode);
 	}
 
 	public String getId() {
@@ -98,12 +98,12 @@ public class SectionRecord implements Serializable  {
 		this.id = id;
 	}
 
-	public String getSectionCode() {
-		return sectionCode;
+	public String getExpenseCode() {
+		return expenseCode;
 	}
 
-	public void setSectionCode(String sectionCode) {
-		this.sectionCode = sectionCode;
+	public void setExpenseCode(String expenseCode) {
+		this.expenseCode = expenseCode;
 	}
 
 	public String getParentCode() {
@@ -178,14 +178,14 @@ public class SectionRecord implements Serializable  {
 		this.grossAmountUsed = grossAmountUsed;
 	}
 	
-	// TODO(ronme): integrate with Section.generateKey().
-	public static String generateKey(int year, String sectionCode) {
-		return new StringBuilder().append(year).append("_").append(sectionCode).toString();
+	// TODO(ronme): integrate with Expense.generateKey().
+	public static String generateKey(int year, String expenseCode) {
+		return new StringBuilder().append(year).append("_").append(expenseCode).toString();
 	}
 
 	@Override
 	public String toString() {
-		return "SectionRecord [sectionCode=" + sectionCode
+		return "ExpenseRecord [expenseCode=" + expenseCode
 				+ ", grosAmountAllocated=" + grosAmountAllocated
 				+ ", grossAmountRevised=" + grossAmountRevised
 				+ ", grossAmountUsed=" + grossAmountUsed + ", name=" + name
@@ -194,7 +194,7 @@ public class SectionRecord implements Serializable  {
 				+ netAmountUsed + ", year=" + year + "]";
 	}
 	
-	public SectionRecord add(SectionRecord other) {		
+	public ExpenseRecord add(ExpenseRecord other) {		
 		
 		this.netAmountAllocated += other.netAmountAllocated;
 		this.netAmountRevised += other.netAmountRevised;
