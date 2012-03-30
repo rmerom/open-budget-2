@@ -1,15 +1,12 @@
 package com.yossale.server.actions;
 
-import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import com.google.appengine.api.datastore.QueryResultIterable;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.data.BucketRecord;
 import com.yossale.server.Common;
