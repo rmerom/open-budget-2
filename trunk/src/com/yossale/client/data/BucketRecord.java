@@ -9,7 +9,9 @@ public class BucketRecord implements Serializable {
 	private String name;
 	private long id;
 	private boolean isPublic;
-	private List<ExpenseRecord> expenses;
+	private List<String> expenseCodes;
+	private List<Integer> years;
+	
 	
 	public boolean isPublic() {
 		return isPublic;
@@ -23,13 +25,22 @@ public class BucketRecord implements Serializable {
 		super();
 	}
 	
-	public BucketRecord(long id, String name, List<ExpenseRecord> expenses) {
+	public BucketRecord(long id, String name, List<String> expenseCodes, List<Integer> years) {
 	  super();
 	  this.name = name;
 	  this.id = id;
 	  this.isPublic = false;
-	  this.expenses = expenses;
+	  this.expenseCodes = expenseCodes;
+	  this.years = years;
   }
+
+	public List<Integer> getYears() {
+		return years;
+	}
+
+	public void setYears(List<Integer> years) {
+		this.years = years;
+	}
 
 	public String getName() {
 		return name;
@@ -43,11 +54,15 @@ public class BucketRecord implements Serializable {
 		return id;
 	}
 	
-	public List<ExpenseRecord> getExpenses() {
-		return expenses;
+	/**
+	 * Returns a mutable list of the expense codes in this bucket.
+	 */
+	public List<String> getExpenseCodes() {
+		return expenseCodes;
 	}
 	
 	public void setId(long id) {
 		this.id = id;
 	}
+	
 }

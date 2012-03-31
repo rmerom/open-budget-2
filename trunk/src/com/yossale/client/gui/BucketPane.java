@@ -1,7 +1,10 @@
 package com.yossale.client.gui;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -9,6 +12,7 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.yossale.client.actions.ExpenseService;
 import com.yossale.client.actions.ExpenseServiceAsync;
@@ -34,15 +38,27 @@ public class BucketPane extends HLayout {
     addMember(grid, 0);
   }
 
+  public ListGridRecord[] getGridRecords() {
+  	return grid.getRecords();
+  }
+  
   public void addExpenses(List<ExpenseRecord> expenses) {
     addExpenses(ExpenseRecord.getExpenseRecordsArray(expenses));
   }
 
   public void addExpenses(ExpenseRecord[] expenses) {
+  	Set<String> expenseCodes = new HashSet<String>();
     for (ExpenseRecord exp : expenses) {
-      grid.addData(ExpenseRecord.getRecord(exp));
-      graphCanvas.updateGraph(expenses);
+    	if (!expenseCodes.contains(exp.getExpenseCode())) {
+    		expenseCodes.add(exp.getExpenseCode());
+    		grid.addData(ExpenseRecord.getRecord(exp));
+    		graphCanvas.updateGraph(expenses);
+    	}
     }
+  }
+  
+  public void clearExpenses() {
+  	grid.setData(new Record[]{});
   }
 
   private ListGrid generateList() {
@@ -61,14 +77,17 @@ public class BucketPane extends HLayout {
     return sectionsList;
   }
 
-  public void addSection(String expenseId, String[] values) {
+  public void addExpenses(String[] expenseCodes, String[] yearStrings) {
 
-    Integer[] years = new Integer[values.length];
-    for (Integer i = 0; i < values.length; i++) {
-      years[i] = Integer.parseInt(values[i]);
+    List<Integer> years = new ArrayList<Integer>();
+    for (Integer i = 0; i < yearStrings.length; i++) {
+      years.add(Integer.parseInt(yearStrings[i]));
     }
+    addExpenses(expenseCodes, years);
+  }
 
-    expensesService.getExpensesByCodeAndYears(expenseId, years,
+  public void addExpenses(String[] expenseCodes, List<Integer> years) {
+    expensesService.getExpensesByCodeAndYears(expenseCodes, years.toArray(new Integer[]{}),
         new AsyncCallback<ExpenseRecord[]>() {
 
           @Override

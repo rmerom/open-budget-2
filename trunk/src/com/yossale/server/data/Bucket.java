@@ -1,15 +1,15 @@
 package com.yossale.server.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Id;
 
+import org.json.JSONObject;
+
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
 import com.yossale.client.data.BucketRecord;
-import com.yossale.client.data.ExpenseRecord;
 
 public class Bucket {
 
@@ -20,12 +20,14 @@ public class Bucket {
 	
 	private String name;
 
-	private List<String> expenses;
+	private List<String> expenseCodes;
+	
+	private List<Integer> years;
 
 	private Boolean isPublic;
 
 	public Bucket() {
-		expenses = new ArrayList<String>();
+		expenseCodes = new ArrayList<String>();
 	}
 	
 	public Bucket(BucketRecord bucketRecord, User owner) {
@@ -33,13 +35,15 @@ public class Bucket {
 	}
 	
 	public Bucket assignBucketRecord(BucketRecord bucketRecord, User owner) {
+		key = bucketRecord.getId();
 		name = bucketRecord.getName();
 		isPublic = bucketRecord.isPublic();
-		expenses = new ArrayList<String>();
-		for (ExpenseRecord expenseRecord : bucketRecord.getExpenses()) {
-			expenses.add(new Expense(expenseRecord).getKey());
+		years = bucketRecord.getYears();
+		expenseCodes = new ArrayList<String>();
+		for (String expenseRecord : bucketRecord.getExpenseCodes()) {
+			expenseCodes.add(expenseRecord);
 		}
-		this.owner = Key.create(User.class, owner.getEmail()); 
+		this.owner = Key.create(User.class, owner.getEmail());
 		
 		return this;
 	}
@@ -63,25 +67,19 @@ public class Bucket {
 	}
 
 	public List<String> getExpenses() {
-		if (expenses == null) {
+		if (expenseCodes == null) {
 			return new ArrayList<String>();
 		}
-		return expenses;
+		return expenseCodes;
 	}
 
 	public Bucket setExpenses(List<String> expenses) {
-		this.expenses = expenses;
+		this.expenseCodes = expenses;
 		return this;
 	}
 	
 	public BucketRecord toBucketRecord() {
-		Objectify otfy = new DAO().fact().begin();
-		Map<String, Expense> loadedExpenses = otfy.get(Expense.class, expenses);
-		List<ExpenseRecord> expenseRecords = new ArrayList<ExpenseRecord>();
-		for (Expense loadedExpense : loadedExpenses.values()) {
-			expenseRecords.add(loadedExpense.toExpenseRecord());
-		}
-		return new BucketRecord(getKey(), getName(), expenseRecords);
+		return new BucketRecord(getKey(), getName(), expenseCodes, years);
 	}
 
 	public Boolean getIsPublic() {
@@ -93,4 +91,14 @@ public class Bucket {
 		return this;
 	}
 
+	/**
+	 * Years which this bucket spans. All expenseCodes are relative to these years.
+	 */
+	public List<Integer> getYears() {
+		return years;
+	}
+
+	public void setYears(List<Integer> years) {
+		this.years = years;
+	}
 }
