@@ -48,6 +48,17 @@
     <url-pattern>/obudget2/bucket</url-pattern>
   </servlet-mapping>
 
+  <!--  NEW API -->
+  <servlet>
+    <servlet-name>getUserBucket</servlet-name>
+    <servlet-class>com.yossale.server.api.GetUserBucketsServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>getUserBucket</servlet-name>
+    <url-pattern>/api/getuserbuckets</url-pattern>
+  </servlet-mapping>
+  
 
   <!--  Add task servlets -->
   <!-- Adds an update task to the task queue. Goes through the years "round robin",
