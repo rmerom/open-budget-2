@@ -23,7 +23,7 @@ public class BucketExpenseServiceImpl extends RemoteServiceServlet implements
 		Bucket bucket = ofy.get(Bucket.class, bucketId);
 		
 		BucketRecord bucketRecord = bucket.toBucketRecord();
-		return bucketRecord.getExpenses().toArray(new ExpenseRecord[0]); 
+		return bucketRecord.getExpenseCodes().toArray(new ExpenseRecord[0]); 
 	}
 	
 	@Override

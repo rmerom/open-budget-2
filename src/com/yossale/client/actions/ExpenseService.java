@@ -7,7 +7,7 @@ import com.yossale.client.data.ExpenseRecord;
 @RemoteServiceRelativePath("expense")
 public interface ExpenseService extends RemoteService {
 
-	ExpenseRecord[] getExpensesByCodeAndYears(String expenseCode, Integer[] years);
+	ExpenseRecord[] getExpensesByCodeAndYears(String[] expenseCodes, Integer[] years);
 	ExpenseRecord[] getExpensesByYear(int year);
 	ExpenseRecord[] getExpensesByYearAndParent(int year, String parentCode);
 	String[] getAvailableBudgetYears();

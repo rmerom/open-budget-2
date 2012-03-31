@@ -1,12 +1,16 @@
 package com.yossale.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.allen_sauer.gwt.log.client.Log;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -16,17 +20,9 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.smartgwt.client.types.DragDataAction;
-import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tree.DataChangedEvent;
-import com.smartgwt.client.widgets.tree.DataChangedHandler;
-import com.smartgwt.client.widgets.tree.Tree;
-import com.smartgwt.client.widgets.tree.TreeGrid;
-import com.smartgwt.client.widgets.tree.TreeGridField;
-import com.smartgwt.client.widgets.tree.TreeNode;
 import com.yossale.client.actions.BucketService;
 import com.yossale.client.actions.BucketServiceAsync;
 import com.yossale.client.actions.LoginService;
@@ -48,54 +44,11 @@ public class OBudget2 implements EntryPoint {
 
   private final GraphCanvas graph = new GraphCanvas();
 
-  private TreeGrid bucketTree;
-
-
-  private TreeGrid generateBucket() {
-
-    Log.info("Generating new bucket");
-    TreeGrid tree = new TreeGrid();
-    tree.setFields(new TreeGridField("expenseCode", "Code"), new TreeGridField(
-        "name", "Name"), new TreeGridField("year", "Year"));
-    tree.setSize("400", "400");
-    tree.setShowOpenIcons(true);
-    tree.setShowEdges(true);
-    tree.setBorder("1px solid black");
-    tree.setBodyStyleName("normal");
-    tree.setLeaveScrollbarGap(false);
-    tree.setEmptyMessage("<br>Drag & drop expenses here");
-    tree.setCanReorderRecords(true);
-    tree.setCanAcceptDrop(true);
-    tree.setCanDragRecordsOut(true);
-    tree.setCanAcceptDroppedRecords(true);
-    tree.setDragDataAction(DragDataAction.MOVE);
-    tree.setCanRemoveRecords(true);
-
-    final Tree bucketModel = new Tree();
-    bucketModel.setModelType(TreeModelType.PARENT);
-    bucketModel.setNameProperty("ID");
-    bucketModel.setChildrenProperty("directReports");
-    tree.setData(bucketModel);
-
-    bucketModel.addDataChangedHandler(new DataChangedHandler() {
-
-      @Override
-      public void onDataChanged(DataChangedEvent event) {
-        System.out.println("dropped something?");
-        TreeNode[] nodes = bucketModel.getAllNodes();
-
-        List<ExpenseRecord> list = new ArrayList<ExpenseRecord>();
-
-        for (int i = 0; i < nodes.length; i++) {
-          list.add(ExpenseRecord.getExpenseRecord(nodes[i]));
-        }
-
-        graph.updateGraph(list);
-      }
-    });
-
-    return tree;
-  }
+  private InputPane inputPane;
+  private BucketPane bucketPane;
+  
+  private Map<String, BucketRecord> userBuckets = 
+  		new HashMap<String, BucketRecord>();
 
   /**
    * This is the entry point method.
@@ -103,8 +56,6 @@ public class OBudget2 implements EntryPoint {
   public void loadOBudget(LoginInfo loginInfo) {
   	final BucketServiceAsync bucketService = GWT.create(BucketService.class); 
     Log.info("OBudget loading started");
-    bucketTree = generateBucket();
-    final TreeGrid bucketTreeFinal = bucketTree;
 
     String currentUser;
     if (loginInfo != null) {
@@ -123,7 +74,24 @@ public class OBudget2 implements EntryPoint {
     bucketLayout.addMember(bucketLabel);
     final ListBox bucketListBox = new ListBox();
 
-//    bucketListBox.
+    bucketListBox.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				String bucketName = bucketListBox.getItemText(bucketListBox.getSelectedIndex());
+				if (bucketName.isEmpty()) {
+					return;
+				}
+				BucketRecord bucketRecord = userBuckets.get(bucketName);
+				bucketPane.clearExpenses();
+				List<String> expenseCodes = new ArrayList<String>();
+				for (String expenseCode : bucketRecord.getExpenseCodes()) {
+					expenseCodes.add(expenseCode);
+				}
+				inputPane.selectYears(bucketRecord.getYears());
+				bucketPane.addExpenses(expenseCodes.toArray(new String[]{}), bucketRecord.getYears());
+			}
+		});
     bucketLayout.addMember(bucketListBox);
 
     bucketService.getBucketsOfLoggedInUser(new AsyncCallback<BucketRecord[]>() {
@@ -135,7 +103,9 @@ public class OBudget2 implements EntryPoint {
 			@Override
 			public void onSuccess(BucketRecord[] result) {
 				Log.warn("Got " + result.length + " buckets");
+				bucketListBox.addItem("");
 				for (BucketRecord bucketRecord : result) {
+					userBuckets.put(bucketRecord.getName(), bucketRecord);
 					bucketListBox.addItem(bucketRecord.getName());
 				}
 			}
@@ -152,10 +122,12 @@ public class OBudget2 implements EntryPoint {
 					
 					@Override
 					public void onSuccess(BucketRecord result) {
-						ListGridRecord[] records = bucketTreeFinal.getRecords();
+						ListGridRecord[] records = bucketPane.getGridRecords();
+						result.getExpenseCodes().clear();
 						for (ListGridRecord record : records) {
-							result.getExpenses().add(ExpenseRecord.getExpenseRecord(record));
+							result.getExpenseCodes().add(ExpenseRecord.getExpenseRecord(record).getExpenseCode());
 						}
+						result.setYears(inputPane.getSelectedYears());
 						bucketService.updateBucket(result, new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -185,16 +157,21 @@ public class OBudget2 implements EntryPoint {
     v.setMembersMargin(30);
     v.addMember(new Label("Version :" + VERSION_ID));
     v.addMember(userLabel);
+    HLayout saveAndLoadHLayout = new HLayout();
+    saveAndLoadHLayout.addMember(bucketLayout);
+    saveAndLoadHLayout.addMember(horizontalSavePanel);
+    v.addMember(saveAndLoadHLayout);
     
-    BucketPane bucketPane = new BucketPane(graph);    
     
     HLayout h = new HLayout();
     h.setMembersMargin(30);
-    h.addMember(new InputPane(bucketPane));
+    bucketPane = new BucketPane(graph);
+    inputPane = new InputPane(bucketPane);
+    h.addMember(inputPane);
     h.addMember(bucketPane);
+    h.addMember(graph);
     
     v.addMember(h);
-    v.addMember(graph);
 
     v.addMember(new DBPanel());
     v.draw();

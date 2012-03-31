@@ -1,10 +1,11 @@
 package com.yossale.client.gui;
 
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.allen_sauer.gwt.log.client.Log;
-
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.widgets.IButton;
@@ -22,30 +23,45 @@ import com.yossale.client.actions.ExpenseServiceAsync;
 
 public class InputPane extends HLayout {
 
+	final SelectItem yearSelector; 
   VLayout vLayout = new VLayout();
-  DynamicForm filtersPane = new DynamicForm();
-  HLayout treesLayout = new HLayout();
   final BucketPane bucketPane;
   private final ExpenseServiceAsync expensesService = GWT
       .create(ExpenseService.class);
 
   public InputPane(BucketPane pane) {    
 
-    this.bucketPane = pane;
+  	yearSelector = new SelectItem();
+  	this.bucketPane = pane;
     
     Log.info("Loading bucket pane");
-    setBorder("5px solid blue");
+    //setBorder("5px solid blue");
 
     vLayout.addMember(buildFilterPane(), 0);
     addMember(vLayout);
   }
 
+  public void selectYears(List<Integer> years) {
+  	List<String> yearStrings = new ArrayList<String>();
+  	for (Integer year : years) {
+  		yearStrings.add(year.toString());
+  	}
+  	yearSelector.setValues(yearStrings.toArray(new String[]{}));
+  }
+  
+  public List<Integer> getSelectedYears() {
+  	List<Integer> result = new ArrayList<Integer>();
+  	for (String value : yearSelector.getValues()) {
+  		result.add(Integer.valueOf(value));
+  	}
+  	return result;
+  }
+  
   private Layout buildFilterPane() {
 
     final DynamicForm form = new DynamicForm();
     form.setWidth(300);
 
-    final SelectItem yearSelector = new SelectItem();
     yearSelector.setTitle("בחר שנים רלוונטיות");
     yearSelector.setMultiple(true);
     yearSelector.setMultipleAppearance(MultipleAppearance.GRID);
@@ -64,13 +80,13 @@ public class InputPane extends HLayout {
     });
 
     yearSelector.setTitle("Select years");
+    yearSelector.setHint("Press ctrl to choose more than one");
     
     RegExpValidator regExpValidator = new RegExpValidator();  
     regExpValidator.setExpression("^[0-9]{2,8}$");  
   
     final TextItem textItem = new TextItem();  
-    textItem.setTitle("Section Id:");
-    textItem.setHint("<nobr>הכנס מספר סעיף</nobr>");
+    textItem.setTitle("Add budget expense:");
     
     textItem.setValidators(regExpValidator);
     
@@ -78,11 +94,16 @@ public class InputPane extends HLayout {
     addSectionButton.setTitle("הוסף");  
     addSectionButton.addClickHandler(new ClickHandler() {  
         public void onClick(ClickEvent event) {  
+        	if (yearSelector.getValues().length > 0) {
             if(form.validate()) {
               Log.info("Whoo!");
-              bucketPane.addSection(textItem.getValueAsString(),yearSelector.getValues());
+              bucketPane.addExpenses(
+              		new String[]{textItem.getValueAsString()}, yearSelector.getValues());
             }
-        }  
+        	} else {
+        		Window.alert("נא לבחור את השנים הרלוונטיות.");
+        	}
+        }
     });  
     
     form.setFields(yearSelector, textItem);
