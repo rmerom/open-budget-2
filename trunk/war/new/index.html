@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Open Budget for professionals</title>
+    <title>התקציב הפתוח לאנשי מקצוע</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js'></script>
     <script src='js/jquery.multiselect.js'></script>  <!-- http://www.erichynds.com/jquery/jquery-ui-multiselect-widget/ -->
@@ -14,10 +14,11 @@
       @import "/table/media/css/demo_table.css";
       .hebrew { font-family: arial; text-align: right;}
       .pagetitle { text-align: center }
+      .multis { margin-right: 5px; margin-left: 5px }
     </style>
   </head>
   <body dir='rtl' class='hebrew'>
-  <h1 class='pagetitle'>התקציב הפתוח - כלי ניתוח</h1> 
+  <h1 class='pagetitle'>התקציב הפתוח - כלי ניתוח למומחים</h1> 
  
   <div id='user' style='display: none'>
   שלום 
@@ -25,30 +26,39 @@
   </div>
   <br/>
   <h3>מחרוזות</h3>
-  טענו מחרוזת:
+
+  <b>טענו</b> מחרוזת
   <select id='bucketLoadSelect'></select> <input type='button' id='loadBucketButton' value='טענו' ></input>
   <br/><br/>
-  שימרו מחרוזת:
-  <select id='bucketSaveSelect'></select> 
-  <span id='newBucket' style='display: none'> <input type='text' id='newBucketName' placeholder='שם מחרוזת חדשה'></input></span>
-  <input type='button' id='saveBucketButton' value='שימרו' ></input> 
+  <b>מיחקו</b> מחרוזת
+  <select id='bucketDeleteSelect'></select> <input type='button' id='deleteBucketButton' value='מיחקו' ></input>
+  <br/><br/>
+
   <h3>נתוני מחרוזת</h3>
   <div id="bucket">
     <span style='vertical-align: center'>
-		  שנים :
-		  <select id='yearsSelect' class="multiselect" multiple=multiple style='width: 100px; height: 150px;'></select>
+		  שנים
+		  <select id='yearsSelect' class="multiselect" multiple=multiple'></select>
+      <span id='yearsText' style='font-size: small'></span>
     </span>
     <p/>
-    הוסף סעיף: 
+
+   <b>הוסיפו</b>
+ סעיף מספר: 
     <input type="text" id="expense_code"></input>
     <input type='button' id='add_expense' value='הוסף'></input>
     <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
-    <hr/>
+    <hr/><hr/>
+    <h3>סעיפים במחרוזת זו</h3>
     <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
-  </div>
 
-  <div id="buckets"></div>
-  
+  </div>
+  <br/>	<hr/><hr/><br/><br/>
+  <b>שימרו</b> מחרוזת זו בשם:
+  <select id='bucketSaveSelect'></select> 
+  <span id='newBucket' style='display: none'> <input type='text' id='newBucketName' placeholder='שם מחרוזת חדשה'></input></span>
+  <input type='button' id='saveBucketButton' value='שימרו' ></input> 
+
   <script src='js/obudget.js'></script>
   </body>
 </html>
