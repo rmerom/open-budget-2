@@ -17,11 +17,26 @@
     </style>
   </head>
   <body dir='rtl' class='hebrew'>
-  <h1 class='pagetitle'>התקציב הפתוח - כלי ניתוח</h1>
+  <h1 class='pagetitle'>התקציב הפתוח - כלי ניתוח</h1> 
+ 
+  <div id='user' style='display: none'>
+  שלום 
+    <span id='useremail'></span>,
+  </div>
+  <br/>
+  <h3>מחרוזות</h3>
+  טענו מחרוזת:
+  <select id='bucketLoadSelect'></select> <input type='button' id='loadBucketButton' value='טענו' ></input>
+  <br/><br/>
+  שימרו מחרוזת:
+  <select id='bucketSaveSelect'></select> 
+  <span id='newBucket' style='display: none'> <input type='text' id='newBucketName' placeholder='שם מחרוזת חדשה'></input></span>
+  <input type='button' id='saveBucketButton' value='שימרו' ></input> 
+  <h3>נתוני מחרוזת</h3>
   <div id="bucket">
     <span style='vertical-align: center'>
 		  שנים :
-		  <select id='yearsSelect' class="multiselect" multiple=multiple style='width: 100px; height: 150px; '></select>
+		  <select id='yearsSelect' class="multiselect" multiple=multiple style='width: 100px; height: 150px;'></select>
     </span>
     <p/>
     הוסף סעיף: 

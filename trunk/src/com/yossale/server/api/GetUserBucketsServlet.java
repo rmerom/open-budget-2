@@ -1,7 +1,6 @@
 package com.yossale.server.api;
 
 import java.io.IOException;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -15,7 +14,6 @@ import org.json.JSONObject;
 
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
-import com.yossale.client.data.BucketRecord;
 import com.yossale.server.Common;
 import com.yossale.server.data.Bucket;
 import com.yossale.server.data.DAO;
@@ -51,7 +49,6 @@ public class GetUserBucketsServlet extends HttpServlet {
 	  }
 
 	  try {
-
 	  	JSONArray buckets = new JSONArray();
 	  	QueryResultIterator<Bucket> bucketIterator = 
 	  			new DAO().ofy().query(Bucket.class).filter("owner", Key.create(User.class, user.getEmail())).fetch().iterator();

@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.yossale.server.data.Bucket;
+import com.yossale.server.data.User;
 
 /**
  * Converts various data objects to/from JSON.
@@ -20,6 +21,7 @@ public class ConvertUtil {
 	public static JSONObject bucketToJson(Bucket bucket) {
 		JSONObject jsonBucket = new JSONObject();
 		try {
+			jsonBucket.put("id", bucket.getKey());
 			jsonBucket.put("name", bucket.getName());
 			if (bucket.getIsPublic()) {
 				jsonBucket.put("isPublic", bucket.getIsPublic());
@@ -58,5 +60,34 @@ public class ConvertUtil {
 		}
 		// Default to json.
 		return object.toString();
+	}
+
+	public static Bucket jsonToBucket(HttpServletRequest req, User user) throws JSONException {
+		Bucket bucket = new Bucket();
+		if (req.getParameter("request") == null) {
+			return null;
+		}
+		JSONObject reqObj = new JSONObject(req.getParameter("request"));
+		JSONObject jsonObj;
+		if (!reqObj.has("bucket")) {
+			logger.warning("could not find 'bucket' in request");
+			return null;
+		}
+		bucket.setOwner(user.getEmail());
+		jsonObj = reqObj.getJSONObject("bucket");
+		if (jsonObj.has("id")) {
+			bucket.setKey(jsonObj.getLong("id"));
+		}
+		bucket.setName(jsonObj.getString("title"));
+		JSONArray jsonYears = jsonObj.getJSONArray("years");
+		for (int i = 0; i < jsonYears.length(); ++i) {
+			bucket.getYears().add(jsonYears.getInt(i));
+		}
+		JSONArray jsonExpenses = jsonObj.getJSONArray("expenses");
+		for (int i = 0; i < jsonExpenses.length(); ++i) {
+			bucket.getExpenses().add(jsonExpenses.getString(i));
+		}
+		
+		return bucket;
 	}
 }

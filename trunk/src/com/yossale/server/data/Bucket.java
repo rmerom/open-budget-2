@@ -28,6 +28,7 @@ public class Bucket {
 
 	public Bucket() {
 		expenseCodes = new ArrayList<String>();
+		years = new ArrayList<Integer>();
 	}
 	
 	public Bucket(BucketRecord bucketRecord, User owner) {
@@ -57,6 +58,10 @@ public class Bucket {
 		return key;
 	}
 
+	public void setKey(Long key) {
+		this.key = key;
+	}
+	
 	public String getName() {
 		return name;
 	}
