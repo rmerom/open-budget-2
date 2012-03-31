@@ -13,11 +13,13 @@
       .pagetitle { text-align: center }
     </style>
   </head>
-  <body dir='rtl'>
-  <h1 class='hebrew pagetitle'>התקציב בניתוח פתוח</h1>
+  <body dir='rtl' class='hebrew'>
+  <h1 class='pagetitle'>התקציב בניתוח פתוח</h1>
   <div id="bucket">
     הוסף סעיף: 
     <input type="text" id="expense_code"></input>
+    <input type='button' id='add_expense' value='הוסף'></input>
+    <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
     <hr/>
     <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
   </div>
@@ -28,16 +30,17 @@
   var years = [2001,2002];
   
   $(document).ready(function() {
-    var result = {};
-    result.aaData = [];
-    result.aoColumns = [
-      {"sTitle" : "סעיף תקציבי"},
+    var tableDef = {};
+    tableDef.aaData = [];
+    tableDef.aoColumns = [
+      {"sTitle" : "סעיף", "sWidth": '40px'},
+      {"sTitle" : "שם", "sWidth": '300px'},
       {"sTitle" : "הקצאה נטו"},
       {"sTitle" : "הקצאה מעודכנת נטו"},
       {"sTitle" : "הקצאה מעודכנת ברוטו"},
       {"sTitle" : "שימוש נטו"},
       {"sTitle" : "שימוש ברוטו"}];
-    result.oLanguage = {
+    tableDef.oLanguage = {  // Make GUI hebrew
 		  "sProcessing":   "מעבד...",
 		  "sLengthMenu":   "הצג _MENU_ פריטים",
 		  "sZeroRecords":  "לא נמצאו רשומות מתאימות",
@@ -52,23 +55,28 @@
 		      "sPrevious": "קודם",
 		      "sNext":     "הבא",
 		      "sLast":     "אחרון"
+      }
     }
-}
    
-     oTable = $('#output_table').dataTable(result);
+     oTable = $('#output_table').dataTable(tableDef);
    });
    
   
   // Register an event on the code input to resolve the given code.
-  $('#expense_code').change(function() {
-    var code = [""+$('#expense_code').val(),"0020"];
+  $('#add_expense').click(function() {
+    var code = [""+$('#expense_code').val()];
     getExpense(code, years, displayDataInTable);
+    $('#spinner').show();
   });
   
   function displayDataInTable(data) {
     var dataArr = [];
+    if (!data.length) {
+      alert('לא נמצאו נתונים עבור סעיף זה');
+    }
     $.each(data, function(i, item) {
       var row = [];
+      row.push(item.code);
       row.push(item.title);
       row.push(item.net_allocated);
       row.push(item.net_revised);
@@ -76,8 +84,10 @@
       row.push(item.net_used);
       row.push(item.gross_used);
       dataArr.push(row);
+      $('#spinner').hide();
+
     });
-    oTable.fnClearTable();
+//    oTable.fnClearTable();
     oTable.fnAddData(dataArr);
   }
 
