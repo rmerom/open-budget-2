@@ -1,6 +1,7 @@
 var expensesByCodeThenYear = {};
 
   $(document).ready(function() {
+    $(".multiselect").multiselect();  // Enable multiple select.
     $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
     var tableDef = {};
     tableDef.aaData = [];
@@ -44,6 +45,7 @@ var expensesByCodeThenYear = {};
          .append(
              $("<option></option>")
                .attr("value", i)
+               .attr("selected", "selected")	
                .text(i));
   }
   $('#yearsSelect').change(function() {
