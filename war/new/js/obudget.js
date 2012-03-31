@@ -1,6 +1,5 @@
-  var years = [2001,2002];
-  
-  
+var expensesByCodeThenYear = {};
+
   $(document).ready(function() {
     $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
     var tableDef = {};
@@ -36,8 +35,19 @@
   // Register an event on the code input to resolve the given code.
   $('#add_expense').click(function() {
     var code = [""+$('#expense_code').val()];
-    getExpense(code, years, getExpenseInfoCallback);
+    getExpense(code, getExpenseInfoCallback);
     $('#spinner').show();
+  });
+  var thisYear = new Date().getFullYear();
+  for (var i = 1996; i <= thisYear; ++i) {
+     $('#yearsSelect')
+         .append(
+             $("<option></option>")
+               .attr("value", i)
+               .text(i));
+  }
+  $('#yearsSelect').change(function() {
+    updateTable();
   });
   
   function renderNumberWithCommas(o, val) {
@@ -48,33 +58,39 @@
 		  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
   
-  function addRowsToTable(data) {
-    var sums = {};
+  function updateTable(data) {
     // Sum over the years.
-    $.each(data, function(i, item) {
-      var code = item.code;
-
-      item.net_allocated = parseInt(item.net_allocated);
-      item.net_revisited = parseInt(item.net_revisited);
-      item.net_used = parseInt(item.net_used);
-      item.gross_revised = parseInt(item.gross_revised);
-      if (!sums[code]) {
-        sums[code] = { 
-          code: code, 
-          title: item.title, 
-          net_allocated: 0, 
-          net_revised: 0, 
-          net_used: 0,
-          gross_revised: 0,
-          gross_used: 0 };
+    var sums = {};
+    for (code in expensesByCodeThenYear) {
+      var expenses = expensesByCodeThenYear[code];
+      for (year in expenses) {
+        if (-1 == $.inArray(year, $('#yearsSelect').val())) {
+          continue; 
+        }
+        var item = expenses[year];
+		    if (!sums[code]) {
+		      sums[code] = { 
+		        code: item.code, 
+		        title: item.title, 
+		        net_allocated: 0, 
+		        net_revised: 0, 
+		        net_used: 0,
+		        gross_revised: 0,
+		        gross_used: 0 };
+		    }
+		    item.net_allocated = parseInt(item.net_allocated);
+		    item.net_revisited = parseInt(item.net_revisited);
+		    item.net_used = parseInt(item.net_used);
+		    item.gross_revised = parseInt(item.gross_revised);
+		    var currentSums = sums[code];
+		    currentSums.net_allocated += nanZero(item.net_allocated);
+		    currentSums.net_revised += nanZero(item.net_revised);
+		    currentSums.net_used += nanZero(item.net_used);
+		    currentSums.gross_revised += nanZero(item.gross_revised);
+		    currentSums.gross_used += nanZero(item.gross_used);
       }
-      var currentSums = sums[code];
-      currentSums.net_allocated += item.net_allocated;
-      currentSums.net_revised += item.net_revised;
-      currentSums.net_used += item.net_used;
-      currentSums.gross_revised += item.gross_revised;
-      currentSums.gross_used += item.gross_used;
-    });
+    };
+    oTable.fnClearTable();
     // Now add the sums to the table.
     $.each(sums, function(i, item) {
 		  var row = [];
@@ -89,23 +105,33 @@
     });
   }
 
+  // Expenses is an array of items received from the "data store".
+  function addData(expenses) {
+    $.each(expenses, function(i, item) {
+      if (!expensesByCodeThenYear[item.code]) {
+        expensesByCodeThenYear[item.code] = {};
+      }
+      expensesByCodeThenYear[item.code][item.year] = item;
+    });
+  }
+
   function getExpenseInfoCallback(codes, data) {
     $('#spinner').hide();
     var dataArr = [];
     if (!data.length) {
       alert('לא נמצאו נתונים עבור סעיפ/ים ' + codes);
     }
-    addRowsToTable(data);
+    addData(data);
+    updateTable();
   }
 
 
   // Call this function to resolve the given codes and years and get their data from yeda.us
   // Example:
   // getExpense(["00","0020"], ["2001", "2002"], function (data) {}); 
-  function getExpense(codes, years, callback) {
+  function getExpense(codes, callback) {
     var query = {};
     query.code = {"$in":codes};
-    query.year = {"$in":years};
     $.getJSON("http://api.yeda.us/data/gov/mof/budget/?callback=?", 
       {
         "o" : "jsonp",
@@ -113,10 +139,7 @@
       }, function(data) {callback(codes, data);});
   }
 
-//  $.getJSON("getBucket?j=?", {}, function(data) {
-//    $.each(data, function(i, item){
-//      $("<div>").html(item.num).appendTo("#buckets");
-//      if ( i == 3 ) return false;
-//    });
-//  });
+  function nanZero(num) {
+    return isNaN(num) ? 0 : num;
+  }
 
