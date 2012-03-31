@@ -4,19 +4,24 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Open Budget for professionals</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="json2.js"></script>
+<!--    <script src="json2.js"></script>-->
     <script src="/table/media/js/jquery.dataTables.js"></script> 
     <style type="text/css" title="currentStyle">
       @import "/table/media/css/demo_page.css";
       @import "/table/media/css/demo_table.css";
+      .hebrew { font-family: arial }
+      .pagetitle { text-align: center }
     </style>
   </head>
-  <body>
+  <body dir='rtl'>
+  <h1 class='hebrew pagetitle'>התקציב בניתוח פתוח</h1>
   <div id="bucket">
+    הוסף סעיף: 
     <input type="text" id="expense_code"></input>
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="output_table"></table>
+    <hr/>
+    <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
   </div>
-  
+
   <div id="buckets"></div>
   
   <script>
@@ -32,6 +37,23 @@
       {"sTitle" : "הקצאה מעודכנת ברוטו"},
       {"sTitle" : "שימוש נטו"},
       {"sTitle" : "שימוש ברוטו"}];
+    result.oLanguage = {
+		  "sProcessing":   "מעבד...",
+		  "sLengthMenu":   "הצג _MENU_ פריטים",
+		  "sZeroRecords":  "לא נמצאו רשומות מתאימות",
+		  "sInfo": "_START_ עד _END_ מתוך _TOTAL_ רשומות" ,
+		  "sInfoEmpty":    "0 עד 0 מתוך 0 רשומות",
+		  "sInfoFiltered": "(מסונן מסך _MAX_  רשומות)",
+		  "sInfoPostFix":  "",
+		  "sSearch":       "חפש:",
+		  "sUrl":          "",
+		  "oPaginate": {
+		      "sFirst":    "ראשון",
+		      "sPrevious": "קודם",
+		      "sNext":     "הבא",
+		      "sLast":     "אחרון"
+    }
+}
    
      oTable = $('#output_table').dataTable(result);
    });

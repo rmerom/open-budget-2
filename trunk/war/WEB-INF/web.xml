@@ -6,6 +6,8 @@
 <web-app>
   
   <!-- Servlets -->
+  
+  <!-- 
   <servlet>
     <servlet-name>getBucket</servlet-name>
     <servlet-class>com.yossale.server.actions.GetBucket</servlet-class>
@@ -14,7 +16,7 @@
   <servlet-mapping>
     <servlet-name>getBucket</servlet-name>
     <url-pattern>/getBucket</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping> -->
   
   <servlet>
     <servlet-name>loginService</servlet-name>
