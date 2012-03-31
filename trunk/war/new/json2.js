@@ -41,11 +41,6 @@
 
   <body class="logged_in page-blob windows vis-public env-production " data-blob-contribs-enabled="yes">
     <div id="wrapper">
-
-    
-    
-    
-
       <div id="header" class="true clearfix">
         <div class="container clearfix">
           <a class="site-logo" href="https://github.com/">
