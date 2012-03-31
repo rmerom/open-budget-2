@@ -7,17 +7,6 @@
   
   <!-- Servlets -->
   
-  <!-- 
-  <servlet>
-    <servlet-name>getBucket</servlet-name>
-    <servlet-class>com.yossale.server.actions.GetBucket</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>getBucket</servlet-name>
-    <url-pattern>/getBucket</url-pattern>
-  </servlet-mapping> -->
-  
   <servlet>
     <servlet-name>loginService</servlet-name>
     <servlet-class>com.yossale.server.actions.LoginServiceImpl</servlet-class>
@@ -59,7 +48,16 @@
     <url-pattern>/api/getuserbuckets</url-pattern>
   </servlet-mapping>
   
-
+  <servlet>
+    <servlet-name>saveUserBucket</servlet-name>
+    <servlet-class>com.yossale.server.api.SaveUserBucketServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>saveUserBucket</servlet-name>
+    <url-pattern>/api/saveuserbucket</url-pattern>
+  </servlet-mapping>
+  
   <!--  Add task servlets -->
   <!-- Adds an update task to the task queue. Goes through the years "round robin",
        unless a "year=XXXX" parameter is specified. -->

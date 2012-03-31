@@ -33,7 +33,7 @@ $.widget("ech.multiselect", {
 		classes: 'hebrew',
 		checkAllText: 'ביחרו הכל',
 		uncheckAllText: 'הסירו הכל',
-		noneSelectedText: 'בחרו שנים',
+		noneSelectedText: 'ביחרו שנים',
 		selectedText: 'נבחרו #',
 		selectedList: 0,
 		show: '',
