@@ -1,5 +1,6 @@
 var expensesByCodeThenYear = {};
 var userBuckets = {};
+var reqCounter = 0;
 
 $(document).ready(function() {
   $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
@@ -12,7 +13,9 @@ $(document).ready(function() {
     { sTitle : "הקצאה מעודכנת נטו", sType: "number-commas", fnRender: renderNumberWithCommas },
     { sTitle : "הקצאה מעודכנת ברוטו", sType: "number-commas", fnRender: renderNumberWithCommas },
     { sTitle : "שימוש נטו", sType: "number-commas", fnRender: renderNumberWithCommas },
-    { sTitle : "שימוש ברוטו", sType: "number-commas", fnRender: renderNumberWithCommas }];
+    { sTitle : "שימוש ברוטו", sType: "number-commas", fnRender: renderNumberWithCommas },
+    { sTitle : "מחיקה", sType: "text" } ];
+
   tableDef.oLanguage = {  // Make GUI hebrew
 	  "sProcessing":   "מעבד...",
 	  "sLengthMenu":   "הצג _MENU_ פריטים",
@@ -34,7 +37,7 @@ $(document).ready(function() {
 	// Register an event on the add button retrieve the given code.
 	$('#add_expense').click(function() {
 	  var code = [""+$('#expense_code').val()];
-	  getExpense(code, getExpenseInfoCallback);
+	  getExpenses(code, getExpenseInfoCallback);
 	  $('#spinner').show();
 	});
 	var thisYear = new Date().getFullYear();
@@ -47,10 +50,12 @@ $(document).ready(function() {
 	        .text(i));
 	}
 	$('#yearsSelect').change(function() {
-	  updateTable();
+	  refreshUI();
 	});
   $(".multiselect").multiselect();  // Enable multiple select.
-	perpareUserBuckets();
+	prepareUserBuckets();
+  initDialogBox();
+  refreshUI();
 }); // end of ready()
   
 function renderNumberWithCommas(o, val) {
@@ -62,6 +67,10 @@ function numberWithCommas(x) {
 };
 
 function saveBucket() {
+  if (Object.keys(expensesByCodeThenYear).length == 0) {
+    prettyAlert('אנא הוסיפו תחילה סעיפים לתוך המחרוזת');
+    return;
+  }
   if ($('#bucketSaveSelect').val() != '') {
     if (!confirm('בטוחים שברצונכם להחליף את המחרוזת?')) {
       return;
@@ -81,43 +90,57 @@ function saveBucket() {
   request = {};
   request.bucket = bucket;
   $.post('/api/saveuserbucket', { 'request' : JSON.stringify(request) }).success(
-    function() { alert('נשמר בהצלחה'); }).error(
-    function() { alert('אירעה שגיאה'); } );
+    function() { 
+      readBuckets(); 
+      prettyAlert('נשמר בהצלחה'); 
+    }).error(
+    function() { prettyAlert('אירעה שגיאה'); } );
 }
 
-function perpareUserBuckets() {
+function readBuckets() {
+  aRequest(true);
   $.getJSON("/api/getuserbuckets?type=json", {}, function(data) {
+    aRequest(false);
     $('#useremail').text(data.email);
     $('#user').show();
-    var selects = $('#bucketLoadSelect,#bucketSaveSelect');
+    var selects = $('#bucketLoadSelect,#bucketSaveSelect,#bucketDeleteSelect');
+    selects.empty();
     $.each(data.buckets, function(i, bucket) {
      userBuckets[bucket.id] = bucket;
 	   selects.append(
 	     $("<option></option>")
 	       .attr("value", bucket.id)
-	       .attr("selected", "selected")	
 	        .text(bucket.name));
     });
     $('#bucketSaveSelect').append($("<option></option>").attr('value','').text('מחרוזת חדשה...'));
   });
- 
+}
+
+function prepareUserBuckets() {
+  readBuckets(); 
   $('#loadBucketButton').click(function() {
     var id = $('#bucketLoadSelect').val();
     var bucket = userBuckets[id];
+    $('#bucketSaveSelect').val(id);
     $('#yearsSelect').val(bucket.years);
     $('#yearsSelect').multiselect('refresh');
-	  getExpense(bucket.expenses, getExpenseInfoCallback);
+	  getExpenses(bucket.expenses, getExpenseInfoCallback);
+    refreshUI();
   });
 
   $('#bucketSaveSelect').change(function() {
     $('#newBucket').toggle($('#bucketSaveSelect').val() == '');
   });
 
-  $('#saveBucketButton').click(function() {saveBucket();});
-
+  $('#saveBucketButton').click(function() { saveBucket(); });
+  $('#deleteBucketButton').click(function() { prettyAlert('עדיין לא עובד...');} );
 }
 
-function updateTable(data) {
+function refreshUI() {
+  // Refresh the years textbox.
+  $('#yearsText').show().text(numberArrayToText($('#yearsSelect').val()));
+
+  // Refresh the table.
   // Sum over the years.
   var sums = {};
   for (code in expensesByCodeThenYear) {
@@ -160,12 +183,14 @@ function updateTable(data) {
 	  row.push(parseInt(item.gross_revised));
 	  row.push(parseInt(item.net_used));
 	  row.push(parseInt(item.gross_used));
+    row.push('<a href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>');
     oTable.fnAddData(row);
   });
 }
 
 // Expenses is an array of items received from the "data store".
-function addData(expenses) {
+function setBucketExpenses(expenses) {
+  expensesByCodeThenYear = {};
   $.each(expenses, function(i, item) {
     if (!expensesByCodeThenYear[item.code]) {
       expensesByCodeThenYear[item.code] = {};
@@ -178,27 +203,96 @@ function getExpenseInfoCallback(codes, data) {
   $('#spinner').hide();
   var dataArr = [];
   if (!data.length) {
-    alert('לא נמצאו נתונים עבור סעיפ/ים ' + codes);
+    prettyAlert('לא נמצאו נתונים עבור סעיפ/ים ' + codes);
   }
-  addData(data);
-  updateTable();
+  setBucketExpenses(data);
+  refreshUI();
 }
 
 
 // Call this function to resolve the given codes and years and get their data from yeda.us
 // Example:
-// getExpense(["00","0020"], ["2001", "2002"], function (data) {}); 
-function getExpense(codes, callback) {
+// getExpenses(["00","0020"], function (data) {}); 
+function getExpenses(codes, callback) {
+  if (codes.length == 0) {
+    // No expenses were selected.
+    return;
+  }
   var query = {};
   query.code = {"$in":codes};
+  aRequest(true);
   $.getJSON("http://api.yeda.us/data/gov/mof/budget/?callback=?", 
     {
       "o" : "jsonp",
       "query" : JSON.stringify(query)
-    }, function(data) {callback(codes, data);});
+    }, function(data) {
+      aRequest(false);
+      callback(codes, data);
+    });
 }
 
 function nanZero(num) {
   return isNaN(num) ? 0 : num;
 }
 
+function numberArrayToText(array) {
+  if (array.length == 0) {
+    return "";
+  }
+  if (array.length == 1) {
+    return "" + array[0];
+  }
+  var prev = 0;
+  result = "";
+  var i = 1; 
+  var currentStart = 0;
+  while (i < array.length) {
+    if (parseInt(array[i]) != parseInt(array[i-1]) + 1) {
+      var currentEnd = i-1;
+      if (currentStart == currentEnd) {
+        result += ', ' + array[currentStart];
+      } else {
+        result += ', ' + array[currentStart] + '-' + array[currentEnd];
+      }
+      currentStart = i;
+    }
+    i++;
+  }
+  if (currentStart != array.length - 1) {
+    result += ', ' + array[currentStart] + '-' + array[array.length - 1];
+  }
+  return result.substring(2);
+}
+
+function aRequest(isStart) {
+  if (isStart) 
+    ++reqCounter;
+  else 
+    --reqCounter;
+  $('#spinner').toggle(reqCounter > 0);
+}
+
+function deleteExpense(code) {
+  delete expensesByCodeThenYear[code];
+  refreshUI();
+}
+
+function initDialogBox(){
+  $("<div id='msgBox'></div>").dialog({
+		autoOpen: false,
+		title: '',
+		bgiframe: true,
+		modal: true,
+		buttons: {
+		    'סגור': function() {
+		        $(this).dialog('close');
+		    }
+		}
+  });
+}
+
+function prettyAlert(msg) {
+	$("#msgBox").empty();
+	$("#msgBox").append(msg);
+	$("#msgBox").dialog('open');
+}
