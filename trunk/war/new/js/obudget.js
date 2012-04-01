@@ -38,7 +38,6 @@ $(document).ready(function() {
 	$('#add_expense').click(function() {
 	  var code = [""+$('#expense_code').val()];
 	  getExpenses(code, getExpenseInfoCallback);
-	  $('#spinner').show();
 	});
 	var thisYear = new Date().getFullYear();
   var select = $('#yearsSelect');
@@ -124,6 +123,9 @@ function prepareUserBuckets() {
     $('#bucketSaveSelect').val(id);
     $('#yearsSelect').val(bucket.years);
     $('#yearsSelect').multiselect('refresh');
+    // Clear existing expenses.
+    expensesByCodeThenYear = {};
+    // And get the new ones.
 	  getExpenses(bucket.expenses, getExpenseInfoCallback);
     refreshUI();
   });
@@ -189,8 +191,7 @@ function refreshUI() {
 }
 
 // Expenses is an array of items received from the "data store".
-function setBucketExpenses(expenses) {
-  expensesByCodeThenYear = {};
+function addBucketExpenses(expenses) {
   $.each(expenses, function(i, item) {
     if (!expensesByCodeThenYear[item.code]) {
       expensesByCodeThenYear[item.code] = {};
@@ -201,11 +202,10 @@ function setBucketExpenses(expenses) {
 
 function getExpenseInfoCallback(codes, data) {
   $('#spinner').hide();
-  var dataArr = [];
   if (!data.length) {
     prettyAlert('לא נמצאו נתונים עבור סעיפ/ים ' + codes);
   }
-  setBucketExpenses(data);
+  addBucketExpenses(data);
   refreshUI();
 }
 
