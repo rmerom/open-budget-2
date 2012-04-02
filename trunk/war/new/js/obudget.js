@@ -1,3 +1,5 @@
+// Of the type:
+// { '0001': { 'weight': '1.0', 'years': { '2009': { title: '...', net_used: '...', ... } }
 var expensesByCodeThenYear = {};
 var userBuckets = {};
 var reqCounter = 0;
@@ -9,6 +11,7 @@ $(document).ready(function() {
   tableDef.aoColumns = [
     { sTitle : "סעיף", "sWidth": '40px' },
     { sTitle : "שם", "sWidth": '300px' },
+    { sTitle : "אחוז מסעיף", sType: 'numeric' },
     { sTitle : "הקצאה נטו", sType: "number-commas", fnRender: renderNumberWithCommas },
     { sTitle : "הקצאה מעודכנת נטו", sType: "number-commas", fnRender: renderNumberWithCommas },
     { sTitle : "הקצאה מעודכנת ברוטו", sType: "number-commas", fnRender: renderNumberWithCommas },
@@ -36,8 +39,12 @@ $(document).ready(function() {
    oTable = $('#output_table').dataTable(tableDef);
 	// Register an event on the add button retrieve the given code.
 	$('#add_expense').click(function() {
-	  var code = [""+$('#expense_code').val()];
-	  getExpenses(code, getExpenseInfoCallback);
+	  var code = ""+$('#expense_code').val();
+    var expense = {
+      code: code,
+      weight: parseInt($('#expense_weight').val()) / 100.0
+    };
+	  getExpenses([expense], getExpenseInfoCallback);
 	});
 	var thisYear = new Date().getFullYear();
   var select = $('#yearsSelect');
@@ -51,9 +58,13 @@ $(document).ready(function() {
 	$('#yearsSelect').change(function() {
 	  refreshUI();
 	});
+  $('#partialWeightCb').click(function() {
+    $('#partialRow').toggle($('#partialWeightCb').val());
+    $('#expense_weight').val(100);  // reset to 100%.
+  });
   $(".multiselect").multiselect();  // Enable multiple select.
 	prepareUserBuckets();
-  initDialogBox();
+  initDialogBoxes();
   refreshUI();
 }); // end of ready()
   
@@ -70,6 +81,10 @@ function saveBucket() {
     prettyAlert('אנא הוסיפו תחילה סעיפים לתוך המחרוזת');
     return;
   }
+  if ($('#bucketSaveSelect').val() == '' && $('#newBucketName').val() == '') {
+    prettyAlert('אנא העניקו שם למחרוזת החדשה');
+    return;
+  }
   if ($('#bucketSaveSelect').val() != '') {
     if (!confirm('בטוחים שברצונכם להחליף את המחרוזת?')) {
       return;
@@ -83,7 +98,8 @@ function saveBucket() {
   bucket.title = val == '' ? $('#newBucketName').val() : $('#bucketSaveSelect option[value=\'' + val +'\']').text();
   bucket.years = $('#yearsSelect').val();
   bucket.expenses = [];
-  for (var expense in expensesByCodeThenYear) {
+  for (var code in expensesByCodeThenYear) {
+    var expense = { code: code, weight: expensesByCodeThenYear[code].weight };
  	  bucket.expenses.push(expense);
   }
   request = {};
@@ -94,6 +110,22 @@ function saveBucket() {
       prettyAlert('נשמר בהצלחה'); 
     }).error(
     function() { prettyAlert('אירעה שגיאה'); } );
+}
+
+function deleteBucket() {
+  if ($('#bucketDeleteSelect').val() == '') {
+    prettyAlert('אנא ביחרו איזו מחרוזת למחוק');
+    return;
+  }
+  var bucketId = $('#bucketDeleteSelect').val();
+  var request = { bucketId: bucketId };
+  $.post('/api/deleteuserbucket', { 'request' : JSON.stringify(request) }).success(
+    function() { 
+      readBuckets(); 
+      prettyAlert('המחיקה הצליחה'); 
+    }).error(
+    function() { prettyAlert('אירעה שגיאה'); } );
+
 }
 
 function readBuckets() {
@@ -112,6 +144,7 @@ function readBuckets() {
 	        .text(bucket.name));
     });
     $('#bucketSaveSelect').append($("<option></option>").attr('value','').text('מחרוזת חדשה...'));
+    $('#newBucketName').toggle(data.buckets.length == 0);
   });
 }
 
@@ -131,11 +164,13 @@ function prepareUserBuckets() {
   });
 
   $('#bucketSaveSelect').change(function() {
-    $('#newBucket').toggle($('#bucketSaveSelect').val() == '');
+    $('#newBucketName').toggle($('#bucketSaveSelect').val() == '');
   });
 
   $('#saveBucketButton').click(function() { saveBucket(); });
-  $('#deleteBucketButton').click(function() { prettyAlert('עדיין לא עובד...');} );
+  $('#deleteBucketButton').click(function() { 
+    deleteBucket();
+  });
 }
 
 function refreshUI() {
@@ -146,15 +181,16 @@ function refreshUI() {
   // Sum over the years.
   var sums = {};
   for (code in expensesByCodeThenYear) {
-    var expenses = expensesByCodeThenYear[code];
-    for (year in expenses) {
+    var expense = expensesByCodeThenYear[code];
+    for (year in expense.years) {
       if (-1 == $.inArray(year, $('#yearsSelect').val())) {
         continue; 
       }
-      var item = expenses[year];
+      var item = expense.years[year];
 	    if (!sums[code]) {
 	      sums[code] = { 
 	        code: item.code, 
+          weight: expense.weight,
 	        title: item.title, 
 	        net_allocated: 0, 
 	        net_revised: 0, 
@@ -180,46 +216,55 @@ function refreshUI() {
 	  var row = [];
 	  row.push(item.code);
 	  row.push(item.title);
-	  row.push(parseInt(item.net_allocated));
-	  row.push(parseInt(item.net_revised));
-	  row.push(parseInt(item.gross_revised));
-	  row.push(parseInt(item.net_used));
-	  row.push(parseInt(item.gross_used));
+    row.push(Math.round(item.weight * 100));
+	  row.push(parseInt(item.net_allocated * item.weight));
+	  row.push(parseInt(item.net_revised * item.weight));
+	  row.push(parseInt(item.gross_revised * item.weight));
+	  row.push(parseInt(item.net_used * item.weight));
+	  row.push(parseInt(item.gross_used * item.weight));
     row.push('<a href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>');
     oTable.fnAddData(row);
   });
 }
 
 // Expenses is an array of items received from the "data store".
-function addBucketExpenses(expenses) {
-  $.each(expenses, function(i, item) {
+function addBucketExpenses(expenses, data) {
+  // Translate expenses into a map.
+  var expenseMap = {};
+  $.each(expenses, function(i, expense) { expenseMap[expense.code] = expense.weight });
+
+  // Add actual expenses.
+  $.each(data, function(i, item) {
     if (!expensesByCodeThenYear[item.code]) {
       expensesByCodeThenYear[item.code] = {};
+      expensesByCodeThenYear[item.code].years = {};
     }
-    expensesByCodeThenYear[item.code][item.year] = item;
+    expensesByCodeThenYear[item.code].weight = expenseMap[item.code]
+    expensesByCodeThenYear[item.code].years[item.year] = item;
   });
 }
 
-function getExpenseInfoCallback(codes, data) {
+function getExpenseInfoCallback(expenses, data) {
   $('#spinner').hide();
   if (!data.length) {
-    prettyAlert('לא נמצאו נתונים עבור סעיפ/ים ' + codes);
+    prettyAlert('לא נמצאו נתונים עבור סעיפ/ים ' + $.map(expenses, function(expense) { return expense.code; }));
   }
-  addBucketExpenses(data);
+  addBucketExpenses(expenses, data);
   refreshUI();
 }
 
 
 // Call this function to resolve the given codes and years and get their data from yeda.us
 // Example:
-// getExpenses(["00","0020"], function (data) {}); 
-function getExpenses(codes, callback) {
-  if (codes.length == 0) {
+// getExpenses([{code: "00", weight: 0.5},{code:"0020", weight: 0.7}], function (data) {}); 
+function getExpenses(expenses, callback) {
+  if (expenses.length == 0) {
     // No expenses were selected.
     return;
   }
   var query = {};
-  query.code = {"$in":codes};
+  var codes = $.map(expenses, function(expense) { return expense.code; });
+  query.code = {"$in": codes};
   aRequest(true);
   $.getJSON("http://api.yeda.us/data/gov/mof/budget/?callback=?", 
     {
@@ -227,7 +272,7 @@ function getExpenses(codes, callback) {
       "query" : JSON.stringify(query)
     }, function(data) {
       aRequest(false);
-      callback(codes, data);
+      callback(expenses, data);
     });
 }
 
@@ -235,6 +280,7 @@ function nanZero(num) {
   return isNaN(num) ? 0 : num;
 }
 
+// Turns input such as [2000, 2001, 2003, 2005, 2006, 2007] into "2000-2001, 2005-2007".
 function numberArrayToText(array) {
   if (array.length == 0) {
     return "";
@@ -273,11 +319,14 @@ function aRequest(isStart) {
 }
 
 function deleteExpense(code) {
-  delete expensesByCodeThenYear[code];
-  refreshUI();
+  prettyConfirm('האם אתם בטוחים שברצונכם למחוק סעיף זה?', function() {
+    delete expensesByCodeThenYear[code];
+    refreshUI();
+  });
 }
 
-function initDialogBox(){
+function initDialogBoxes(){
+  // Alert / message box.
   $("<div id='msgBox'></div>").dialog({
 		autoOpen: false,
 		title: '',
@@ -289,10 +338,39 @@ function initDialogBox(){
 		    }
 		}
   });
+
+  // Confirm box.
+  $("<div id='confirmBox'></div>").dialog({
+		autoOpen: false,
+		title: '',
+		bgiframe: true,
+		modal: true,
+		buttons: {  // Filled dynamically
+		}
+  });
 }
+
 
 function prettyAlert(msg) {
 	$("#msgBox").empty();
 	$("#msgBox").append(msg);
 	$("#msgBox").dialog('open');
+}
+
+function prettyConfirm(msg, callbackYes, callbackNo) {
+  $('#confirmBox').empty();
+  $('#confirmBox').append(msg);
+  $('#confirmBox').dialog("option", "buttons", {
+      'כן': function() {
+        $(this).dialog('close');
+        callbackYes();
+      },
+	    'לא': function() {
+      $(this).dialog('close');
+      if (callbackNo) {
+        callbackNo(); 
+      }
+    }
+  });
+  $('#confirmBox').dialog('open');
 }

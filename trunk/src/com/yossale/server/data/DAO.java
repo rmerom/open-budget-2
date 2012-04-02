@@ -6,7 +6,6 @@ import com.googlecode.objectify.util.DAOBase;
 public class DAO extends DAOBase {
 	static {
 		ObjectifyService.register(Bucket.class);
-		ObjectifyService.register(Expense.class);
 		ObjectifyService.register(User.class);
 	}
 }

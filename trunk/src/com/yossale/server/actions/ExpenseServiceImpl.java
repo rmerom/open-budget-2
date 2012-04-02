@@ -5,24 +5,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.appengine.api.datastore.QueryResultIterable;
-import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
 import com.yossale.client.actions.ExpenseService;
 import com.yossale.client.data.ExpenseRecord;
-import com.yossale.server.data.DAO;
-import com.yossale.server.data.Expense;
 
 @SuppressWarnings("serial")
 public class ExpenseServiceImpl extends RemoteServiceServlet implements
@@ -31,20 +22,23 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
   private static Logger logger = Logger.getLogger(ExpenseServiceImpl.class.getName());
 
   public void addExpenseRecord(ExpenseRecord record) {
-    Expense expense = new Expense(record);
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+
+/*    Expense expense = new Expense(record);
     Objectify ofy = new DAO().ofy();
     try {
       ofy.put(expense);
     } catch (Exception ex) {
       System.out.println("Failed to commit to DB");
-    }
+    }*/
   }
 
   public void removeAll() {
-  	Objectify ofy = new DAO().ofy();
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*  	Objectify ofy = new DAO().ofy();
   	QueryResultIterable<Expense> results = ofy.query(Expense.class).fetch();
   	ofy.delete(results);
-  }
+*/  }
 
   private ExpenseRecord generateExpenseRecord(JSONObject j) throws JSONException {    
     String expenseCode = j.getString("code");
@@ -135,7 +129,8 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
   }
  
   public ExpenseRecord[] getExpensesByYear(int year) {
-    Objectify ofy = new DAO().ofy();
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*    Objectify ofy = new DAO().ofy();
     logger.info("Loading expenses by year: " + year);  	
     Query<Expense> query = ofy.query(Expense.class).filter("year", year).order("expenseCode");
     
@@ -143,11 +138,13 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
 
     System.out.println("Found " + results.length + " records");
 
-    return results;
+    return results;*/
   }
 
   @Override
   public ExpenseRecord[] getExpensesByYearAndParent(int year, String parentCode) {
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*
     logger.info("getExpensesByYearAndParent : " + year + "," + parentCode);
     
     String parentCodeFixed = (parentCode == null) ? "" : parentCode;
@@ -158,11 +155,13 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
 
     logger.info("Found " + results.length  + " results for getExpensesByYearAndParent : " + year + "," + parentCode);
 
-    return results;
+    return results;*/
   }
 
   @Override
-  public String[] getAvailableBudgetYears() {    
+  public String[] getAvailableBudgetYears() { 
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*
     
     System.out.println("Querying getAvailableBudgetYears");
     logger.info("Querying getAvailableBudgetYears");
@@ -178,12 +177,13 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     	years.add(Integer.valueOf(expense.getYear()).toString());
     }
     System.out.println("Found " + years.size() + " years");
-    return years.toArray(new String[0]);
+    return years.toArray(new String[0]);*/
   }
 
   @Override
   public ExpenseRecord[] getExpenseByYearAndCode(int year, String expenseCode) {
-    
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*
     logger.info("getExpensesByYearAndCode: " + year + "," + expenseCode);
     
     Objectify ofy = new DAO().ofy();
@@ -193,10 +193,11 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
 
     logger.info("Found " + results.length  + " results found for getExpensesByYearAndCode: " + year + "," + expenseCode);
 
-    return results;
+    return results;*/
   }
-
+/*
   private ExpenseRecord[] executeQuery(Query<Expense> query) {
+		throw new UnsupportedOperationException("GWT client no longer supported.");
     QueryResultIterator<Expense> results = query.fetch().iterator();
 
     Vector<ExpenseRecord> expenses = new Vector<ExpenseRecord>();
@@ -208,18 +209,20 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
     System.out.println("Found " + expenses.size() + " records");
 
     return expenses.toArray(new ExpenseRecord[0]);
-  	
-  }
+  
+  }*/
   
   @Override
   public ExpenseRecord[] getExpensesByNameAndCode(int year, String nameLike) {
-    return new ExpenseRecord[]{};
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*return new ExpenseRecord[]{};*/
   }
 
 	@Override
 	public ExpenseRecord[] getExpensesByCodeAndYears(String[] expenseCodes,
 			Integer[] years) {
-    
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*    
     logger.info("getExpensesByYearAndCode: " + expenseCodes);
 
     List<Integer> yearList = new ArrayList<Integer>();
@@ -237,6 +240,6 @@ public class ExpenseServiceImpl extends RemoteServiceServlet implements
 
     logger.info("Found " + results.length  + " results found for getExpensesByCodeAndYears: " + years + ", " + expenseCodes);
 
-    return results;
+    return results;*/
 	}
 }

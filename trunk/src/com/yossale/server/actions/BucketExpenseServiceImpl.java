@@ -18,16 +18,20 @@ public class BucketExpenseServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public ExpenseRecord[] getExpenses(long bucketId) {
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*
 		Objectify ofy = new DAO().ofy();
 		// TODO(ronme): add error handling, check against curent user;
 		Bucket bucket = ofy.get(Bucket.class, bucketId);
 		
 		BucketRecord bucketRecord = bucket.toBucketRecord();
-		return bucketRecord.getExpenseCodes().toArray(new ExpenseRecord[0]); 
+		return bucketRecord.getExpenseCodes().toArray(new ExpenseRecord[0]);*/ 
 	}
 	
 	@Override
 	public void updateBucketExpenses(long bucketId, ExpenseRecord[] expenseRecords) {
+		throw new UnsupportedOperationException("GWT client no longer supported.");
+/*
 		Objectify ofy = new DAO().ofy();
 		// TODO(ronme): add error handling, check against curent user;
 		Bucket bucket = ofy.get(Bucket.class, bucketId);
@@ -37,7 +41,7 @@ public class BucketExpenseServiceImpl extends RemoteServiceServlet implements
 			expenseStrings.add(expenseRecord.getId());
 		}
 		bucket.setExpenses(expenseStrings);
-		ofy.put(bucket);
+		ofy.put(bucket);*/
 	}
 
 }
