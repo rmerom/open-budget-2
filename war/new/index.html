@@ -3,8 +3,8 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>התקציב הפתוח לאנשי מקצוע</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.js'></script>
     <script src='js/jquery.multiselect.js'></script>  <!-- http://www.erichynds.com/jquery/jquery-ui-multiselect-widget/ -->
     <script src="/table/media/js/jquery.dataTables.js"></script> 
     <link rel="stylesheet" href="css/jquery.multiselect.css" type="text/css">
@@ -18,7 +18,8 @@
     </style>
   </head>
   <body dir='rtl' class='hebrew'>
-  <h1 class='pagetitle'>התקציב הפתוח - כלי ניתוח לאנשי מקצוע</h1> 
+  <h1 class='pagetitle'>התקציב הפתוח - כלי ניתוח לאנשי מקצוע <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
+</h1> 
  
   <div id='user' style='display: none'>
   שלום 
@@ -43,11 +44,28 @@
     </span>
     <p/>
 
-   <b>הוסיפו</b>
- סעיף מספר: 
-    <input type="text" id="expense_code"></input>
-    <input type='button' id='add_expense' value='הוסף'></input>
-    <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
+    <b>הוסיפו</b> סעיף:
+    <table role='presentation'>
+      <tr>
+        <td style='width: 155px'>מספר סעיף:</td>
+        <td><input type="text" id="expense_code" style='width: 90px'></input></td>
+      </tr>
+      <tr>
+        <td>
+          <input type='checkbox' id='partialWeightCb'></input><label for='partialWeight'>חלק יחסי מהסעיף</label>
+        </td>
+      </tr>
+      <tr style='display: none' id='partialRow'>
+        <td>חלק יחסי (באחוזים):</td>
+        <td><input type='number' min="1" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input></td>
+      </tr>
+      <tr>
+        <td><input type='button' id='add_expense' value='הוסיפו'></input></td>
+      <tr>
+ 
+    </table>
+    
+    
     <hr/><hr/>
     <h3>סעיפים במחרוזת זו</h3>
     <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
@@ -56,7 +74,7 @@
   <br/>	<hr/><hr/><br/><br/>
   <b>שימרו</b> מחרוזת זו בשם:
   <select id='bucketSaveSelect'></select> 
-  <span id='newBucket' style='display: none'> <input type='text' id='newBucketName' placeholder='שם מחרוזת חדשה'></input></span>
+  <input type='text' id='newBucketName' placeholder='שם המחרוזת החדשה'></input>
   <input type='button' id='saveBucketButton' value='שימרו' ></input> 
 
   <script src='js/obudget.js'></script>

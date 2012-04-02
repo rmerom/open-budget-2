@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.yossale.server.data.Bucket;
+import com.yossale.server.data.Bucket.Expense;
 import com.yossale.server.data.User;
 
 /**
@@ -28,7 +29,13 @@ public class ConvertUtil {
 			}
 			JSONArray years = new JSONArray(bucket.getYears());
 			jsonBucket.put("years", years);
-			JSONArray expenses = new JSONArray(bucket.getExpenses());
+			JSONArray expenses = new JSONArray();
+			for (Expense expense : bucket.getExpenses()) {
+				JSONObject jsonExpense = new JSONObject();
+				jsonExpense.put("code", expense.getExpenseCode());
+				jsonExpense.put("weight", expense.getRatio());
+				expenses.put(jsonExpense);
+			}
 			jsonBucket.put("expenses", expenses);
 		} catch (JSONException e) {
 			logger.severe("Cannot convert bucket to json: " + bucket.getKey() + ", name: " + bucket.getName());
@@ -85,9 +92,13 @@ public class ConvertUtil {
 		}
 		JSONArray jsonExpenses = jsonObj.getJSONArray("expenses");
 		for (int i = 0; i < jsonExpenses.length(); ++i) {
-			bucket.getExpenses().add(jsonExpenses.getString(i));
+			JSONObject jsonExpense = jsonExpenses.getJSONObject(i);
+			double weight = jsonExpense.optDouble("weight", 1.0);
+			if (weight > 1.0 || weight < 0.0) {
+				weight = 1.0;
+			}
+			bucket.getExpenses().add(new Expense(jsonExpense.getString("code"), weight));
 		}
-		
 		return bucket;
 	}
 }
