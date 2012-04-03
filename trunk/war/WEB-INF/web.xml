@@ -7,35 +7,6 @@
   
   <!-- Servlets -->
   
-  <servlet>
-    <servlet-name>loginService</servlet-name>
-    <servlet-class>com.yossale.server.actions.LoginServiceImpl</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>loginService</servlet-name>
-    <url-pattern>/obudget2/login</url-pattern>
-  </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>expenseService</servlet-name>
-    <servlet-class>com.yossale.server.actions.ExpenseServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>expenseService</servlet-name>
-    <url-pattern>/obudget2/expense</url-pattern>
-  </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>bucketService</servlet-name>
-    <servlet-class>com.yossale.server.actions.BucketServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>bucketService</servlet-name>
-    <url-pattern>/obudget2/bucket</url-pattern>
-  </servlet-mapping>
 
   <!--  NEW API -->
   <servlet>
