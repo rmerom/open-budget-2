@@ -245,7 +245,6 @@ function addBucketExpenses(expenses, data) {
 }
 
 function getExpenseInfoCallback(expenses, data) {
-  $('#spinner').hide();
   if (!data.length) {
     prettyAlert('לא נמצאו נתונים עבור סעיפ/ים ' + $.map(expenses, function(expense) { return expense.code; }));
   }
