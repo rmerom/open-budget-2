@@ -29,12 +29,5 @@
 	 For production mode, replace the word DEBUG with OFF-->
   <inherits name="com.allen_sauer.gwt.log.gwt-log-OFF" />
 
-	<!-- Specify the app entry point class. -->
-	<entry-point class='com.yossale.client.OBudget2' />
-
-	<!-- Specify the paths for translatable code -->
-	<source path='client' />	
-	<source path='shared' />
-
 </module>
 
