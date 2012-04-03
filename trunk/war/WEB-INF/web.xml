@@ -39,10 +39,10 @@
     <url-pattern>/api/deleteuserbucket</url-pattern>
   </servlet-mapping>
   
-  <!-- Default page to serve -->  
+  <!-- Default page to serve   
   <welcome-file-list>
-    <welcome-file>/new/index.html</welcome-file>
-  </welcome-file-list>
+    <welcome-file>/new</welcome-file>
+  </welcome-file-list> -->
   
   <security-constraint>
       <web-resource-collection>
