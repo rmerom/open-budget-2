@@ -7,7 +7,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Id;
 
 import com.googlecode.objectify.Key;
-import com.yossale.client.data.BucketRecord;
 
 public class Bucket {
 
@@ -64,29 +63,6 @@ public class Bucket {
 		years = new ArrayList<Integer>();
 	}
 	
-	public Bucket(BucketRecord bucketRecord, User owner) {
-		assignBucketRecord(bucketRecord, owner);
-	}
-	
-	public Bucket assignBucketRecord(BucketRecord bucketRecord, User owner) {
-		throw new UnsupportedOperationException("GWT client no longer supported.");
-		/*
-		key = bucketRecord.getId();
-		name = bucketRecord.getName();
-		isPublic = bucketRecord.isPublic();
-		years = bucketRecord.getYears();
-		expenseCodes = new ArrayList<Key<WeightedBucketExpense>>();
-		for (String expenseRecord : bucketRecord.getExpenseCodes()) {
-			WeightedBucketExpense weightedExpense = new WeightedBucketExpense(
-					new Key<Bucket>(Bucket.class, key), expenseRecord, 1.0);
-			new DAO().ofy().put(weightedExpense);
-			expenseCodes.add(Key.create(WeightedBucketExpense.class, weightedExpense.getKey()));
-		}
-		this.owner = Key.create(User.class, owner.getEmail());
-		
-		return this;*/
-	}
-
 	public Bucket setOwner(String ownerEmail) {
 		this.owner = Key.create(User.class, ownerEmail);
 		return this;
@@ -118,11 +94,6 @@ public class Bucket {
 		return this;
 	}
 	
-	public BucketRecord toBucketRecord() {
-		throw new UnsupportedOperationException("GWT client no longer supported.");
-//		return new BucketRecord(getKey(), getName(), expenseCodes, years);
-	}
-
 	public Boolean getIsPublic() {
 		return isPublic == null ? false : isPublic;
 	}
