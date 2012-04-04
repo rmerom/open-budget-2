@@ -1,4 +1,4 @@
-package com.yossale.server.api;
+package com.yossale.server.publicapi;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -13,11 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.googlecode.objectify.Key;
-import com.yossale.server.Common;
 import com.yossale.server.data.Bucket;
 import com.yossale.server.data.DAO;
-import com.yossale.server.data.User;
 import com.yossale.server.util.ConvertUtil;
 
 /**
@@ -27,42 +24,35 @@ import com.yossale.server.util.ConvertUtil;
  *             callback - for the case type equals "jsonp".
  * Returns: 
  *   Success:
- *     { "email":"rmerom@gmail.com",
+ *     { 
  *       "buckets":[
  *       {
  *         "id":24001,
  *         "name":"somename",
  *         "years":[2010,2011,2012],
- *         "expenses":[{"weight":1,"code":"00"}, {"weight":0.5,"code":"0001"}]
+ *         "expenses":[{"weight":1,"code":"00"},{"weight":0.5,"code":"0001"}]
  *       }]}
+ *       
  *   
  * @author ronme
  */
-public class GetUserBucketsServlet extends HttpServlet {
+public class GetAllPublicBuckets extends HttpServlet {
 
-	private Logger logger = Logger.getLogger(GetUserBucketsServlet.class.getName());
+	private Logger logger = Logger.getLogger(GetAllPublicBuckets.class.getName());
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		User user = Common.getLoggedInUserRecord();
-	  if (user == null) {
-	  	// Should never happen, this directory is protected in web.xml .
-	  	resp.sendError(400, "No user logged in");
-	  	return;
-	  }
-
 	  try {
 	  	JSONArray buckets = new JSONArray();
 	  	QueryResultIterator<Bucket> bucketIterator = 
-	  			new DAO().ofy().query(Bucket.class).filter("owner", Key.create(User.class, user.getEmail())).fetch().iterator();
+	  			new DAO().ofy().query(Bucket.class).filter("isPublic", true).fetch().iterator();
 	  	while (bucketIterator.hasNext()) {
 	  		Bucket bucket = bucketIterator.next();
 	  		buckets.put(ConvertUtil.bucketToJson(bucket));;
 	  	}
 	  	resp.setContentType("text/html; charset=UTF-8");
 	  	JSONObject result = new JSONObject();
-	  	result.put("email", user.getEmail());
 	  	result.put("buckets", buckets);
 	  	String outputText = ConvertUtil.jsonObjectAsformat(result, req);
 	  	resp.getWriter().print(outputText);

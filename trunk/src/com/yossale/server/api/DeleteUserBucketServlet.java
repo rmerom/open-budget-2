@@ -22,9 +22,8 @@ import com.yossale.server.data.User;
  * Parameters: 
  *   request = { 
  *     'request' :
- *       { "bucketId": "59843543" }   // Note bucketId is a string.
+ *       { "bucketId": "59843543" }
  *   }
- * "id" is optional - if exists and such a bucket exists, it is overridden. Otherwise, a new one is created.
  * @author ronme
  */
 public class DeleteUserBucketServlet extends HttpServlet {
