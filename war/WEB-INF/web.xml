@@ -8,7 +8,7 @@
   <!-- Servlets -->
   
 
-  <!--  NEW API -->
+  <!--  Authenticated API -->
   <servlet>
     <servlet-name>getUserBucket</servlet-name>
     <servlet-class>com.yossale.server.api.GetUserBucketsServlet</servlet-class>
@@ -38,19 +38,45 @@
     <servlet-name>deleteUserBucket</servlet-name>
     <url-pattern>/api/deleteuserbucket</url-pattern>
   </servlet-mapping>
-  
-  <!-- Default page to serve   
-  <welcome-file-list>
-    <welcome-file>/new</welcome-file>
-  </welcome-file-list> -->
+
+  <!--  Public API -->
+  <servlet>
+    <servlet-name>getAllPublicBuckets</servlet-name>
+    <servlet-class>com.yossale.server.publicapi.GetAllPublicBuckets</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>getAllPublicBuckets</servlet-name>
+    <url-pattern>/public/getallpublicbuckets</url-pattern>
+  </servlet-mapping>
+
+  <!--  Admin API -->
+  <servlet>
+    <servlet-name>setIsPublicBucket</servlet-name>
+    <servlet-class>com.yossale.server.admin.SetIsPublicBucket</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>setIsPublicBucket</servlet-name>
+    <url-pattern>/admin/setispublicbucket</url-pattern>
+  </servlet-mapping>
   
   <security-constraint>
-      <web-resource-collection>
-          <url-pattern>/new/*</url-pattern>
-      </web-resource-collection>
-      <auth-constraint>
-          <role-name>*</role-name>
-      </auth-constraint>
+    <web-resource-collection>
+        <url-pattern>/new/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+        <role-name>*</role-name>
+    </auth-constraint>
   </security-constraint>
-
+      
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+    
 </web-app>

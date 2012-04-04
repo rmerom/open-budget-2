@@ -1,4 +1,4 @@
-package com.yossale.server.api;
+package com.yossale.server.admin;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Objectify;
 import com.yossale.server.Common;
 import com.yossale.server.data.Bucket;
 import com.yossale.server.data.DAO;
@@ -21,26 +22,20 @@ import com.yossale.server.data.User;
 import com.yossale.server.util.ConvertUtil;
 
 /**
- * Returns the logged in user's name and her buckets buckets.
+ * Sets a bucket to public or not public.
+ * Temporary servlet, until we have a UI for making buckets public.
  * 
- * Parameters: type - "json" or "jsonp" (json if omitted).
+ * Parameters: 
+ *             type - "json" or "jsonp" (json if omitted).
  *             callback - for the case type equals "jsonp".
- * Returns: 
- *   Success:
- *     { "email":"rmerom@gmail.com",
- *       "buckets":[
- *       {
- *         "id":24001,
- *         "name":"somename",
- *         "years":[2010,2011,2012],
- *         "expenses":[{"weight":1,"code":"00"}, {"weight":0.5,"code":"0001"}]
- *       }]}
- *   
+ *             bucketid - long
+ *             ispublic - "true" or "false"
+ *             
  * @author ronme
  */
-public class GetUserBucketsServlet extends HttpServlet {
+public class SetIsPublicBucket extends HttpServlet {
 
-	private Logger logger = Logger.getLogger(GetUserBucketsServlet.class.getName());
+	private Logger logger = Logger.getLogger(SetIsPublicBucket.class.getName());
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -51,21 +46,30 @@ public class GetUserBucketsServlet extends HttpServlet {
 	  	resp.sendError(400, "No user logged in");
 	  	return;
 	  }
+	  
+		if (req.getParameter("bucketid") == null || req.getParameter("ispublic") == null) {
+			resp.sendError(400, "bad request");
+			return;
+		}
+		long bucketId = Long.valueOf(req.getParameter("bucketid"));
+		boolean isPublic = Boolean.valueOf(req.getParameter("ispublic"));
 
 	  try {
-	  	JSONArray buckets = new JSONArray();
-	  	QueryResultIterator<Bucket> bucketIterator = 
-	  			new DAO().ofy().query(Bucket.class).filter("owner", Key.create(User.class, user.getEmail())).fetch().iterator();
-	  	while (bucketIterator.hasNext()) {
-	  		Bucket bucket = bucketIterator.next();
-	  		buckets.put(ConvertUtil.bucketToJson(bucket));;
+	  	Objectify ofy = new DAO().ofy();
+	  	Bucket bucket = 
+	  			ofy.get(new Key<Bucket>(Bucket.class, bucketId));
+	  	if (bucket == null) {
+		  	resp.setContentType("text/html; charset=UTF-8");
+	  		resp.getWriter().print("Bucket not found");
+	  		return;
 	  	}
+  		bucket.setIsPublic(isPublic);
+  		ofy.put(bucket);
 	  	resp.setContentType("text/html; charset=UTF-8");
 	  	JSONObject result = new JSONObject();
-	  	result.put("email", user.getEmail());
-	  	result.put("buckets", buckets);
+	  	result.put("bucket", ConvertUtil.bucketToJson(bucket));
 	  	String outputText = ConvertUtil.jsonObjectAsformat(result, req);
-	  	resp.getWriter().print(outputText);
+	  	resp.getWriter().print("changed this bucket: <br/>" + outputText);
 	  } catch (JSONException e) {
 	  	resp.sendError(500, "JSONException: " + e.getMessage());
 	  	return;
