@@ -136,6 +136,7 @@ function readBuckets() {
     $('#user').show();
     var selects = $('#bucketLoadSelect,#bucketSaveSelect,#bucketDeleteSelect');
     selects.empty();
+    $('#bucketManagement').toggle(data.buckets.length > 0);
     $.each(data.buckets, function(i, bucket) {
      userBuckets[bucket.id] = bucket;
 	   selects.append(
@@ -171,6 +172,7 @@ function prepareUserBuckets() {
   $('#deleteBucketButton').click(function() { 
     deleteBucket();
   });
+  $('#output_table_filter').hide();
 }
 
 function refreshUI() {
