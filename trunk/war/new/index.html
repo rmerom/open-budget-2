@@ -15,9 +15,32 @@
       .hebrew { font-family: arial; text-align: right;}
       .pagetitle { text-align: center }
       .multis { margin-right: 5px; margin-left: 5px }
+      p { padding-top: 10px; }
+      h1, h2, h3, h4, h5 { color: blue; }
+      #add_expense_table td { padding-top: 10px; padding-bottom: 10px; }
+      body { 
+background-image: linear-gradient(bottom, rgb(245,245,201) 22%, rgb(184,210,224) 61%, rgb(184,209,209) 81%);
+background-image: -o-linear-gradient(bottom, rgb(245,245,201) 22%, rgb(184,210,224) 61%, rgb(184,209,209) 81%);
+background-image: -moz-linear-gradient(bottom, rgb(245,245,201) 22%, rgb(184,210,224) 61%, rgb(184,209,209) 81%);
+background-image: -webkit-linear-gradient(bottom, rgb(245,245,201) 22%, rgb(184,210,224) 61%, rgb(184,209,209) 81%);
+background-image: -ms-linear-gradient(bottom, rgb(245,245,201) 22%, rgb(184,210,224) 61%, rgb(184,209,209) 81%);
+
+background-image: -webkit-gradient(
+	linear,
+	left bottom,
+	left top,
+	color-stop(0.22, rgb(245,245,201)),
+	color-stop(0.61, rgb(184,210,224)),
+	color-stop(0.81, rgb(184,209,209))
+);
+Disqus
+
     </style>
   </head>
   <body dir='rtl' class='hebrew'>
+  <div style='float:left'>
+    <a href='http://help.takziv.com' target='_blank'>איך עובדים עם זה?</a>
+  </div>
   <h1 class='pagetitle'>חוקר התקציב <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
 </h1> 
  
@@ -27,44 +50,50 @@
   </div>
   <br/>
   <div id='bucketManagement'>
-    <h3>מחרוזות</h3>
+    <h2>המחרוזות שלי</h2>
 
-    <b>טענו</b> מחרוזת
-    <select id='bucketLoadSelect'></select> <input type='button' id='loadBucketButton' value='טענו' ></input>
+    <select id='bucketSelect'></select> 
     <br/><br/>
-    <b>מיחקו</b> מחרוזת
-    <select id='bucketDeleteSelect'></select> <input type='button' id='deleteBucketButton' value='מיחקו' ></input>
+    <input type='button' id='loadBucketButton' value='טענו' > 
+    <input type='button' id='deleteBucketButton' value='מיחקו' ></input>
     <br/><br/>
 
     <hr/>
   </div>
-  <h3>עריכת מחרוזת נוכחית</h3>
-  <h4>מאפייני מחרוזת</h3>
+  <h2>עריכת מחרוזת נוכחית</h2>
+  <h3>מאפייני מחרוזת</h2>
   <div id="bucket">
-    <span style='vertical-align: center'>
+    <span style='vertical-align: center'><p>
 		  שנים רלוונטיות
 		  <select id='yearsSelect' class="multiselect" multiple=multiple'></select>
       <span id='yearsText' style='font-size: small'></span>
-    </span>
-    <p/>
+    </p></span>
+    <p>
+      <input type='checkbox' id='isPublicCheckbox'></input><label for='isPublicCheckbox'>מחרוזת זו הינה ציבורית</label>
+    </p>
+    <p>
+      <b>שימרו</b> מחרוזת זו בשם:
+      <select id='bucketSaveSelect'></select> 
+      <input type='text' id='newBucketName' placeholder='שם המחרוזת החדשה'></input>
+      <input type='button' id='saveBucketButton' value='שימרו' ></input> 
+    </p>
 
-    <hr/><hr/>
-    <h4>סעיפים במחרוזת</h4>
-    <b>הוסיפו</b> סעיף
-    <table role='presentation'>
+
+    <h3>הוספת סעיפים למחרוזת</h3>
+    <table id='add_expense_table' role='presentation'>
       <tr>
         <td style='width: 155px'>מספר סעיף:</td>
         <td><input type="text" id="expense_code" style='width: 90px'></input></td>
         <td style='padding-right: 30px; font-size: small'>עזרים: <a href='http://budget.msh.gov.il' target='_blank'>התקציב הפתוח</a>, <a href='http://religinfoserv.gov.il/magic94scripts/mgrqispi94.dll?APPNAME=budget&PRGNAME=takzivreq' target='_blank'>מערכת משרד האוצר</a></td>
       </tr>
-      <tr>
+      <tr class='add_expense_tr'>
         <td>
           <input type='checkbox' id='partialWeightCb'></input><label for='partialWeight'>חלק יחסי מהסעיף</label>
         </td>
-      </tr>
+      </tr class='add_expense_tr'>
       <tr style='display: none' id='partialRow'>
         <td>חלק יחסי (באחוזים):</td>
-        <td><input type='number' min="1" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input></td>
+        <td><input type='number' min="5" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input></td>
       </tr>
       <tr>
         <td><input type='button' id='add_expense' value='הוסיפו'></input></td>
@@ -76,11 +105,6 @@
     <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
 
   </div>
-  <br/>	<hr/><hr/><br/><br/>
-  <b>שימרו</b> מחרוזת זו בשם:
-  <select id='bucketSaveSelect'></select> 
-  <input type='text' id='newBucketName' placeholder='שם המחרוזת החדשה'></input>
-  <input type='button' id='saveBucketButton' value='שימרו' ></input> 
 
   <script src='js/obudget.js'></script>
   </body>
