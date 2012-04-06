@@ -86,6 +86,7 @@ public class ConvertUtil {
 			bucket.setKey(jsonObj.getLong("id"));
 		}
 		bucket.setName(jsonObj.getString("title"));
+		bucket.setIsPublic(jsonObj.optBoolean("isPublic"));
 		JSONArray jsonYears = jsonObj.getJSONArray("years");
 		for (int i = 0; i < jsonYears.length(); ++i) {
 			bucket.getYears().add(jsonYears.getInt(i));

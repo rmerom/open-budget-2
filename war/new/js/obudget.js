@@ -40,6 +40,7 @@ $(document).ready(function() {
 	// Register an event on the add button retrieve the given code.
 	$('#add_expense').click(function() {
 	  var code = ""+$('#expense_code').val();
+    $('#expense_code').val('');  // Clear textbox of old value.
     var expense = {
       code: code,
       weight: parseInt($('#expense_weight').val()) / 100.0
@@ -97,6 +98,7 @@ function saveBucket() {
   var val = $('#bucketSaveSelect').val();
   bucket.title = val == '' ? $('#newBucketName').val() : $('#bucketSaveSelect option[value=\'' + val +'\']').text();
   bucket.years = $('#yearsSelect').val();
+  bucket.isPublic = $('#isPublicCheckbox').is(':checked');
   bucket.expenses = [];
   for (var code in expensesByCodeThenYear) {
     var expense = { code: code, weight: expensesByCodeThenYear[code].weight };
@@ -113,19 +115,22 @@ function saveBucket() {
 }
 
 function deleteBucket() {
-  if ($('#bucketDeleteSelect').val() == '') {
+  var bucketId = $('#bucketSelect').val();
+  if (bucketId == '') {
     prettyAlert('אנא ביחרו איזו מחרוזת למחוק');
     return;
   }
-  var bucketId = $('#bucketDeleteSelect').val();
-  var request = { bucketId: bucketId };
-  $.post('/api/deleteuserbucket', { 'request' : JSON.stringify(request) }).success(
-    function() { 
-      readBuckets(); 
-      prettyAlert('המחיקה הצליחה'); 
-    }).error(
-    function() { prettyAlert('אירעה שגיאה'); } );
-
+  var bucketName = userBuckets[bucketId].name;
+  prettyConfirm('האם אתם בטוחים שברצונכם למחוק את המחרוזת<br/>' + bucketName,
+    function() {
+      var request = { bucketId: bucketId };
+      $.post('/api/deleteuserbucket', { 'request' : JSON.stringify(request) }).success(
+        function() { 
+          readBuckets(); 
+          prettyAlert('המחיקה הצליחה'); 
+        }).error(
+        function() { prettyAlert('אירעה שגיאה'); } );
+    });
 }
 
 function readBuckets() {
@@ -134,9 +139,9 @@ function readBuckets() {
     aRequest(false);
     $('#useremail').text(data.email);
     $('#user').show();
-    var selects = $('#bucketLoadSelect,#bucketSaveSelect,#bucketDeleteSelect');
+    var selects = $('#bucketSelect,#bucketSaveSelect');
     selects.empty();
-    $('#bucketManagement').toggle(data.buckets.length > 0);
+    $('#bucketManagement,#bucketSaveSelect').toggle(data.buckets.length > 0);
     $.each(data.buckets, function(i, bucket) {
      userBuckets[bucket.id] = bucket;
 	   selects.append(
@@ -149,13 +154,15 @@ function readBuckets() {
   });
 }
 
+// Reads all of the user's buckets, and sets up the load button behavior.
 function prepareUserBuckets() {
   readBuckets(); 
   $('#loadBucketButton').click(function() {
-    var id = $('#bucketLoadSelect').val();
+    var id = $('#bucketSelect').val();
     var bucket = userBuckets[id];
-    $('#bucketSaveSelect').val(id);
+    $('#bucketSelect').val(id);
     $('#yearsSelect').val(bucket.years);
+    $('#isPublicCheckbox').attr('checked', bucket.isPublic);
     $('#yearsSelect').multiselect('refresh');
     // Clear existing expenses.
     expensesByCodeThenYear = {};
@@ -172,6 +179,7 @@ function prepareUserBuckets() {
   $('#deleteBucketButton').click(function() { 
     deleteBucket();
   });
+  // No need for the "search in this table" feature.
   $('#output_table_filter').hide();
 }
 
