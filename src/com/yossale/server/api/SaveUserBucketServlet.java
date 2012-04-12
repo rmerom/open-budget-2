@@ -61,9 +61,10 @@ public class SaveUserBucketServlet extends HttpServlet {
 		Objectify ofy = new DAO().ofy();
 		if (bucket.getKey() != null) {
 	  	QueryResultIterator<Bucket> bucketIterator = 
-	  			ofy.query(Bucket.class).filter("owner", Key.create(User.class, user.getEmail())).fetch().iterator();
+	  			ofy.query(Bucket.class).filter("owner", Key.create(User.class, user.getEmail()))
+	  			    .filter("key", bucket.getKey()).fetch().iterator();
 	  	if (!bucketIterator.hasNext()) {
-	  		// No such bucket exists with this owner; create a new one by settings the id back to null.
+	  		// No such bucket exists with this owner; create a new one by setting the id back to null.
 	  		bucket.setKey(null);
 	  	}
 		}
