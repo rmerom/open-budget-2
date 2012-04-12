@@ -8,7 +8,7 @@ Expense.prototype.retrieveData = function() {
   DataStorage.retrieveData(codes, dataStorageCallback);
 }
 
-Expense.prototype.getCode() {
+Expense.prototype.getCode = function() {
   return this.code;
 }
 

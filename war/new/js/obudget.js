@@ -9,14 +9,6 @@ var reqCounter = 0;
 
 $(document).ready(function() {
   $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
-  $.getScript('js/Expense.js')
-    .fail(function(jqxhr, settings, exception) {
-      alert('error loading Expense ' + exception + " | " + settings);
-    });    
-  $.getScript("js/DataStorage.js")
-    .fail(function(jqxhr, settings, exception) {
-      alert('error ' + exception + " | " + settings);
-    });    
 
   var tableDef = {};
   tableDef.aaData = [];
