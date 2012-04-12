@@ -4,11 +4,12 @@ var MIN_YEAR = 1992;
 $(document).ready(function() {
   $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
 
-  var tableDef = {};
+  var tableDef = { "bLengthChange": false, "bPaginate": false};
   tableDef.aaData = [];
   tableDef.aoColumns = [
     { sTitle : "סעיף", "sWidth": '40px' },
     { sTitle : "שם", "sWidth": '300px' },
+    { sTitle : "שנה", "sWidth": '40px' },
     { sTitle : "אחוז מסעיף", sType: 'numeric' },
     { sTitle : "הקצאה נטו", sType: "number-commas", fnRender: renderNumberWithCommas },
     { sTitle : "הקצאה מעודכנת נטו", sType: "number-commas", fnRender: renderNumberWithCommas },
@@ -34,7 +35,15 @@ $(document).ready(function() {
 	      "sLast":     "אחרון"
     }
   }
+
    oTable = $('#output_table').dataTable(tableDef);
+   oTable.rowGrouping({
+       bHideGroupingColumn: false,
+       bExpandableGrouping: true,
+       iGroupingColumnIndex: 0,
+       sGroupingColumnSortDirection: "asc",
+      // iGroupingOrderByColumnIndex: 1
+	});
 	// Register an event on the add button retrieve the given code.
 	$('#add_expense').click(function() {
 	  var code = ""+$('#expense_code').val();
@@ -107,7 +116,8 @@ function prepareUserBuckets() {
 function refreshUI() {
   // Refresh the years textbox.
   $('#yearsText').show().text(numberArrayToText($('#yearsSelect').val()));
-
+  oTable.fnClearTable();
+  
   // Refresh the table.
   // Sum over the years.
   var sums = {};
@@ -145,22 +155,48 @@ function refreshUI() {
 	    currentSums.net_used += nanZero(item.net_used);
 	    currentSums.gross_revised += nanZero(item.gross_revised);
 	    currentSums.gross_used += nanZero(item.gross_used);
+	    
+	    var row = [];
+  	  row.push(item.code);
+  	  row.push(item.title);
+  	  row.push(year);
+      row.push(Math.round(expense.weight * 100));
+  	  row.push(parseInt(item.net_allocated * expense.weight));
+  	  row.push(parseInt(item.net_revised * expense.weight));
+  	  row.push(parseInt(item.gross_revised * expense.weight));
+  	  row.push(parseInt(item.net_used * expense.weight));
+  	  row.push(parseInt(item.gross_used * expense.weight));
+      row.push('<a href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>');
+      oTable.fnAddData(row);
+    
     }
   }
-  oTable.fnClearTable();
   // Now add the sums to the table.
   $.each(sums, function(i, item) {
-	  var row = [];
+    var firstTd = $("#group-id-output_table-"+item.code+" td");
+    var groupTr = $("#group-id-output_table-"+item.code);
+    var tdClass = firstTd.attr("class");
+    firstTd.attr("colspan",1);
+    var row = [];
 	  row.push(item.code);
 	  row.push(item.title);
+	  groupTr.append($("<td>").addClass(tdClass).text(item.title).attr("rel",item.code));
+	  groupTr.append($("<td>").addClass(tdClass).text("").attr("rel",item.code));
     row.push(Math.round(item.weight * 100));
-	  row.push(parseInt(item.net_allocated * item.weight));
-	  row.push(parseInt(item.net_revised * item.weight));
-	  row.push(parseInt(item.gross_revised * item.weight));
+    groupTr.append($("<td>").addClass(tdClass).text(Math.round(item.weight * 100)).attr("rel",item.code));
+    row.push(parseInt(item.net_allocated * item.weight));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_allocated * item.weight)).attr("rel",item.code));
+    row.push(parseInt(item.net_revised * item.weight));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_revised * item.weight)).attr("rel",item.code));
+    row.push(parseInt(item.gross_revised * item.weight));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_revised * item.weight)).attr("rel",item.code));
 	  row.push(parseInt(item.net_used * item.weight));
-	  row.push(parseInt(item.gross_used * item.weight));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_used * item.weight)).attr("rel",item.code));
+    row.push(parseInt(item.gross_used * item.weight));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_used * item.weight)).attr("rel",item.code));
     row.push('<a href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>');
-    oTable.fnAddData(row);
+    groupTr.append($("<td>").addClass(tdClass).text("").attr("rel",item.code));
+    //oTable.fnAddData(row);
   });
 }
 
