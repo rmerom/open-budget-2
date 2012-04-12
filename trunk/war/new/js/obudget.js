@@ -1,3 +1,6 @@
+// Constants
+var MIN_YEAR = 1992;
+
 // Of the type:
 // { '0001': { 'weight': '1.0', 'years': { '2009': { title: '...', net_used: '...', ... } }
 var expensesByCodeThenYear = {};
@@ -6,6 +9,15 @@ var reqCounter = 0;
 
 $(document).ready(function() {
   $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
+  $.getScript('js/Expense.js')
+    .fail(function(jqxhr, settings, exception) {
+      alert('error loading Expense ' + exception + " | " + settings);
+    });    
+  $.getScript("js/DataStorage.js")
+    .fail(function(jqxhr, settings, exception) {
+      alert('error ' + exception + " | " + settings);
+    });    
+
   var tableDef = {};
   tableDef.aaData = [];
   tableDef.aoColumns = [
@@ -49,7 +61,7 @@ $(document).ready(function() {
 	});
 	var thisYear = new Date().getFullYear();
   var select = $('#yearsSelect');
-	for (var i = 1996; i <= thisYear; ++i) {
+	for (var i = MIN_YEAR; i <= thisYear; ++i) {
 	   select.append(
 	     $("<option></option>")
 	       .attr("value", i)
@@ -192,6 +204,7 @@ function refreshUI() {
   var sums = {};
   for (code in expensesByCodeThenYear) {
     var expense = expensesByCodeThenYear[code];
+    var differentTitles = false;
     for (year in expense.years) {
       if (-1 == $.inArray(year, $('#yearsSelect').val())) {
         continue; 
@@ -207,7 +220,12 @@ function refreshUI() {
 	        net_used: 0,
 	        gross_revised: 0,
 	        gross_used: 0 };
-	    }
+	    } else {
+        if (sums[code].title != item.title) {
+          prettyAlert('שימו לב: סעיף ' + code + ' מכיל לאורך השנים תיאורים שונים.</br>' +
+              'בשלב זה חוקר התקציב אינו מאפשר הפרדה אוטומטית בין שנים אלה. אנא בידקו בתקציב הפתוח אילו שנים רלוונטיות עבורכם.');
+        }
+      }
 	    item.net_allocated = parseInt(item.net_allocated);
 	    item.net_revisited = parseInt(item.net_revisited);
 	    item.net_used = parseInt(item.net_used);
@@ -273,13 +291,7 @@ function getExpenses(expenses, callback) {
   }
   var query = {};
   var codes = $.map(expenses, function(expense) { return expense.code; });
-  query.code = {"$in": codes};
-  aRequest(true);
-  $.getJSON("http://api.yeda.us/data/gov/mof/budget/?callback=?", 
-    {
-      "o" : "jsonp",
-      "query" : JSON.stringify(query)
-    }, function(data) {
+  DataStorage.retrieveData(codes, function(data) {
       aRequest(false);
       callback(expenses, data);
     });
