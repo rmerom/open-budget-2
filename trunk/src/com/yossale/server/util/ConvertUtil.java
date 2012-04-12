@@ -23,17 +23,22 @@ public class ConvertUtil {
 		JSONObject jsonBucket = new JSONObject();
 		try {
 			jsonBucket.put("id", bucket.getKey());
-			jsonBucket.put("name", bucket.getName());
+			jsonBucket.put("title", bucket.getName());
 			if (bucket.getIsPublic()) {
 				jsonBucket.put("isPublic", bucket.getIsPublic());
 			}
-			JSONArray years = new JSONArray(bucket.getYears());
-			jsonBucket.put("years", years);
 			JSONArray expenses = new JSONArray();
 			for (Expense expense : bucket.getExpenses()) {
 				JSONObject jsonExpense = new JSONObject();
 				jsonExpense.put("code", expense.getExpenseCode());
-				jsonExpense.put("weight", expense.getRatio());
+				JSONArray years = new JSONArray();
+				for (int year : bucket.getYears()) {
+					JSONObject yearAndWeight = new JSONObject();
+					yearAndWeight.put("year", year);
+					yearAndWeight.put("weight", expense.getRatio());
+					years.put(yearAndWeight);
+				}
+				jsonExpense.put("years", years);
 				expenses.put(jsonExpense);
 			}
 			jsonBucket.put("expenses", expenses);
