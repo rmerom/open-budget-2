@@ -1,6 +1,5 @@
 // Represents the Data Storage (מחסן הנתונים)
 function DataStorage() {
-  this.hello = 'hello';
 }
 
 DataStorage.retrieveData = function(expenseCodes, callback) {
