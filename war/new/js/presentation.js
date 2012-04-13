@@ -173,30 +173,29 @@ function refreshUI() {
   }
   // Now add the sums to the table.
   $.each(sums, function(i, item) {
-    var firstTd = $("#group-id-output_table-"+item.code+" td");
     var groupTr = $("#group-id-output_table-"+item.code);
-    var tdClass = firstTd.attr("class");
-    firstTd.attr("colspan",1);
+    var tdClass = "group group-item-expander";
+    
     var row = [];
 	  row.push(item.code);
-	  row.push(item.title);
-	  groupTr.append($("<td>").addClass(tdClass).text(item.title).attr("rel",item.code));
-	  groupTr.append($("<td>").addClass(tdClass).text("").attr("rel",item.code));
+	  $("#group-id-output_table-"+item.code+" td").attr("colspan",1);
+    row.push(item.title);
+	  groupTr.append($("<td>").addClass(tdClass).text(item.title));
+	  groupTr.append($("<td>").addClass(tdClass).text(""));
     row.push(Math.round(item.weight * 100));
-    groupTr.append($("<td>").addClass(tdClass).text(Math.round(item.weight * 100)).attr("rel",item.code));
+    groupTr.append($("<td>").addClass(tdClass).text(Math.round(item.weight * 100)));
     row.push(parseInt(item.net_allocated * item.weight));
-	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_allocated * item.weight)).attr("rel",item.code));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_allocated * item.weight)));
     row.push(parseInt(item.net_revised * item.weight));
-	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_revised * item.weight)).attr("rel",item.code));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_revised * item.weight)));
     row.push(parseInt(item.gross_revised * item.weight));
-	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_revised * item.weight)).attr("rel",item.code));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_revised * item.weight)));
 	  row.push(parseInt(item.net_used * item.weight));
-	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_used * item.weight)).attr("rel",item.code));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.net_used * item.weight)));
     row.push(parseInt(item.gross_used * item.weight));
-	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_used * item.weight)).attr("rel",item.code));
+	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_used * item.weight)));
     row.push('<a href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>');
-    groupTr.append($("<td>").addClass(tdClass).text("").attr("rel",item.code));
-    $("#group-id-output_table-"+item.code+" td").click(oTable.fnOnGroupedClicked);
+    groupTr.append($("<td>").addClass(tdClass).text(""));
     //oTable.fnAddData(row);
   });
 }

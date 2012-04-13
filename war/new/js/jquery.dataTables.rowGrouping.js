@@ -144,8 +144,8 @@
                         var oTrExpandedGroup = $(".expanded-group");
                         oTrExpandedGroup.removeClass("expanded-group");
                         oTrExpandedGroup.addClass("collapsed-group");
-                        $(this).addClass("expanded-group");
-                        $(this).removeClass("collapsed-group");
+                        $(this).children().first().addClass("expanded-group");
+                        $(this).children().first().removeClass("collapsed-group");
                         if (properties.iExpandGroupOffset != -1) {
                             var position = $("#group-id-" + oTable.attr("id") + "-" + sGroup).offset().top - properties.iExpandGroupOffset;
                             window.scroll(0, position);
@@ -158,13 +158,13 @@
                     if (bIsExpanded) {
                         var index = $.inArray(sGroup, asExpandedGroups);
                         asExpandedGroups.splice(index, 1);
-                        $(this).removeClass("expanded-group");
-                        $(this).addClass("collapsed-group");
+                        $(this).children().first().removeClass("expanded-group");
+                        $(this).children().first().addClass("collapsed-group");
                         $(".group-item-" + sGroup, oTable).hide();
                     } else {
                         asExpandedGroups.push(sGroup);
-                        $(this).addClass("expanded-group");
-                        $(this).removeClass("collapsed-group");
+                        $(this).children().first().addClass("expanded-group");
+                        $(this).children().first().removeClass("collapsed-group");
                         $(".group-item-" + sGroup, oTable).show();
                     }
                 }
@@ -343,11 +343,12 @@
                             nCell.className += " group-item-expander";
                             //nCell.rel = sGroupCleaned;
                             $(nCell).attr('rel', sGroupCleaned); //Fix provided by mssskhalsa (Issue 5)
+                            $(nGroup).attr('rel', sGroupCleaned);
 
                             ///*************
 
 
-                           // $(nCell).click(_fnOnGroupClick);
+                            $(nGroup).click(_fnOnGroupClick);
                     
 
 
@@ -412,7 +413,6 @@
 
                 //-----End grouping
                 properties.fnOnGrouped();
-                properties.fnOnGroupedClicked = _fnOnGroupClick;
 
                 bInitialGrouping = false;
             };
