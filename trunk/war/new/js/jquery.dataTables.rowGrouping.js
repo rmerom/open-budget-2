@@ -122,7 +122,8 @@
                 return sGroup.toLowerCase().replace(/\W+/g, "-"); //Fix provided by bmathews (Issue 7)
             }
 
-            var _fnOnGroupClick = function (e) {
+            var _fnOnGroupClick= function (e) {
+            
                 ///<summary>
                 ///Function that is called when user click on the group cell in order to
                 ///expand of collapse group
@@ -170,6 +171,8 @@
                 e.preventDefault();
 
             }; //end function _fnOnGroupClick
+            
+            $.fn.fnOnGroupedClicked = _fnOnGroupClick;
 
             //var oTable = this;
             var iYearIndex = 6;
@@ -344,7 +347,7 @@
                             ///*************
 
 
-                            $(nCell).click(_fnOnGroupClick);
+                           // $(nCell).click(_fnOnGroupClick);
                     
 
 
@@ -409,6 +412,7 @@
 
                 //-----End grouping
                 properties.fnOnGrouped();
+                properties.fnOnGroupedClicked = _fnOnGroupClick;
 
                 bInitialGrouping = false;
             };

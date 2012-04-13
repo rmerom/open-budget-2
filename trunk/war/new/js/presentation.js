@@ -196,6 +196,7 @@ function refreshUI() {
 	  groupTr.append($("<td>").addClass(tdClass).text(parseInt(item.gross_used * item.weight)).attr("rel",item.code));
     row.push('<a href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>');
     groupTr.append($("<td>").addClass(tdClass).text("").attr("rel",item.code));
+    $("#group-id-output_table-"+item.code+" td").click(oTable.fnOnGroupedClicked);
     //oTable.fnAddData(row);
   });
 }
