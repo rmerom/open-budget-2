@@ -75,7 +75,7 @@ function readBuckets() {
 	   selects.append(
 	     $("<option></option>")
 	       .attr("value", bucket.id)
-	        .text(bucket.name));
+	        .text(bucket.title));
     });
     $('#bucketSaveSelect').append($("<option></option>").attr('value','').text('מחרוזת חדשה...'));
     $('#newBucketName').toggle(data.buckets.length == 0);
