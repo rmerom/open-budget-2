@@ -66,7 +66,6 @@ function readBuckets() {
   $.getJSON("/api/getuserbuckets?type=json", {}, function(data) {
     aRequest(false);
     $('#useremail').text(data.email);
-    $('#user').show();
     var selects = $('#bucketSelect,#bucketSaveSelect');
     selects.empty();
     $('#bucketManagement,#bucketSaveSelect').toggle(data.buckets.length > 0);

@@ -1,0 +1,13 @@
+/* CSS Document */
+#main_container {
+  width : 1200px;
+  margin-right : auto;
+  margin-left : auto;
+}
+#user_details_container {
+  text-align : left;
+}
+
+.center {
+  text-align : center;
+}
