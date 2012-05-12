@@ -1,6 +1,9 @@
 // Constants
 var MIN_YEAR = 1992;
 
+// Expenses for which we already warnted that their name changes over the years.
+var expensesWarned = [];
+
 $(document).ready(function() {
   $.getScript('js/number-commas-sort.js');  // Show commas thousands in numbers.
 
@@ -140,7 +143,8 @@ function refreshUI() {
 	        gross_revised: 0,
 	        gross_used: 0 };
 	    } else {
-        if (sums[code].title != item.title) {
+        if (sums[code].title != item.title && $.inArray(code, expensesWarned) == -1) {
+          expensesWarned.push(code);
           prettyAlert('שימו לב: סעיף ' + code + ' מכיל לאורך השנים תיאורים שונים.</br>' +
               'בשלב זה חוקר התקציב אינו מאפשר הפרדה אוטומטית בין שנים אלה. אנא בידקו בתקציב הפתוח אילו שנים רלוונטיות עבורכם.');
         }
