@@ -70,7 +70,6 @@ $(document).ready(function() {
 	  refreshUI();
 	});
   $('#partialWeightCb').click(function() {
-    $('#partialRow').toggle($('#partialWeightCb').val());
     $('#expense_weight').val(100);  // reset to 100%.
   });
   $(".multiselect").multiselect();  // Enable multiple select.
@@ -91,9 +90,9 @@ function numberWithCommas(x) {
 function prepareUserBuckets() {
   readBuckets(); 
   $('#loadBucketButton').click(function() {
-    var id = $('#bucketSelect').val();
+    var id = $('#bucketSaveSelect').val();
     var bucket = userBuckets[id];
-    $('#bucketSelect').val(id);
+    $('#bucketSaveSelect').val(id);
     $('#yearsSelect').val(bucket.years);
     $('#isPublicCheckbox').attr('checked', bucket.isPublic);
     $('#yearsSelect').multiselect('refresh');
