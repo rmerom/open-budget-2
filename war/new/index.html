@@ -49,37 +49,41 @@
            <span class='header_subtitle'>הסדנא לידע ציבורי</span>
         </td>
         <td width="60%" class="center">
-          <div class='header_center' style='margin-left: auto; margin-right: auto; width: 50%; text-align: center;'>
-          <span style='current_bucket_name'>המחרוזת שלך</span>
+          <div id="bucket_container">
+              <select id='bucketSelect'></select>
           </div>
         </td>
         <td width="20%" id="user_details_container">
           <a href='http://help.takziv.com' target='_blank' class="internal_link">עזרה</a>
-          <span id='useremail'></span>
+          <span id='useremail' class="reg_text"></span>
         </td>
       </tr>
     </table>
    </div>
    
-   <div id="add_expense">
+   <div id="add_expense_container">
     <div class="section_title">הוספת סעיפים</div>
-    <div class="">
+    <div id="add_expense_row">
       <span class="reg_text">מספר סעיף: </span>
+      <input type="text" id="expense_code" style='width: 90px'></input>
       <span class="reg_text">חלק יחסי: </span>
+      <input type='number' min="5" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input>
+      <input type='button' id='add_expense' value='הוסיפו'></input>
+      <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
     </div>
     <div class="">
       <span class="reg_text">כלי עזר: </span>
-      <a class="internal_link">התקציב הפתוח</a>
-      <a class="internal_link">מערכת משרד האוצר</a>
+      <a class="internal_link" href="http://budget.msh.gov.il/">התקציב הפתוח</a>
+      <a class="internal_link" href="http://religinfoserv.gov.il/magic94scripts/mgrqispi94.dll?APPNAME=budget&PRGNAME=takzivreq">מערכת משרד האוצר</a>
     </div>
    </div>
  
- <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
+ 
  
   <div id='bucketManagement'>
     <h2>המחרוזות שלי</h2>
 
-    <select id='bucketSelect'></select> 
+     
     <br/><br/>
     <input type='button' id='loadBucketButton' value='טענו' > 
     <input type='button' id='deleteBucketButton' value='מיחקו' ></input>
@@ -110,7 +114,7 @@
     <table id='add_expense_table' role='presentation'>
       <tr>
         <td style='width: 155px'>מספר סעיף:</td>
-        <td><input type="text" id="expense_code" style='width: 90px'></input></td>
+        <td></td>
         <td style='padding-right: 30px; font-size: small'>עזרים: <a href='http://budget.msh.gov.il' target='_blank'>התקציב הפתוח</a>, <a href='http://religinfoserv.gov.il/magic94scripts/mgrqispi94.dll?APPNAME=budget&PRGNAME=takzivreq' target='_blank'>מערכת משרד האוצר</a></td>
       </tr>
       <tr class='add_expense_tr'>
@@ -120,10 +124,10 @@
       </tr class='add_expense_tr'>
       <tr style='display: none' id='partialRow'>
         <td>חלק יחסי (באחוזים):</td>
-        <td><input type='number' min="5" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input></td>
+        <td></td>
       </tr>
       <tr>
-        <td><input type='button' id='add_expense' value='הוסיפו'></input></td>
+        <td></td>
       <tr>
  
     </table>

@@ -1,4 +1,8 @@
 /* CSS Document */
+body {
+  font-family: arial;
+}
+
 #main_container {
   width : 1200px;
   margin-right : auto;
@@ -16,6 +20,32 @@
   font-size: 25px;
 }
 
-#add_expense {
+#add_expense_container {
   margin-top: 20px;
+}
+
+input, select{
+  border-radius: 3px;
+  border-color: #91b9f5;
+}
+
+.reg_text{
+  font-size: 12px;
+  font-family: arial;
+}
+
+#bucket_container {
+  background-color: #ddedf2;
+  border-radius : 3px;
+  padding : 8px 3px;
+  width : 400px;
+  margin : 0px auto;
+  text-align : right;
+}
+
+#add_expense_row {
+  padding : 8px 3px;
+  background-color: #ddedf2;
+  width: 500px;
+  border-radius: 3px;
 }
