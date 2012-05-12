@@ -245,11 +245,14 @@ table.display tr.even.gradeU {
 
 
 tr.odd {
-	background-color: #E2E4FF;
+	background-color: #ebfcfa;
+	border-color: #e5e5e5;
+	border-width: 1px;
+	border-style: solid;
 }
 
 tr.even {
-	background-color: white;
+	background-color: #ebfcfa;
 }
 
 
@@ -296,9 +299,7 @@ tfoot input.search_init {
 }
 
 td.group {
-	background-color: #d1cfd0;
-	border-bottom: 2px solid #A19B9E;
-	border-top: 2px solid #A19B9E;
+	background-color: white;
 }
 
 td.details {
@@ -357,36 +358,6 @@ table.display tr.even.row_selected td {
 table.display tr.odd.row_selected td {
 	background-color: #9FAFD1;
 }
-
-
-/*
- * Sorting classes for columns
- */
-/* For the standard odd/even */
-tr.odd td.sorting_1 {
-	background-color: #D3D6FF;
-}
-
-tr.odd td.sorting_2 {
-	background-color: #DADCFF;
-}
-
-tr.odd td.sorting_3 {
-	background-color: #E0E2FF;
-}
-
-tr.even td.sorting_1 {
-	background-color: #EAEBFF;
-}
-
-tr.even td.sorting_2 {
-	background-color: #F2F3FF;
-}
-
-tr.even td.sorting_3 {
-	background-color: #F9F9FF;
-}
-
 
 /* For the Conditional-CSS grading rows */
 /*
