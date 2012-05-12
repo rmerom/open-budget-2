@@ -1,9 +1,10 @@
-.headerDiv {
+.header_div {
    background-image: linear-gradient(bottom, rgb(213,242,255) 46%, rgb(130,232,255) 73%, rgb(146,220,252) 87%);
   background-image: -o-linear-gradient(bottom, rgb(213,242,255) 46%, rgb(130,232,255) 73%, rgb(146,220,252) 87%);
   background-image: -moz-linear-gradient(bottom, rgb(213,242,255) 46%, rgb(130,232,255) 73%, rgb(146,220,252) 87%);
   background-image: -webkit-linear-gradient(bottom, rgb(213,242,255) 46%, rgb(130,232,255) 73%, rgb(146,220,252) 87%);
   background-image: -ms-linear-gradient(bottom, rgb(213,242,255) 46%, rgb(130,232,255) 73%, rgb(146,220,252) 87%);
+  height: 70px;
 
   background-image: -webkit-gradient(
 	  linear,
@@ -36,8 +37,8 @@
 }
 
 .internal_link {
-  font-size: 8px;
+  font-size: 12px;
   font-family: arial;
-  color: #1c94bd;
   margin-right: 20px;
+  color: #20a1ce;
 }
