@@ -1,8 +1,5 @@
 package com.yossale.server.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Id;
 
 public class User {
