@@ -16,10 +16,13 @@
 );
 }
 
+.alltext {
+  font-family: arial;
+}
+
 .header_title {
   font-size: 24px;
   font-weight: bold;
-  font-family: arial;
   color: #1c94bd;
   margin-right: 20px;
   text-shadow: 1px 1px gray;
@@ -28,15 +31,18 @@
 
 .header_center {
   background: #96d7f5;
+  font-size: 18px;
+  color: white;
+  text-shadow: 1px 1px lightgray;
 }
 
 .current_bucket_name {
+
 }
 
 .header_subtitle {
   font-size: 16px;
   font-weight: bold;
-  font-family: arial;
   color: #1c94bd;
   margin-right: 20px;
   text-shadow: 1px 1px gray;

@@ -33,7 +33,7 @@ import com.yossale.server.util.ConvertUtil;
  *         "id":24001,
  *         "name":"somename",
  *         "years":[2010,2011,2012],
- *         "expenses":[{"weight":1,"code":"00"}, {"weight":0.5,"code":"0001"}]
+ *         "expenses":[{"years":[2010,2011,2012], "weight":1,"code":"00"}, {"years":[2010,2011,2012], "weight":0.5,"code":"0001"}]
  *       }]}
  *   
  * @author ronme
@@ -64,7 +64,7 @@ public class GetUserBucketsServlet extends HttpServlet {
 	  	JSONObject result = new JSONObject();
 	  	result.put("email", user.getEmail());
 	  	result.put("buckets", buckets);
-	  	String outputText = ConvertUtil.jsonObjectAsformat(result, req);
+	  	String outputText = ConvertUtil.jsonObjectAsFormat(result, req);
 	  	resp.getWriter().print(outputText);
 	  } catch (JSONException e) {
 	  	resp.sendError(500, "JSONException: " + e.getMessage());

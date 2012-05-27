@@ -68,7 +68,7 @@ function readBuckets() {
     $('#useremail').text(data.email);
     var selects = $('#bucketSelect,#bucketSaveSelect');
     selects.empty();
-    $('#bucket_management,#bucketSaveSelect').toggle(data.buckets.length > 0);
+//    $('#bucket_management,#bucketSaveSelect').toggle(data.buckets.length > 0);
     $.each(data.buckets, function(i, bucket) {
      userBuckets[bucket.id] = bucket;
 	   selects.append(

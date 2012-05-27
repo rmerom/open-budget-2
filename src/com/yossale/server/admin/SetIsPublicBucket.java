@@ -66,7 +66,7 @@ public class SetIsPublicBucket extends HttpServlet {
 	  	resp.setContentType("text/html; charset=UTF-8");
 	  	JSONObject result = new JSONObject();
 	  	result.put("bucket", ConvertUtil.bucketToJson(bucket));
-	  	String outputText = ConvertUtil.jsonObjectAsformat(result, req);
+	  	String outputText = ConvertUtil.jsonObjectAsFormat(result, req);
 	  	resp.getWriter().print("changed this bucket: <br/>" + outputText);
 	  } catch (JSONException e) {
 	  	resp.sendError(500, "JSONException: " + e.getMessage());
