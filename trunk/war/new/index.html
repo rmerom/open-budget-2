@@ -38,7 +38,7 @@
 
     </script>
   </head>
-  <body dir='rtl' class='hebrew'>
+ <body dir='rtl' class='hebrew alltext'>
  <div id="main_container" class="header_div">
    <div id="top_row">
     <table width="100%">
@@ -49,12 +49,26 @@
            <span class='header_subtitle'>הסדנא לידע ציבורי</span>
         </td>
         <td width="60%" class="center">
+
+          <div class='header_center' style='margin-left: auto; margin-right: auto; width: 50%;'>
+          <table width='100%'>
+            <tr>
+              <td>
+                <span style='current_bucket_name'>המחרוזת שלך</span>
+              </td>
+              <td>
+                <select id='bucketSelect'></select>
+              </td>
+            </tr>
+          </table>
+
           <div id="bucket_management">
               <select id='bucketSaveSelect'></select>
               <input type='text' id='newBucketName' placeholder='שם המחרוזת החדשה'></input>
               <input type='button' id='saveBucketButton' value='שימרו' ></input>
               <input type='button' id='loadBucketButton' value='טענו' />
               <input type='button' id='deleteBucketButton' value='מיחקו' />
+
           </div>
         </td>
         <td width="20%" id="user_details_container">
@@ -83,6 +97,17 @@
    </div>
  
  
+  <div id='bucketManagement'>
+    <h2>המחרוזות שלי</h2>
+
+    <input type='button' id='loadBucketButton' value='טענו' > 
+    <input type='button' id='deleteBucketButton' value='מיחקו' ></input>
+    <br/><br/>
+
+    <hr/>
+  </div>
+  <h2>עריכת מחרוזת נוכחית</h2>
+  <h3>מאפייני מחרוזת</h2>
   <div id="bucket">
     <span style='vertical-align: center'><p>
 		  שנים רלוונטיות

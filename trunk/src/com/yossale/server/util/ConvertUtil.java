@@ -19,6 +19,15 @@ public class ConvertUtil {
 
 	private static Logger logger = Logger.getLogger(ConvertUtil.class.getName());
 
+	/**
+	 * NOTE: The old API returned years for the whole bucket, and this is what the client currently uses.
+	 * The new API supports different years for different expenses, and this is what the external clients
+	 * use for GetAllPublickBuckets.
+	 * For the time being, we generate both here. 
+	 * TODO(rmerom): if required, change the datastore objects to support per-expense years, and drop
+	 * the per-bucket years (after updating the client).
+	 * and deprecate the per-bucket years.  
+	 */
 	public static JSONObject bucketToJson(Bucket bucket) {
 		JSONObject jsonBucket = new JSONObject();
 		try {
@@ -27,18 +36,20 @@ public class ConvertUtil {
 			if (bucket.getIsPublic()) {
 				jsonBucket.put("isPublic", bucket.getIsPublic());
 			}
+			jsonBucket.put("years", bucket.getYears());
+			
 			JSONArray expenses = new JSONArray();
 			for (Expense expense : bucket.getExpenses()) {
 				JSONObject jsonExpense = new JSONObject();
 				jsonExpense.put("code", expense.getExpenseCode());
-				JSONArray years = new JSONArray();
+				JSONArray yearsAndWeights = new JSONArray();
 				for (int year : bucket.getYears()) {
 					JSONObject yearAndWeight = new JSONObject();
 					yearAndWeight.put("year", year);
 					yearAndWeight.put("weight", expense.getRatio());
-					years.put(yearAndWeight);
+					yearsAndWeights.put(yearAndWeight);
 				}
-				jsonExpense.put("years", years);
+				jsonExpense.put("years", yearsAndWeights);
 				expenses.put(jsonExpense);
 			}
 			jsonBucket.put("expenses", expenses);
@@ -59,7 +70,7 @@ public class ConvertUtil {
 	 * "callback" is the method to call when format is "jsonp". 
 	 * Otherwise it's not used.   
 	 */
-	public static String jsonObjectAsformat(Object object, HttpServletRequest req) {
+	public static String jsonObjectAsFormat(Object object, HttpServletRequest req) {
 		String format = req.getParameter("format");
 		if (format != null && format.equals("jsonp")) {
 			String callback = req.getParameter("callback");

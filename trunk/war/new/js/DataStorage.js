@@ -12,7 +12,6 @@ DataStorage.retrieveData = function(expenseCodes, callback) {
     "query" : JSON.stringify(query)
   }).success(function(data) {
     aRequest(false);
-    callback(expenseCodes, data);
     callback(data);
   }).error(function() {
     alert('שגיאה בהתחברות למחסן הנתונים');
