@@ -324,10 +324,19 @@ function generateGraph(containerName, sumsByYearMap) {
                 }
             },
             tooltip: {
-                formatter: function() {
-                    return ''+
-                        this.x +': '+ Highcharts.numberFormat(this.y, 0, ',');
-                }
+                "shared": true,                
+                "formatter": function() {
+                	var text = '';
+                	$.each(this.points, function(i, point) {
+                		text += '<br/><span style="color:' + point.series.color + '">' + point.series.name + ': ' + '</span><strong>' + point.y + '</strong>';
+                	});
+                	text += '</span>';
+
+                	$('#mock').html(text);
+
+                	return text;
+                },
+                useHTML: true
             },
             plotOptions: {
                 area: {
