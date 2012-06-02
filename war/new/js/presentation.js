@@ -93,6 +93,7 @@ function prepareUserBuckets() {
     var id = $('#bucketSaveSelect').val();
     var bucket = userBuckets[id];
     $('#bucketSaveSelect').val(id);
+    $('#current_bucket_span').text(bucket.title);
     $('#yearsSelect').val(bucket.years);
     $('#isPublicCheckbox').attr('checked', bucket.isPublic);
     $('#yearsSelect').multiselect('refresh');
