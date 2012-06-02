@@ -154,17 +154,13 @@ function refreshUI() {
 			}
 		}
 		
-	    item.net_allocated = parseInt(item.net_allocated);
-	    item.net_revisited = parseInt(item.net_revisited);
-	    item.net_used = parseInt(item.net_used);
-	    item.gross_revised = parseInt(item.gross_revised);
+	    item.net_allocated = nanZero(parseInt(item.net_allocated));
+	    item.net_revisited = nanZero(parseInt(item.net_revisited));
+	    item.net_used = nanZero(parseInt(item.net_used));
+	    item.gross_revised = nanZero(parseInt(item.gross_revised));
 	    
 		//Yossi: compute the expenses by year
-		if (!sumsByYear[year]) {
-        	sumsByYear[year] = 0;
-        }
-        sumsByYear[year] += expense.weight * nanZero(item.net_allocated)       
-		//Yossi - end section
+		updateSumByYears(sumsByYear, year, expense.weight, item)
 		
 		var currentSums = sums[code];
 	    currentSums.net_allocated += nanZero(item.net_allocated);
@@ -219,6 +215,22 @@ function refreshUI() {
   
 }
 
+function updateSumByYears(sumsByYear, year, expenseWeight, item) {
+	if (!sumsByYear[year]) {
+		sumsByYear[year] = {
+			net_allocated : 0,
+			net_revisited : 0,
+			net_used : 0,
+			gross_revised : 0,
+		};
+	}
+	var sums = sumsByYear[year]
+	sums.net_allocated += expenseWeight * parseInt(item.net_allocated);
+	sums.net_revisited += expenseWeight * parseInt(item.net_revisited);
+	sums.net_used += expenseWeight * parseInt(item.net_used);
+	sums.gross_revised += expenseWeight * parseInt(item.gross_revised);
+}
+
 function aRequest(isStart) {
   if (isStart) 
     ++reqCounter;
@@ -260,17 +272,27 @@ function prettyAlert(msg) {
 
 function generateGraph(containerName, sumsByYearMap) {
 	
-	var xCategories = Object.keys(sumsByYearMap).sort()
-	//Currently I'm only using 1 series - net allocated. but later I'll have to add some more
-	var netValueSeries = jQuery.map(xCategories, function(n) {
-      return (sumsByYearMap[n]);
-    });
-	
-	var graphInfo = { 
-			name: 'NetValue',
-	        data: netValueSeries
+	if(typeof sumsByYearMap === "undefined") {
+		return;
 	}
-	 
+	
+	var years = Object.keys(sumsByYearMap).sort();
+		
+	var graphData = [];
+	
+	var someYear = sumsByYearMap[years[0]];
+	
+	for (property in someYear) {
+		var values = [];
+		for (var i = 0; i < years.length; i++) {
+			var curVal = sumsByYearMap[years[i]];
+			if (curVal) {
+				values.push(curVal[property]);
+			}
+		}		
+		graphData.push ({name: property, data: values});
+	}
+		 
 	chart = new Highcharts.Chart({
             chart: {
                 renderTo: containerName,
@@ -283,7 +305,7 @@ function generateGraph(containerName, sumsByYearMap) {
                 text: 'כותרת משנה'
             },
             xAxis: {
-                categories: xCategories,
+                categories: years,
                 tickmarkPlacement: 'on',
                 title: {
                     // enabled: false
@@ -292,18 +314,19 @@ function generateGraph(containerName, sumsByYearMap) {
             },
             yAxis: {
                 title: {
-                    text: 'שח'
+                    text: 'באלפי שח'
                 },
                 labels: {
-//                    formatter: function() {
-//                        return this.value / 1000;
-//                    }
+                    formatter: function() {
+                        //return this.value / 1000;
+						return Highcharts.numberFormat(this.value, 0, ',')
+                    }
                 }
             },
             tooltip: {
                 formatter: function() {
                     return ''+
-                        this.x +': '+ Highcharts.numberFormat(this.y, 0, ',') +' millions';
+                        this.x +': '+ Highcharts.numberFormat(this.y, 0, ',');
                 }
             },
             plotOptions: {
@@ -317,7 +340,7 @@ function generateGraph(containerName, sumsByYearMap) {
                     }
                 }
             },
-            series: [graphInfo]
+            series: graphData
         });
 
 }
