@@ -56,3 +56,10 @@
   color: #20a1ce;
 }
 
+.left_div {
+  float: left;
+}
+
+#years_div {
+  width: 50%;
+}
