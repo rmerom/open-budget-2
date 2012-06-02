@@ -21,11 +21,14 @@ div {
 }
 
 .section_title {
+  margin-top: 15px;
   font-size : 25px;
+  clear: both;
 }
 
 #add_expense_container {
   margin-top : 20px;
+  width: 50%;
 }
 
 input, select{
