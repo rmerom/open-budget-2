@@ -42,6 +42,7 @@ public class ConvertUtil {
 			for (Expense expense : bucket.getExpenses()) {
 				JSONObject jsonExpense = new JSONObject();
 				jsonExpense.put("code", expense.getExpenseCode());
+				jsonExpense.put("weight", expense.getRatio());
 				JSONArray yearsAndWeights = new JSONArray();
 				for (int year : bucket.getYears()) {
 					JSONObject yearAndWeight = new JSONObject();

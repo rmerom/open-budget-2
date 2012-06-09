@@ -33,9 +33,12 @@ import com.yossale.server.util.ConvertUtil;
  *         "id":24001,
  *         "name":"somename",
  *         "years":[2010,2011,2012],
- *         "expenses":[{"years":[2010,2011,2012], "weight":1,"code":"00"}, {"years":[2010,2011,2012], "weight":0.5,"code":"0001"}]
+ *         "expenses":[{"years":[{year: 2010, weight: 0.9}, {year: 2011, weight: 0.9}], "weight":1,"code":"00"}, {"years":[{year: 2010, weight: 0.5}, {year: 2011, weight: 0.5}], "weight":0.5,"code":"0001"}]
  *       }]}
- *   
+ *
+ * Note that currently we have weight both at the expense level, and at the expense/year level. We currently support weight
+ * only at the level of expense, but some clients need weight on the expense/year level, so we duplicate
+ * the weight throughout the years. 
  * @author ronme
  */
 public class GetUserBucketsServlet extends HttpServlet {
