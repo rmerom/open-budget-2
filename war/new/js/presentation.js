@@ -212,7 +212,7 @@ function refreshUI() {
 			'<span href="javascript:deleteExpense(\'' + item.code + '\')">מחקו</a>'));
   });
   generateGraph('expenses_graph', sumsByYear);
-  
+  generateGraphByExpenses('expenses_graph_by_expense');
 }
 
 function updateSumByYears(sumsByYear, year, expenseWeight, item) {
@@ -269,6 +269,99 @@ function prettyAlert(msg) {
 	$("#msgBox").append(msg);
 	$("#msgBox").dialog('open');
 }
+
+function generateGraphByExpenses(containerName) {
+
+  if (typeof expensesByCodeThenYear === "undefined") {
+    return;
+  }
+
+  var expenses = []
+
+  var years = $('#yearsSelect').val().sort();
+
+  var graphData = [];
+
+  for (code in expensesByCodeThenYear) {
+    var expense = expensesByCodeThenYear[code];
+    var values = []
+    for (i in years) {
+      var item = expense.years[years[i]];
+      if (typeof item === "undefined") {
+        continue;
+      }
+      var netUsed = expense.weight * nanZero(parseInt(item.net_used));
+      values.push(netUsed);
+    }
+    graphData.push({
+      name : code,
+      data : values
+    });
+  }
+
+  chart = new Highcharts.Chart({
+    chart : {
+      renderTo : containerName,
+      type : 'area'
+    },
+    title : {
+      text : 'ניצול סעיפים לפי שנים'
+    },
+    subtitle : {
+      text : 'חתך לפי מספרי סעיפים'
+    },
+    xAxis : {
+      categories : years,
+      tickmarkPlacement : 'on',
+      title : {
+        // enabled: false
+        text : 'שנים'
+      }
+    },
+    yAxis : {
+      title : {
+        text : 'באלפי שח'
+      },
+      labels : {
+        formatter : function() {
+          // return this.value / 1000;
+          return Highcharts.numberFormat(this.value, 0, ',')
+        }
+      }
+    },
+    tooltip : {
+      "shared" : true,
+      "formatter" : function() {
+        var text = '';
+        $.each(this.points, function(i, point) {
+          text += '<br/><span style="color:' + point.series.color + '">'
+              + point.series.name + ': ' + '</span><strong>' + point.y
+              + '</strong>';
+        });
+        text += '</span>';
+
+        $('#mock').html(text);
+
+        return text;
+      },
+      useHTML : true
+    },
+    plotOptions : {
+      area : {
+        stacking : 'normal',
+        lineColor : '#666666',
+        lineWidth : 1,
+        marker : {
+          lineWidth : 1,
+          lineColor : '#666666'
+        }
+      }
+    },
+    series : graphData
+  });
+
+}
+
 
 function generateGraph(containerName, sumsByYearMap) {
 	
