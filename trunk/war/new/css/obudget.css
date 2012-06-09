@@ -63,3 +63,25 @@
 #years_div {
   width: 50%;
 }
+
+a.hasadna{
+  float:left;
+  display:block;
+}
+
+#footer span{
+  font-size:1.2em;
+  margin-left:10px;
+  line-height:40px;
+  color:#243d7e;
+}
+
+#footer a.hasadna{
+  float:left;
+  display:block;
+}
+
+#footer{
+  background:#eef7f9;height:40px;position:relative;text-align:left;padding:3px 10px; margin-top: 30px;
+  position:absolute; bottom:10px; left: 0; width: 450px;
+}

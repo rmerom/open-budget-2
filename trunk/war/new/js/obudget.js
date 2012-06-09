@@ -43,7 +43,7 @@ function saveBucket() {
 }
 
 function deleteBucket() {
-  var bucketId = $('#bucketSelect').val();
+  var bucketId = $('#bucketSaveSelect').val();
   if (bucketId == '') {
     prettyAlert('אנא ביחרו איזו מחרוזת למחוק');
     return;
@@ -66,7 +66,7 @@ function readBuckets() {
   $.getJSON("/api/getuserbuckets?type=json", {}, function(data) {
     aRequest(false);
     $('#useremail').text(data.email);
-    var selects = $('#bucketSelect,#bucketSaveSelect');
+    var selects = $('#bucketSaveSelect');
     selects.empty();
 //    $('#bucket_management,#bucketSaveSelect').toggle(data.buckets.length > 0);
     $.each(data.buckets, function(i, bucket) {
@@ -86,7 +86,9 @@ function readBuckets() {
 function addBucketExpenses(expenses, data) {
   // Translate expenses into a map.
   var expenseMap = {};
-  $.each(expenses, function(i, expense) { expenseMap[expense.code] = expense.weight });
+  $.each(expenses, function(i, expense) { 
+    expenseMap[expense.code] = expense.weight 
+  });
 
   // Add actual expenses.
   $.each(data, function(i, item) {

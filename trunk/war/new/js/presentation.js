@@ -93,7 +93,7 @@ function prepareUserBuckets() {
   $('#loadBucketButton').click(function() {
     var id = $('#bucketSaveSelect').val();
     var bucket = userBuckets[id];
-    $('#bucketSaveSelect').val(id);
+    $('#loadBucketButton').toggle(id != '');
     $('#current_bucket_span').text(bucket.title);
     $('#yearsSelect').val(bucket.years);
     $('#isPublicCheckbox').attr('checked', bucket.isPublic);

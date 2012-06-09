@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/oobudget.css" type="text/css">
     <link rel="stylesheet" href="css/jquery.multiselect.css" type="text/css">
     <link rel="stylesheet" href="css/jquery.dataTables.rowGrouping.css" type="text/css">
-		<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/eggplant/jquery-ui.css" />
+      <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/eggplant/jquery-ui.css" />
     <style type="text/css" title="currentStyle">
       @import "/table/media/css/demo_page.css";
       @import "/table/media/css/demo_table.css";
@@ -40,82 +40,86 @@
     </script>
   </head>
  <body dir='rtl' class='hebrew alltext'>
-   <div id="main_container" class="header_div">
-     <div id="top_row">
-      <table width="100%">
-        <tr>
-          <td width="20%">
-            <span class='header_title'>חוקר התקציב</span>
-             <br/>
-             <span class='header_subtitle'>הסדנא לידע ציבורי</span>
-          </td>
-          <td width="60%" class="center">
+   <div id='main_container'>
+     <div id="main_header_container" class="header_div">
+       <div id="top_row">
+        <table width="100%">
+          <tr>
+            <td width="20%">
+              <span class='header_title'>חוקר התקציב</span>
+               <br/>
+               <span class='header_subtitle'>הסדנא לידע ציבורי</span>
+            </td>
+            <td width="60%" class="center">
 
+              <div id="bucket_management">
+                  <span style='current_bucket_name' id='current_bucket_span'>מחרוזת חדשה</span>
+                  <select id='bucketSaveSelect'></select>
+                  <input type='text' id='newBucketName' placeholder='שם המחרוזת החדשה'></input>
+                  <input type='button' id='saveBucketButton' value='שימרו' ></input>
+                  <input type='button' id='loadBucketButton' value='טענו' />
+                  <input type='button' id='deleteBucketButton' value='מיחקו' />
 
-            <div id="bucket_management">
-                <span style='current_bucket_name' id='current_bucket_span'>מחרוזת חדשה</span>
-                <select id='bucketSelect'></select>
-                <select id='bucketSaveSelect'></select>
-                <input type='text' id='newBucketName' placeholder='שם המחרוזת החדשה'></input>
-                <input type='button' id='saveBucketButton' value='שימרו' ></input>
-                <input type='button' id='loadBucketButton' value='טענו' />
-                <input type='button' id='deleteBucketButton' value='מיחקו' />
-
-            </div>
-          </td>
-          <td width="20%" id="user_details_container">
-            <a href='http://help.takziv.com' target='_blank' class="internal_link">עזרה</a>
-            <span id='useremail' class="reg_text"></span>
-          </td>
-        </tr>
-      </table>
-     </div>
-     
-    <div id="years_div" class="left_div">
-      <span style='vertical-align: center'><p>
-		    שנים רלוונטיות
-		    <select id='yearsSelect' class="multiselect" multiple=multiple'></select>
-        <span id='yearsText' style='font-size: small'></span>
-      </p></span>
-      <p>
-        <input type='checkbox' id='isPublicCheckbox'></input><label for='isPublicCheckbox'>מחרוזת זו הינה ציבורית</label>
-      </p>
-    </div>
-
-    <div id="add_expense_container" class='left_div'>
-      <div class="section_title">הוספת סעיפים</div>
-      <div id="add_expense_row">
-        <span class="reg_text">מספר סעיף: </span>
-        <input type="text" id="expense_code" style='width: 90px'></input>
-        <span class="reg_text">חלק יחסי: </span>
-        <input type='number' min="5" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input>
-        <input type='button' id='add_expense' value='הוסיפו'></input>
-        <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
+              </div>
+            </td>
+            <td width="20%" id="user_details_container">
+              <a href='http://help.takziv.com' target='_blank' class="internal_link">עזרה</a>
+              <span id='useremail' class="reg_text"></span>
+            </td>
+          </tr>
+        </table>
+       </div>
       </div>
-      <div class="">
-        <span class="reg_text">כלי עזר: </span>
-        <a class="internal_link" href="http://budget.msh.gov.il/">התקציב הפתוח</a>
-        <a class="internal_link" href="http://religinfoserv.gov.il/magic94scripts/mgrqispi94.dll?APPNAME=budget&PRGNAME=takzivreq">מערכת משרד האוצר</a>
+       
+      <div id="years_div" class="left_div">
+        <span style='vertical-align: center'><p>
+              שנים רלוונטיות
+          <select id='yearsSelect' class="multiselect" multiple=multiple'></select>
+          <span id='yearsText' style='font-size: small'></span>
+        </p></span>
+        <p>
+          <input type='checkbox' id='isPublicCheckbox'></input><label for='isPublicCheckbox'>מחרוזת זו הינה ציבורית</label>
+        </p>
       </div>
-    </div>	  
-		
+
+      <div id="add_expense_container" class='left_div'>
+        <div class="section_title">הוספת סעיפים</div>
+        <div id="add_expense_row">
+          <span class="reg_text">מספר סעיף: </span>
+          <input type="text" id="expense_code" style='width: 90px'></input>
+          <span class="reg_text">חלק יחסי: </span>
+          <input type='number' min="5" max="100" step="5" id='expense_weight' style='width: 80px' value='100'></input>
+          <input type='button' id='add_expense' value='הוסיפו'></input>
+          <img id='spinner' src='../images/ajax_spinner.gif' width='25' style='display: none'></img>
+        </div>
+        <div class="">
+          <span class="reg_text">כלי עזר: </span>
+          <a class="internal_link" href="http://budget.msh.gov.il/">התקציב הפתוח</a>
+          <a class="internal_link" href="http://religinfoserv.gov.il/magic94scripts/mgrqispi94.dll?APPNAME=budget&PRGNAME=takzivreq">מערכת משרד האוצר</a>
+        </div>
+      </div>
+
+      <!-- need this just for clear: both -->
+      <div style='clear:both'></div>
+      <div class="section_title">סעיפים</div>
+      <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
+
     <!-- need this just for clear: both -->
     <div style='clear:both'></div>
     
-	<div id="expenses_graph" style="direction:ltr">
-	   <p>Here be Graphs!</p>
+	  <div id="expenses_graph" style="direction:ltr">
     </div>
 	
-	<div class="section_title">סעיפים</div>
-    <table cellpadding="0" cellspacing="0" border="0" class="display hebrew" id="output_table"></table>
-
-    <h2>עריכת מחרוזת נוכחית</h2>
-    <h3>מאפייני מחרוזת</h2>
-    
-    <script src='js/obudget.js'></script>
-    <script src='js/presentation.js'></script>
-    <script src='js/DataStorage.js'></script>
-    
+      <script src='js/obudget.js'></script>
+      <script src='js/presentation.js'></script>
+      <script src='js/DataStorage.js'></script>
+      
+      <div style='clear:both'></div><div></div>
+    </div>
+    <div id='footer'>
+      <span>פרוייקט נוסף מבית</span>
+      <a href="http://www.hasadna.org.il/" target="_blank" class="hasadna"><img src="img/hasadna-badge.png"></a>
+    </div>
     </div>
   </body>
 </html>
